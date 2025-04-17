@@ -1,0 +1,35 @@
+{
+  "HomePage": {
+    "title": "Xin chao!",
+    "about": "Go to the about page"
+  },
+  "Register":{
+    "welcome": "Welcome to the English learning system",
+    "register": "Register",
+    "or": "Or",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone number",
+    "gender": "Gender",
+    "nation": "Nation",
+    "password": "Password",
+    "retypePassword": "Retype password",
+    "verificationCode": "Verification code",
+    "namePlaceholder": "Enter your name here",
+    "emailPlaceholder": "Enter your email here",
+    "phonePlaceholder": "Enter your phone number here",
+    "passwordPlaceholder": "Enter your password here",
+    "retypePasswordPlaceholder": "Retype your password here",
+    "verificationCodePlaceholder": "Enter the verification code",
+    "registerButton": "Register",
+    "googleLogin": "Google",
+    "facebookLogin": "Facebook"
+  },
+  "Dashboard": {
+    "title": "Xin chao!",
+    "about": "Go to the about page"
+  }
+
+}

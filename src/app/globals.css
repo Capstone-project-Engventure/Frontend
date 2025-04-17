@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Tailwind v4 has changed */
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
