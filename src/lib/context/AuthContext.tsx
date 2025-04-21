@@ -21,18 +21,27 @@ interface DecodedToken {
   // nbf?: number;
   scope: string[] | string;
 }
+
+interface User {
+  id: string;
+  email: string;
+  role: "user" | "admin";
+};
+
+
 // username: string | null;
 interface AuthContextProps {
   tokenInfo: TokenInfo | null;
   setTokenInfo: (info: TokenInfo) => void;
   reset: () => void;
+  user:User|null;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [tokenInfo, setTokenInfoState] = useState<TokenInfo | null>(null);
-
+  const [user, setUser] = useState<User|null>(null)
   const setTokenInfo = ({
     accessToken,
     refreshToken,
@@ -59,13 +68,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role: role,
     };
 
+    const cookieOptions = "path=/; secure; samesite=lax; max-age=2592000";
+    document.cookie = `accessToken=${accessToken}; ${cookieOptions}`;
+    document.cookie = `refreshToken=${refreshToken}; ${cookieOptions}`;
+  
+
     setTokenInfoState(tokenInfo);
   };
   const reset = () => {
     setTokenInfoState(null);
+    setUser(null);
+  
+    // Remove cookies by setting empty value and expired date
+    document.cookie = "accessToken=; path=/;";
+    document.cookie = "refreshToken=; path=/;";
   };
   return (
-    <AuthContext.Provider value={{ tokenInfo, setTokenInfo, reset }}>
+    <AuthContext.Provider value={{ tokenInfo, setTokenInfo, reset , user}}>
       {children}
     </AuthContext.Provider>
   );

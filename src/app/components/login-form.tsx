@@ -2,7 +2,7 @@
 import Image from "next/image";
 const BackgroundImg = "/english_app_background.jpg";
 import { MdOutlineEmail, MdLockOutline } from "react-icons/md";
-// import { LuEye, LuEyeClosed } from "react-icons/lu";
+import { LuEye, LuEyeClosed } from "react-icons/lu";
 import GoogleButton from "./google-button";
 import FacebookButton from "./facebook-button";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
@@ -28,6 +28,8 @@ export default function LoginForm() {
     password: "",
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -37,16 +39,19 @@ export default function LoginForm() {
     try {
       e.preventDefault();
       console.log("Form submitted:", loginForm);
-      const formData = new FormData()
-      formData.append("username", loginForm.email)
-      formData.append("password", loginForm.password)
-      const res = await api.post("/users/login",formData);
+      const formData = new FormData();
+      formData.append("username", loginForm.email);
+      formData.append("password", loginForm.password);
+      const res = await api.post("/users/login", formData);
       if (res.status == 200) {
         const { access_token, refresh_token } = res.data;
         if (access_token && refresh_token) {
-          setTokenInfo({ accessToken:access_token, refreshToken:refresh_token });
+          setTokenInfo({
+            accessToken: access_token,
+            refreshToken: refresh_token,
+          });
         }
-        router.push("/my-course");
+        router.push("/student/my-course");
         // const data = await res.json();
 
         // setAccessToken(data.access_token);
@@ -131,16 +136,22 @@ export default function LoginForm() {
                         <MdLockOutline />
                       </div>
                       <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         name="password"
-                        className="block grow py-1.5 pl-1 pr-3 w-full text-base text-gray-900 placeholder:text-gray-400"
+                        className="block grow py-1.5 pl-1 pr-3 w-full text-base text-black placeholder:text-gray-400"
                         placeholder="Nhập mật khẩu tại đây"
                         value={loginForm.password || ""}
                         onChange={handleChange}
                       />
-                      {/* <div className="left-auto text-base text-gray-500">
-                        <LuEyeClosed />
-                      </div> */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowPassword((prev) => !prev);
+                        }}
+                        className="left-auto text-base text-gray-500 relative items-center"
+                      >
+                        {showPassword ? <LuEyeClosed /> : <LuEye />}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -190,7 +201,7 @@ export default function LoginForm() {
                   </FacebookButton>
                 </div>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400 text-center">
-                  Bạn chưa có tài khoản?{" "}
+                  Bạn chưa có tài khoản?
                   {/* <a
                     href="/register"
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
