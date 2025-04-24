@@ -8,14 +8,14 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const {tokenInfo} = useAuth();
-  const router = useRouter()
-  // const [isAuthenticated,setIsAuthenticated]= useState(false);
+  const router = useRouter();
   useEffect(()=>{
-    if(tokenInfo && tokenInfo.accessToken){
-      // setIsAuthenticated(true);
+    console.log("tokenInfo: ", tokenInfo);
+    
+    if(tokenInfo?.accessToken){
       router.push("/student/user-profile")
     }
-  },[]) 
+  },[tokenInfo,]) 
   return (
     <LoginForm />
   );

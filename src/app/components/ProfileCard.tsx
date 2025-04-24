@@ -27,7 +27,7 @@ export default function ProfileCard() {
     phone: "",
     gender: "male",
     level: "",
-    nation:"",
+    nation: "",
     address: "",
     password: "",
   });
@@ -40,11 +40,14 @@ export default function ProfileCard() {
 
   const handleGenderChange = (value: GenderEnum) => {
     setProfileForm((prev) => ({
-        ...prev,
-        gender: value,
-      }));
-    };
-  
+      ...prev,
+      gender: value,
+    }));
+  };
+
+  const handleSaveProfile =()=>{
+
+  }
 
   return (
     <div>
@@ -98,11 +101,13 @@ export default function ProfileCard() {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <form className="space-y-4 md:space-y-6">
-              <div className="grid grid-cols-12 gap-2">
+            <form className="space-y-4 md:space-y-6 mt-4 md:w-2/3">
+              <div className="grid md:grid-cols-12 gap-2 grid-cols-1">
                 {/*  Name */}
                 <div className="col-span-6 gap-2">
-                  <label className="block text-sm text-gray-900">Tên học viên</label>
+                  <label className="block text-sm text-gray-900">
+                    Tên học viên
+                  </label>
                   <div className="mt-2">
                     <div className="flex items-center border border-gray-300 rounded-lg pl-3">
                       <div className="shrink-0 text-base text-gray-500 items-center gap-1 border-r-1 pr-1 select-none">
@@ -140,10 +145,12 @@ export default function ProfileCard() {
                 </div>
               </div>
               {/* Birth & Phone */}
-              <div className="grid grid-cols-12 gap-2">
+              <div className="grid md:grid-cols-12 gap-2 grid-cols-1">
                 {/*  Birth */}
                 <div className="col-span-6 gap-2">
-                  <label className="block text-sm text-gray-900">Ngày sinh</label>
+                  <label className="block text-sm text-gray-900">
+                    Ngày sinh
+                  </label>
                   <div className="mt-2">
                     <div className="flex items-center border border-gray-300 rounded-lg pl-3">
                       <div className="shrink-0 text-base text-gray-500 items-center gap-1 border-r-1 pr-1 select-none">
@@ -181,10 +188,12 @@ export default function ProfileCard() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-12 gap-2">
+              <div className="grid md:grid-cols-12 gap-2 grid-cols-1">
                 {/*  Gender */}
                 <div className="col-span-6 gap-2">
-                  <label className="block text-sm text-gray-900">Giới tính</label>
+                  <label className="block text-sm text-gray-900">
+                    Giới tính
+                  </label>
                   <div className="mt-2">
                     <div className="flex items-center border border-gray-300 rounded-lg pl-3">
                       <div className="shrink-0 text-base text-gray-500 items-center gap-1 border-r-1 pr-1 select-none">
@@ -192,10 +201,10 @@ export default function ProfileCard() {
                       </div>
 
                       <GenderSelect
-                            className="block grow py-1.5 pl-1 pr-3 w-full text-base text-gray-900 placeholder:text-gray-400"
-                            value={profileForm.gender}
-                            onChange={handleGenderChange}
-                          />
+                        className="block grow py-1.5 pl-1 pr-3 w-full text-base text-gray-900 placeholder:text-gray-400"
+                        value={profileForm.gender}
+                        onChange={handleGenderChange}
+                      />
                       {/* <input
                         type="date"
                         name="dateOfBirth"
@@ -209,7 +218,9 @@ export default function ProfileCard() {
                 </div>
                 {/*  Nation */}
                 <div className="col-span-6 gap-2">
-                  <label className="block text-sm text-gray-900">Quốc gia</label>
+                  <label className="block text-sm text-gray-900">
+                    Quốc gia
+                  </label>
                   <div className="mt-2">
                     <div className="flex items-center border border-gray-300 rounded-lg pl-3">
                       <div className="shrink-0 text-base text-gray-500 items-center gap-1 border-r-1 pr-1 select-none">
@@ -246,9 +257,11 @@ export default function ProfileCard() {
                   </div>
                 </div>
               </div>
-               {/*  Address */}
-               <div className="gap-2">
-                <label className="block text-sm text-gray-900">Địa chỉ cụ thể</label>
+              {/*  Address */}
+              <div className="gap-2">
+                <label className="block text-sm text-gray-900">
+                  Địa chỉ cụ thể
+                </label>
                 <div className="mt-2">
                   <div className="flex items-center border border-gray-300 rounded-lg pl-3">
                     <div className="shrink-0 text-base text-gray-500 items-center gap-1 border-r-1 pr-1 select-none">
@@ -264,6 +277,14 @@ export default function ProfileCard() {
                     />
                   </div>
                 </div>
+              </div>
+              <div className="flex flex-row">
+                <button type="submit" className="px-2 py-3 bg-gray-400 text-white rounded-md" onClick={handleSaveProfile}>
+                  Lưu thông tin
+                </button>
+                <button type="button" className="px-2 py-3 bg-white text-gray-400 border border-gray-400 rounded-md ml-3">
+                  Yêu cầu xóa tài khoản
+                </button>
               </div>
             </form>
           </TabPanel>

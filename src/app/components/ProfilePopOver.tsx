@@ -9,9 +9,12 @@ import Link from "next/link";
 import { Component, useState } from "react";
 import { HiUserCircle } from "react-icons/hi";
 import Image from "next/image";
-import { MdArrowDropDown, MdArrowDropUp } from "react-icons/md";
-
+import { MdArrowDropDown, MdArrowDropUp, MdLogout } from "react-icons/md";
+import { useAuth } from "@/lib/context/AuthContext";
+import { useRouter } from "next/navigation";
 export default function ProfilePopOVer() {
+  const router = useRouter();
+  const { reset } = useAuth();
   const items = [
     {
       label: "Thông tin cá nhân",
@@ -28,13 +31,17 @@ export default function ProfilePopOVer() {
       icon: HiUserCircle,
       href: "/settings",
     },
-    {
-      label: "Đăng xuất",
-      icon: HiUserCircle,
-      href: "/logout",
-    },
+    // {
+    //   label: "Đăng xuất",
+    //   icon: HiUserCircle,
+    //   href: "/logout",
+    // },
   ];
   const [isShowProfile, setIsShowProfile] = useState(false);
+  const handleLogout = () => {
+    reset();
+    router.push("/")
+  };
   const toggleProfile = () => {
     setIsShowProfile(!isShowProfile);
   };
@@ -66,10 +73,19 @@ export default function ProfilePopOVer() {
                     key={index}
                   >
                     <span className="text-black col-span-3">{item.label}</span>
-                    <Icon className="w-6 h-6 col-span-1 text-black"/>
+                    <Icon className="w-6 h-6 col-span-1 text-black" />
                   </Link>
                 );
               })}
+            </div>
+            <div>
+              <button
+                type="button"
+                className="grid grid-cols-4 px-3 py-2 gap-2 bg-white items-center"
+                onClick={handleLogout}
+              >
+                <span className="text-black col-span-3 ">Đăng xuất</span> <MdLogout className="w-6 h-6 col-span-1 text-black"/>
+              </button>
             </div>
           </PopoverPanel>
         </Transition>

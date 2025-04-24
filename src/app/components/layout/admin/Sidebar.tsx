@@ -16,35 +16,35 @@ export default function Sidebar() {
     {
       label: "Thống kê",
       icon: MdOutlineBarChart,
-      href: "/student/statistic",
+      href: "/admin/dashboard",
     },
     {
-      label: "Lớp học của tôi",
+      label: "Danh sách khóa học",
       icon: TbNotes,
-      href: "/student/my-course",
+      href: "/admin/courses",
     },
   ];
 
   const learnNavItems = [
     {
-      label: "Khóa học",
+      label: "Danh sách buổi học",
       icon: MdOutlineBarChart,
-      href: "/student/my-lesson",
+      href: "/admin/lessons",
     },
     {
-      label: "Bài học yêu thích",
+      label: "Danh sách topic",
       icon: TbNotes,
-      href: "/student/favorite-course",
+      href: "/admin/topic",
     },
     {
       label: "Flashcard",
       icon: TbNotes,
-      href: "/student/flashcard",
+      href: "/admin/flashcard",
     },
      {
       label: "Ghi chú",
       icon: TbNotes,
-      href: "/student/my-note",
+      href: "/admin/my-note",
     },
   ];
 

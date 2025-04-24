@@ -1,4 +1,5 @@
 "use client";
+// import styles from ".LoginForm.module.css"
 import Image from "next/image";
 const BackgroundImg = "/english_app_background.jpg";
 import { MdOutlineEmail, MdLockOutline } from "react-icons/md";
@@ -7,12 +8,13 @@ import GoogleButton from "./google-button";
 import FacebookButton from "./facebook-button";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useApi } from "@/lib/Api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/context/AuthContext";
+import { OrbitProgress } from "react-loading-indicators";
 
 interface LoginFormData {
   email: string;
@@ -29,16 +31,27 @@ export default function LoginForm() {
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("email");
+    if (savedEmail) {
+      setLoginForm((prev) => ({ ...prev, email: savedEmail }));
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
     setLoginForm((values) => ({ ...values, [name]: value }));
   };
+
   const login = async (e: React.FormEvent) => {
     try {
       e.preventDefault();
-      console.log("Form submitted:", loginForm);
+      setIsLoading(true);
       const formData = new FormData();
       formData.append("username", loginForm.email);
       formData.append("password", loginForm.password);
@@ -50,18 +63,20 @@ export default function LoginForm() {
             accessToken: access_token,
             refreshToken: refresh_token,
           });
+
+          if (rememberMe) {
+            localStorage.setItem("email", loginForm.email);
+            localStorage.setItem("access_token", access_token);
+          } else {
+            sessionStorage.setItem("email", loginForm.email);
+            sessionStorage.setItem("access_token", access_token);
+          }
         }
         router.push("/student/my-course");
-        // const data = await res.json();
 
-        // setAccessToken(data.access_token);
-        // setScopes(data.scopes);
-        // setUsername(data.username);
         console.log("res:", res);
       } else {
         console.log("Something went wrong");
-        // const err = await res.json();
-        // setErrorMessage("Incorrect username or password.");
         toast(errorMessage);
         toast("Incorrect username or password.");
       }
@@ -70,6 +85,8 @@ export default function LoginForm() {
       // setErrorMessage(err?.response.data);
       toast("System is error");
       // toast("Incorrect username or password.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -162,6 +179,8 @@ export default function LoginForm() {
                       <input
                         id="remember"
                         type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
                         className="w-4 h-4 border border-gray-300 text-white font-bold rounded bg-gray-50"
                       />
                     </div>
@@ -183,9 +202,10 @@ export default function LoginForm() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full text-white bg-gray-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  className="w-full text-white bg-gray-400 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  disabled={isLoading}
                 >
-                  Đăng nhập
+                  {isLoading ? <div className="flex flex-row justify-center "><span>Đang xử lý</span> <OrbitProgress style={{ width: "6px", height: "6px",fontSize:"6px", position:"relative",marginLeft:"3px"}} variant="spokes" color="#32cd32" size="small" text="" textColor="" /></div> : <p>Đăng nhập</p>}
                 </button>
                 <div className="items-center flex bg-[#a7abc3] justify-center my-5 w-full relative h-0.5">
                   <span className="font-light inline-flex text-gray-600 bg-white left-0 relative px-2.5 top-0">
