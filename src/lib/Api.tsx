@@ -4,30 +4,40 @@ import { useAuth } from './context/AuthContext';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null; // SSR-safe
+  const cookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(name + '='));
+  return cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
+}
+
 export const useApi = () => {
     const { tokenInfo, setTokenInfo, reset } = useAuth();
     // const { currentLanguage } = useLocale();
     const api = axios.create({
       baseURL: baseURL,
+      withCredentials:false
     });
   
     // Request interceptor
     api.interceptors.request.use((config) => {
-      let access_token = tokenInfo?.accessToken?.trim() || null;
-      if (access_token === '') access_token = null;
-  
-      // let language = currentLanguage?.trim() || null;
-      // if (language === '') language = null;
-  
+      // let access_token = tokenInfo?.accessToken?.trim() || null;
+      // if (access_token === '') access_token = getCookie("accessToken")
+      // if (access_token === '') access_token = null;
+      let access_token = tokenInfo?.accessToken?.trim()||null;
+      if (!access_token) {
+        const storedToken = localStorage.getItem("accessToken");
+        access_token = typeof storedToken === "string" ? storedToken.trim() : null;
+      }
+    
+      console.log("access_token", access_token);
+      
       const isLoginEndpoint = config.url?.endsWith('/login');
   
       if (access_token && !isLoginEndpoint) {
         config.headers['Authorization'] = `Bearer ${access_token}`;
       }
-      // if (language) {
-      //   config.headers['Accept-Language'] = language;
-      // }
-  
       return config;
     });
   

@@ -1,0 +1,10 @@
+/* .OP-spokes-rli-bounding-box .OP-spokes-indicator{
+
+} */
+.OP-spokes-rli-bounding-box {
+    --OP-spokes-phase1-color: rgb(50, 205, 50);
+    font-size: 5px;
+    position: relative;
+    color: var(--OP-spokes-phase1-color);
+    margin-left: 3px;
+}
