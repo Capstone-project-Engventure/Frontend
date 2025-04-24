@@ -1,0 +1,30 @@
+{
+  "HomePage": {
+    "title": "Hello world!",
+    "about": "Go to the about page"
+  },
+  "Register": {
+    "welcome": "Chào mừng bạn đến với hệ thống học tập tiếng Anh",
+    "register": "Đăng ký",
+    "or": "Hoặc",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "signIn": "Đăng nhập",
+    "name": "Tên",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "gender": "Giới tính",
+    "nation": "Quốc gia",
+    "password": "Mật khẩu",
+    "retypePassword": "Nhập lại mật khẩu",
+    "verificationCode": "Mã xác nhận",
+    "namePlaceholder": "Nhập tên tại đây",
+    "emailPlaceholder": "Nhập email tại đây",
+    "phonePlaceholder": "Nhập số điện thoại tại đây",
+    "passwordPlaceholder": "Nhập mật khẩu tại đây",
+    "retypePasswordPlaceholder": "Nhập lại mật khẩu tại đây",
+    "verificationCodePlaceholder": "Nhập mã xác nhận",
+    "registerButton": "Đăng ký",
+    "googleLogin": "Google",
+    "facebookLogin": "Facebook"
+  }
+}
