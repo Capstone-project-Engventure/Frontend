@@ -11,7 +11,7 @@ import {
 } from "react-icons/md";
 import { TbNotes } from "react-icons/tb";
 export default function Sidebar() {
-  const [toggleSidebar,setToggleSidebar] = useState(false);
+  const [toggleSidebar, setToggleSidebar] = useState(false);
   const mainNavItems = [
     {
       label: "Thống kê",
@@ -37,16 +37,38 @@ export default function Sidebar() {
       href: "/admin/topics",
     },
     {
-      label: "Danh sách bài học",
+      label: "Bài học",
       icon: TbNotes,
-      href: "/admin/exercises",
+      children: [
+        {
+          label: "Từ vựng",
+          href: "/admin/exercises/vocabulary",
+        },
+        {
+          label: "Ngữ pháp",
+          href: "/admin/exercises/grammar",
+        },
+        {
+          label: "Nghe",
+          href: "/admin/exercises/listening",
+        },
+        {
+          label: "Phát âm",
+          href: "/admin/exercises/pronunciation",
+        },
+      ],
+    },
+    {
+      label: "Kiểu bài học",
+      icon: TbNotes,
+      href: "/admin/exercises/types",
     },
     {
       label: "Flashcard",
       icon: TbNotes,
       href: "/admin/flashcard",
     },
-     {
+    {
       label: "Ghi chú",
       icon: TbNotes,
       href: "/admin/my-note",
@@ -66,11 +88,13 @@ export default function Sidebar() {
             />
             <span className="text-xl font-bold text-amber-500">EngVenture</span>
 
-            <button type="button" className="p-2 bg-gray-200 text-black rounded-md" onClick={()=>setToggleSidebar((prev)=>!prev)}>
-              {toggleSidebar? <MdArrowForwardIos />: <MdArrowBackIosNew />}
-              </button>
-            
-
+            <button
+              type="button"
+              className="p-2 bg-gray-200 text-black rounded-md"
+              onClick={() => setToggleSidebar((prev) => !prev)}
+            >
+              {toggleSidebar ? <MdArrowForwardIos /> : <MdArrowBackIosNew />}
+            </button>
           </div>
           <div className="min-h-screen">
             {mainNavItems.map((item, index) => {
@@ -90,15 +114,50 @@ export default function Sidebar() {
             <p className="font-bold">Góc học tập</p>
             {learnNavItems.map((item, index) => {
               const Icon = item.icon;
+
               return (
-                <div className="px-3 py-2" key={index}>
-                  <Link
-                    href={item.href}
-                    className="grid grid-cols-3 hover:text-blue-600 justify-between"
-                  >
-                    <Icon className="w-6 h-6 col-span-1 text-black" />
-                    <span className="col-span-2">{item.label}</span>
-                  </Link>
+                <div key={index} className="px-3 py-2">
+                  {/* Render parent item */}
+                  {item.href ? (
+                    <Link
+                      href={item.href}
+                      className="grid grid-cols-3 hover:text-blue-600 justify-between"
+                    >
+                      {Icon && (
+                        <Icon className="w-6 h-6 col-span-1 text-black" />
+                      )}
+                      <span className="col-span-2">{item.label}</span>
+                    </Link>
+                  ) : (
+                    <div className="flex flex-row justify-between">
+                      <div className="grid grid-cols-3 font-semibold">
+                        {Icon && (
+                          <Icon className="w-6 h-6 col-span-1 text-black" />
+                        )}
+                        <span className="col-span-2">{item.label}</span>
+                      </div>
+                      <div>
+                        <MdArrowDropDown className="w-6 h-6"/>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Render children if they exist */}
+                  {item.children && (
+                    <div className="ml-6 mt-2 space-y-1 text-sm text-gray-700">
+                      {item.children.map((child, childIndex) => (
+                        <Link
+                          key={childIndex}
+                          href={child.href}
+                          className="block hover:text-blue-600"
+                        >
+                          <span className="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group ">
+                            {child.label}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}

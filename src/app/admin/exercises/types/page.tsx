@@ -1,53 +1,44 @@
 "use client";
 import Breadcrumb from "@/app/components/breadcumb";
 import PaginationTable from "@/app/components/table/PaginationTable";
-import ExerciseService from "@/lib/services/exercise.service";
+import ExerciseTypeService from "@/lib/services/exercise-types.service";
 import TopicService from "@/lib/services/topic.service";
-import { Exercise } from "@/lib/types/exercise";
+import { ExerciseType } from "@/lib/types/exercise-type";
 import { useEffect, useState } from "react";
-import {
-  HiPlus,
-  HiPencil,
-  HiTrash,
-  HiChevronLeft,
-  HiChevronRight,
-} from "react-icons/hi";
+import { HiPlus } from "react-icons/hi";
 
-export default function AdminExercise() {
-  const exerciseService = new ExerciseService();
+export default function AdminExerciseTypesPage() {
+  const exerciseTypeService = new ExerciseTypeService();
   const topicService = new TopicService();
   const [isLoading, setIsLoading] = useState(false);
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exerciseTypes, setExerciseTypes] = useState<ExerciseType[]>([]);
   const [topics, setTopics] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const fields = [
     { key: "name", label: "Name" },
-    { key: "question", label: "Question" },
-    { key: "answer", label: "Answer" },
-    { key: "level", label: "Level" },
-    { key: "topic", label: "Topic" },
     { key: "description", label: "Description" },
   ];
 
   const breadcrumbs = [
     { label: "Home", href: "/admin/home" },
-    { label: "Exercises" }, // last item: no href
+    { label: "Exercises", href: "/admin/exercises" },
+    { label: "Types" }, // last item: no href
   ];
 
   const onPageChange = (page: number) => {
     setPage(page);
   };
   const handleAdd = (formData: any) => {
-    exerciseService.createExercise(formData);
+    exerciseTypeService.createExerciseType(formData);
   };
   const handleUpdate = (id: number, formData: any) => {
-    exerciseService.updateExercise(id, formData);
+    exerciseTypeService.updateExerciseType(id, formData);
   };
 
   const handleDelete = (id: number) => {
-    exerciseService.deleteExercise(id);
+    exerciseTypeService.deleteExerciseType(id);
   };
   const [formData, setFormData] = useState<any>(null);
   const isModalOpen = formData !== null;
@@ -82,9 +73,12 @@ export default function AdminExercise() {
     const fetchExerciseData = async () => {
       setIsLoading(true);
       try {
-        const res = await exerciseService.getAllExercises(page, pageSize);
+        const res = await exerciseTypeService.getAllExerciseTypes(
+          page,
+          pageSize
+        );
         if (res.success) {
-          setExercises(res.data.results);
+          setExerciseTypes(res.data.results);
           setPage(res.data.page);
           setPageSize(res.data.page_size);
           setTotalPages(res.data.num_pages);
@@ -98,7 +92,7 @@ export default function AdminExercise() {
     };
 
     const fetchTopics = async () => {
-      const topicService = new TopicService();
+      // const topicService = new TopicService();
       const res = await topicService.getAllTopics();
       if (res.success && Array.isArray(res.data)) {
         setTopics(res.data);
@@ -129,7 +123,7 @@ export default function AdminExercise() {
         </button>
       </div>
       <PaginationTable
-        objects={exercises}
+        objects={exerciseTypes}
         fields={fields}
         page={page}
         totalPages={totalPages}
@@ -143,7 +137,7 @@ export default function AdminExercise() {
         <div className="fixed inset-0 backdrop-blur-sm bg-white/30 bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-              {formData.id ? "Edit" : "Add"} Exercise
+              {formData.id ? "Edit" : "Add"} Exercise Type
             </h3>
 
             <div className="space-y-4">
