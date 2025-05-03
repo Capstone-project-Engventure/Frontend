@@ -7,9 +7,7 @@ import {
   MdArrowDropUp,
   MdOutlineBarChart,
 } from "react-icons/md";
-import ProfilePopOver from "../../components/ProfilePopOver";
 import { TbNotes } from "react-icons/tb";
-import Sidebar from "@/app/components/layout/Sidebar";
 export default function MyCourse() {
   const navbarItem = [
     {

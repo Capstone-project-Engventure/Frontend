@@ -7,7 +7,8 @@ import {
   useLayoutEffect,
 } from "react";
 import { jwtDecode } from "jwt-decode";
-import axios from 'axios';
+import { useApi } from "../Api";
+import UserService from "../services/user.service";
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 interface TokenInfo {
   accessToken: string;
@@ -26,7 +27,7 @@ interface DecodedToken {
 interface User {
   id: string;
   email: string;
-  role: "user" | "admin";
+  roles: string[];
 };
 
 
@@ -40,10 +41,15 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
+
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [tokenInfo, setTokenInfoState] = useState<TokenInfo | null>(null);
-  const [user, setUser] = useState<User|null>(null)
-  const setTokenInfo = ({
+  const [user, setUser] = useState<User|null>(null);
+
+  const userService = new UserService()
+
+  const setTokenInfo = async ({
     accessToken,
     refreshToken,
   }: {
@@ -52,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }) => {
     // if (!accessToken) return;
     const decoded = jwtDecode(accessToken);
-    // const { sub, iat, exp, nbf, scope } = jwtDecode(accessToken);
+    const { sub, iat, exp, nbf, scope } = decoded
     // console.log("decoded: ", decoded);
     
     const scopes = Array.isArray(decoded.scope)
@@ -70,14 +76,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role: role,
     };
 
-    console.log("token info:", tokenInfo);
-    
-    // const cookieOptions = "path=/; secure; samesite=lax; max-age=2592000";
-    // document.cookie = `accessToken=${accessToken}; ${cookieOptions}`;
-    // document.cookie = `refreshToken=${refreshToken}; ${cookieOptions}`;
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
-  
+    localStorage.setItem("tokenInfo", JSON.stringify(tokenInfo));
+    try {
+      const userData = await userService.getOwnUser();
+      localStorage.setItem("user", JSON.stringify(userData.data));
+      setUser(userData.data);
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
 
     setTokenInfoState(tokenInfo);
 
@@ -85,33 +93,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const reset = () => {
     setTokenInfoState(null);
     setUser(null);
-  
-    // Remove cookies by setting empty value and expired date
-    // document.cookie = "accessToken=; path=/;";
-    // document.cookie = "refreshToken=; path=/;";
-
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
   };
 
-  // useLayoutEffect(() => {
-  //   const fetchMe = async () => {
-  //     try {
-  //       const res = await axios.get(`${baseURL}/users/me`, {
-  //         withCredentials: true,
-  //       });
-  //       setUser(res.data);
-  //     } catch (err) {
-  //       console.log("User not authenticated");
-  //       reset();
-  //     }
-  //   };
-  //   fetchMe();
-  // }, []);
-  
-
   return (
-    <AuthContext.Provider value={{ tokenInfo, setTokenInfo, reset , user}}>
+    <AuthContext.Provider value={{ tokenInfo, user, setTokenInfo, reset }}>
       {children}
     </AuthContext.Provider>
   );

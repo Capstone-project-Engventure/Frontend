@@ -189,7 +189,7 @@ export default function ProfileCard() {
                           type="text"
                           name="name"
                           className="block grow py-1.5 pl-1 pr-3 w-full text-base text-gray-900 placeholder:text-gray-400"
-                          placeholder="Nhập tên tại đây"
+                          placeholder="Nhập họ tại đây"
                           value={profileForm.first_name || ""}
                           onChange={handleChange}
                         />
@@ -208,7 +208,7 @@ export default function ProfileCard() {
                           type="text"
                           name="last_name"
                           className="block grow py-1.5 pl-1 pr-3 w-full text-base text-gray-900 placeholder:text-gray-400"
-                          placeholder="Nhập email tại đây"
+                          placeholder="Nhập tên tại đây"
                           value={profileForm.last_name || ""}
                           onChange={handleChange}
                         />
@@ -240,7 +240,7 @@ export default function ProfileCard() {
                   </div>
                   {/*  Phone */}
                   <div className="col-span-6 gap-2">
-                    <label className="block text-sm text-gray-900">Phone</label>
+                    <label className="block text-sm text-gray-900">Điện thoại</label>
                     <div className="mt-2">
                       <div className="flex items-center border border-gray-300 rounded-lg pl-3">
                         <div className="shrink-0 text-base text-gray-500 items-center gap-1 border-r-1 pr-1 select-none">
@@ -250,7 +250,7 @@ export default function ProfileCard() {
                           type="text"
                           name="phone"
                           className="block grow py-1.5 pl-1 pr-3 w-full text-base text-gray-900 placeholder:text-gray-400"
-                          placeholder="Nhập phone tại đây"
+                          placeholder="Nhập điện thoại tại đây"
                           value={profileForm.phone || ""}
                           onChange={handleChange}
                         />

@@ -32,9 +32,14 @@ export default function Sidebar() {
       href: "/admin/lessons",
     },
     {
-      label: "Danh sách topic",
+      label: "Danh sách chủ đề",
       icon: TbNotes,
-      href: "/admin/topic",
+      href: "/admin/topics",
+    },
+    {
+      label: "Danh sách bài học",
+      icon: TbNotes,
+      href: "/admin/exercises",
     },
     {
       label: "Flashcard",

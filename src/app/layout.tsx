@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/lib/context/AuthContext";
+
+import { Providers } from "./providers";
 // import { LocaleProvider } from "@/lib/context/LocaleContext";
 import { ToastContainer, toast } from "react-toastify";
 // import { NextIntlClientProvider, hasLocale } from "next-intl";
@@ -34,17 +35,19 @@ export default function RootLayout({
   // if (!hasLocale(routing.locales, locale)) {
   //   notFound();
   // }
+
+  // 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0`}
       >
-        <AuthProvider>
-          {/* <NextIntlClientProvider> */}
+        {/* <NextIntlClientProvider> */}
+        <Providers>
           {children}
           <ToastContainer />
-          {/* </NextIntlClientProvider> */}
-        </AuthProvider>
+        </Providers>
+        {/* </NextIntlClientProvider> */}
       </body>
     </html>
   );

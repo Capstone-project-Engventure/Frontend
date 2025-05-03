@@ -1,0 +1,235 @@
+"use client";
+import PaginationTable from "@/app/components/table/PaginationTable";
+import { useApi } from "@/lib/Api";
+import LessonService from "@/lib/services/lesson.service";
+import TopicService from "@/lib/services/topic.service";
+import { Lesson } from "@/lib/types/lesson";
+import Link from "next/link";
+import { log } from "node:console";
+import { useEffect, useState } from "react";
+
+import {
+  HiPlus,
+  HiPencil,
+  HiTrash,
+  HiChevronLeft,
+  HiChevronRight,
+} from "react-icons/hi";
+
+export default function AdminLesson() {
+  // Const :
+  const CACHE_KEY = "lessons";
+  const TIMESTAMP_KEY = "lesson_timestamp";
+  const CACHE_DURATION_MINUTES = 10;
+  // State
+  const [isLoading, setIsLoading] = useState(false);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [topics, setTopics] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const lessonService = new LessonService();
+  const topicService = new TopicService();
+  const fields = [
+    { key: "title", label: "Title" },
+    { key: "level", label: "Level" },
+    { key: "topic", label: "Topic" },
+    { key: "description", label: "Description" },
+  ];
+  const fetchLessonData = async () => {
+    setIsLoading(true);
+    try {
+      // Step 1: Check localStorage
+      // const cachedLessons = localStorage.getItem(CACHE_KEY);
+      // const cachedTimestamp = localStorage.getItem(TIMESTAMP_KEY);
+      // const now = Date.now();
+
+      // const isCacheValid =
+      //   cachedLessons &&
+      //   cachedTimestamp &&
+      //   (now - parseInt(cachedTimestamp)) / 60000 < CACHE_DURATION_MINUTES;
+
+      //   if (isCacheValid) {
+      //   const lessonsData = JSON.parse(cachedLessons!);
+      //   setLessons(lessonsData);
+      //   console.log("Loaded lessons from cache");
+      //   return;
+      // }
+
+      // Step 2: Fetch API
+      const res = await lessonService.getAllLessons(page, pageSize);
+      console.log("check res:", res);
+
+      if (!res.success) throw new Error("API response unsuccessful");
+
+      if (Array.isArray(res.data)) {
+        setLessons(res.data);
+        setPageSize(1);
+        // localStorage.setItem(CACHE_KEY, JSON.stringify(res.data));
+        // localStorage.setItem(TIMESTAMP_KEY, now.toString());
+      } else {
+        setLessons(res.data.results);
+        setPage(res.data.page);
+        setPageSize(res.data.page_size);
+        // localStorage.setItem(CACHE_KEY, JSON.stringify(res.data.results));
+        // localStorage.setItem(TIMESTAMP_KEY, now.toString());
+      }
+    } catch (err) {
+      console.error("Fetch lessons failed:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchTopics = async () => {
+    const topicService = new TopicService();
+    const res = await topicService.getAllTopics();
+    if (res.success && Array.isArray(res.data)) {
+      setTopics(res.data);
+    }
+  };
+
+  const onPageChange = (page: number) => {
+    setPage(page);
+  };
+  const handleAdd = (formData: any) => {
+    lessonService.createLesson(formData);
+  };
+  const handleUpdate = (id: number, formData: any) => {
+    lessonService.updateLesson(id, formData);
+  };
+
+  const handleDelete = (id: number) => {
+    lessonService.deleteLesson(id);
+  };
+  const [formData, setFormData] = useState<any>(null);
+  const isModalOpen = formData !== null;
+
+  const handleAddClick = () => {
+    setFormData({
+      title: "",
+      level: "",
+      topic: "",
+      description: "",
+    });
+  };
+
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    if (formData.id) {
+      handleUpdate(formData.id, formData);
+    } else {
+      handleAdd(formData);
+    }
+    setFormData(null);
+  };
+
+  const handleCloseModal = () => {
+    setFormData(null);
+  };
+
+  useEffect(() => {
+    fetchTopics();
+    fetchLessonData();
+  }, [page]);
+
+  if (isLoading) {
+    return <div>Đang tải dữ liệu...</div>;
+  }
+
+  return (
+    // Fix the component with ts
+    <>
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handleAddClick}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
+        >
+          <HiPlus className="text-lg" />
+          Add
+        </button>
+      </div>
+      <PaginationTable
+        objects={lessons}
+        fields={fields}
+        page={page}
+        totalPages={pageSize}
+        onPageChange={onPageChange}
+        onAdd={handleAdd}
+        onDelete={handleDelete}
+        onUpdate={handleUpdate}
+        linkBase="/admin/lessons"
+      />
+      {isModalOpen && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md shadow-xl">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
+              {formData.id ? "Edit" : "Add"} Lesson
+            </h3>
+
+            <div className="space-y-4">
+              {fields.map((f) => (
+                <div key={f.key}>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
+                    {f.label}
+                  </label>
+
+                  {f.key === "level" ? (
+                    <select
+                      value={formData[f.key] || ""}
+                      onChange={(e) => handleChange(f.key, e.target.value)}
+                      className="mt-1 px-2 py-2 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:text-white"
+                    >
+                      <option value="">Select level</option>
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                    </select>
+                  ) : f.key === "topic" ? (
+                    <select
+                      value={formData[f.key] || ""}
+                      onChange={(e) => handleChange(f.key, e.target.value)}
+                      className="mt-1 px-2 py-2 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:text-white"
+                    >
+                      <option value="">Select topic</option>
+                      {topics.map((topic) => (
+                        <option key={topic.id} value={topic.id}>
+                          {topic.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={formData[f.key] || ""}
+                      onChange={(e) => handleChange(f.key, e.target.value)}
+                      className="mt-1 px-2 py-2 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-800 dark:text-white"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={handleCloseModal}
+                className="px-4 py-2 text-sm border rounded-md text-gray-600 dark:text-gray-300 hover:shadow-xl"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
