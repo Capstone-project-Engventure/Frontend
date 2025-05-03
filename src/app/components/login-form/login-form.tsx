@@ -1,11 +1,13 @@
 "use client";
 // import styles from ".LoginForm.module.css"
+import styles from "./login.module.css";
+
 import Image from "next/image";
 const BackgroundImg = "/english_app_background.jpg";
 import { MdOutlineEmail, MdLockOutline } from "react-icons/md";
 import { LuEye, LuEyeClosed } from "react-icons/lu";
-import GoogleButton from "./google-button";
-import FacebookButton from "./facebook-button";
+import GoogleButton from "../google-button";
+import FacebookButton from "../facebook-button";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 
 import { useEffect, useState } from "react";
@@ -102,9 +104,9 @@ export default function LoginForm() {
           height: "100%",
         }}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-12 min-h-screen gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 min-h-screen gap-4">
           {/* */}
-          <div className="flex flex-col justify-center items-center content-center sm:col-span-7 ">
+          <div className="flex flex-col justify-center items-center content-center md:col-span-7 ">
             <div className="flex flex-row gap-2 items-center">
               <Image
                 src="/engventure-logo.svg"
@@ -119,73 +121,67 @@ export default function LoginForm() {
             </h1>
           </div>
 
-          <div className="flex flex-col justify-center items-center px-6 py-12 m-auto sm:col-span-5 w-full ">
-            <div className="page_login__form opacity-90 w-full p-5 mx-4 mt-10 px-6 py-12  bg-white rounded-2xl min-h-96">
+          <div className="flex flex-col justify-center items-center px-6 py-12 m-auto md:col-span-5 w-full ">
+            <div className="page_login__form opacity-90 w-full p-5 mx-4 mt-10 px-6 py-12 bg-white rounded-2xl min-h-96 md:max-w-2/3">
               <h2 className="text-black font-bold text-center">Login</h2>
               <form className="space-y-4 md:space-y-6" onSubmit={login}>
                 {/*  Email */}
-                <div className="gap-2">
-                  <label className="block text-sm text-gray-900">Email</label>
-                  <div className="mt-2">
-                    <div className="flex items-center border border-gray-300 rounded-lg pl-3">
-                      <div className="shrink-0 text-base text-gray-500 items-center gap-1 border-r-1 pr-1 select-none">
-                        <MdOutlineEmail />
-                      </div>
-                      <input
-                        type="email"
-                        name="email"
-                        className="block grow py-1.5 pl-1 pr-3 w-full text-base text-gray-900 placeholder:text-gray-400"
-                        placeholder="Nhập email tại đây"
-                        value={loginForm.email || ""}
-                        onChange={handleChange}
-                      />
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Email</label>
+                  <div className={styles.inputWrapper}>
+                    <div className={styles.inputIcon}>
+                      <MdOutlineEmail />
                     </div>
+                    <input
+                      type="email"
+                      name="email"
+                      className={styles.inputField}
+                      placeholder="Nhập email tại đây"
+                      value={loginForm.email || ""}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
                 {/*  Password */}
-                <div className="gap-2">
-                  <label className="block text-sm text-gray-900">
-                    Mật khẩu
-                  </label>
-                  <div className="mt-2">
-                    <div className="flex flex-row items-center border border-gray-300 rounded-lg pl-3">
-                      <div className="shrink-0 text-base text-gray-500 items-center gap-1 border-r-1 pr-1 select-none">
-                        <MdLockOutline />
-                      </div>
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        className="block grow py-1.5 pl-1 pr-3 w-full text-base text-black placeholder:text-gray-400"
-                        placeholder="Nhập mật khẩu tại đây"
-                        value={loginForm.password || ""}
-                        onChange={handleChange}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowPassword((prev) => !prev);
-                        }}
-                        className="left-auto text-base text-gray-500 relative items-center"
-                      >
-                        {showPassword ? <LuEyeClosed /> : <LuEye />}
-                      </button>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Mật khẩu</label>
+                  <div className={styles.inputWrapper}>
+                    <div className={styles.inputIcon}>
+                      <MdLockOutline />
                     </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      className="block grow py-1.5 pl-1 pr-3 w-full text-base text-black placeholder:text-gray-400"
+                      placeholder="Nhập mật khẩu tại đây"
+                      value={loginForm.password || ""}
+                      onChange={handleChange}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowPassword((prev) => !prev);
+                      }}
+                      className={styles.passwordToggleBtn}
+                    >
+                      {showPassword ? <LuEyeClosed /> : <LuEye />}
+                    </button>
                   </div>
                 </div>
                 {/*  Remember password */}
                 <div className="flex flex-row mt-10 justify-between">
-                  <div className="flex flex-row">
-                    <div className="flex items-center justify-center h-5">
+                  <div className="flex flex-row items-center">
+                    <div className="flex items-center justify-center h-5 bg-white">
                       <input
                         id="remember"
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 border border-gray-300 text-white font-bold rounded bg-gray-50"
+                        className="w-4 h-4 border border-gray-300 text-white font-bold rounded-sm bg-gray-50 dark:bg-white"
                       />
                     </div>
-                    <div className="ml-3 text-sm">
-                      <label className="text-gray-400 text-base">
+                    <div className="ml-2 text-sm">
+                      <label className="text-bold text-black text-base">
                         Ghi nhớ mật khẩu
                       </label>
                     </div>
@@ -197,15 +193,38 @@ export default function LoginForm() {
                     >
                       Quên mật khẩu
                     </a> */}
-                    <Link href="/forgot-password"> Quên mật khẩu</Link>
+                    <Link className="text-amber-400" href="/forgot-password">
+                      {" "}
+                      Quên mật khẩu
+                    </Link>
                   </div>
                 </div>
                 <button
                   type="submit"
-                  className="w-full text-white bg-gray-400 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  className={styles.button}
                   disabled={isLoading}
                 >
-                  {isLoading ? <div className="flex flex-row justify-center "><span>Đang xử lý</span> <OrbitProgress style={{ width: "6px", height: "6px",fontSize:"6px", position:"relative",marginLeft:"3px"}} variant="spokes" color="#32cd32" size="small" text="" textColor="" /></div> : <p>Đăng nhập</p>}
+                  {isLoading ? (
+                    <div className="flex flex-row justify-center ">
+                      <span>Đang xử lý</span>
+                      <OrbitProgress
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          fontSize: "6px",
+                          position: "relative",
+                          marginLeft: "3px",
+                        }}
+                        variant="spokes"
+                        color="#32cd32"
+                        size="small"
+                        text=""
+                        textColor=""
+                      />
+                    </div>
+                  ) : (
+                    <p>Đăng nhập</p>
+                  )}
                 </button>
                 <div className="items-center flex bg-[#a7abc3] justify-center my-5 w-full relative h-0.5">
                   <span className="font-light inline-flex text-gray-600 bg-white left-0 relative px-2.5 top-0">
@@ -221,7 +240,7 @@ export default function LoginForm() {
                   </FacebookButton>
                 </div>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400 text-center">
-                  Bạn chưa có tài khoản?
+                  Bạn chưa có tài khoản? 
                   {/* <a
                     href="/register"
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500"

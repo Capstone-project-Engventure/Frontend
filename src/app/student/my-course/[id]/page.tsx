@@ -6,22 +6,23 @@ import { FaCalendarAlt, FaCalendarCheck, FaUser } from "react-icons/fa";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import clsx from "clsx";
 import Link from "next/link";
+import type { Course } from "@/lib/types/course";
+import type { Lesson } from "@/lib/types/lesson";
+// type Lesson = {
+//   id: number;
+//   title: string;
+//   level: string;
+//   description: string;
+//   topic?: number | null;
+// };
 
-type Lesson = {
-  id: number;
-  title: string;
-  level: string;
-  description: string;
-  topic?: number | null;
-};
-
-type Course = {
-  id: string;
-  name: string;
-  scope: string;
-  description: string;
-  lessons: Lesson[];
-};
+// type Course = {
+//   id: string;
+//   name: string;
+//   scope: string;
+//   description: string;
+//   lessons: Lesson[];
+// };
 
 export default function ClassDetail({
   params,
@@ -30,7 +31,7 @@ export default function ClassDetail({
 }) {
   const api = useApi();
   const { id: courseId } = use(params);
-  const [course, setCourse] = useState<Course>(null);
+  const [course, setCourse] = useState<Course|null>(null);
   useEffect(() => {
     const fetchCourse = async () => {
       console.log("Course ID:", courseId);

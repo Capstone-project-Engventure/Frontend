@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 /* Tailwind v4 has changed */
 /* @tailwind base;
 @tailwind components;
@@ -19,16 +20,13 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #ededed;
-    --foreground: #0a0a0a ;
+    --background:#0a0a0a ;
+    --foreground: #ededed ;
   }
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  
+  color: var(--background);
+  font-family: Arial, Helvetica, sans-serif; 
 }
-
-/* page */

@@ -1,6 +1,6 @@
 "use client"
 import { useSession, signIn, signOut } from "next-auth/react";
-import LoginForm from "./components/login-form";
+import LoginForm from "./components/login-form/login-form";
 import { useAuth } from "@/lib/context/AuthContext";
 import { useEffect, useState } from "react";
 import { useApi } from "@/lib/Api";

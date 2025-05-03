@@ -1,80 +1,65 @@
 "use client";
-import axios from 'axios';
-import { useAuth } from './context/AuthContext';
-
+import axios from "axios";
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
-
-function getCookie(name: string): string | null {
-  if (typeof document === "undefined") return null; // SSR-safe
-  const cookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith(name + '='));
-  return cookie ? decodeURIComponent(cookie.split('=')[1]) : null;
-}
-
+// const reset = () => {
+//   localStorage.setItem("accessToken", "");
+//   localStorage.setItem("refreshToken", "");
+// };
+// import { useAuth } from "@/lib/context/AuthContext";
 export const useApi = () => {
-    const { tokenInfo, setTokenInfo, reset } = useAuth();
-    // const { currentLanguage } = useLocale();
-    const api = axios.create({
-      baseURL: baseURL,
-      withCredentials:false
-    });
-  
-    // Request interceptor
-    api.interceptors.request.use((config) => {
-      // let access_token = tokenInfo?.accessToken?.trim() || null;
-      // if (access_token === '') access_token = getCookie("accessToken")
-      // if (access_token === '') access_token = null;
-      let access_token = tokenInfo?.accessToken?.trim()||null;
-      if (!access_token) {
-        const storedToken = localStorage.getItem("accessToken");
-        access_token = typeof storedToken === "string" ? storedToken.trim() : null;
-      }
-    
-      console.log("access_token", access_token);
-      
-      const isLoginEndpoint = config.url?.endsWith('/login');
-  
-      if (access_token && !isLoginEndpoint) {
-        config.headers['Authorization'] = `Bearer ${access_token}`;
-      }
-      return config;
-    });
-  
-    // Response error interceptor
-    api.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const response = error.response;
-  
-        if (response?.status === 401 || response?.status === 403) {
-          const refresh_token = tokenInfo?.refreshToken;
-          if (refresh_token?.trim() !== '') {
-            const formData = new FormData();
-            formData.append('refresh_token', refresh_token);
+  // const { currentLanguage } = useLocale();
+  // const {reset} = useAuth()
+  const api = axios.create({
+    baseURL: baseURL,
+    withCredentials: false,
+  });
 
-            try {
-              const refreshResponse = await axios.post(
-                `${baseURL}/users/refresh-token`,
-                formData
-              );
-              const { access_token, refresh_token: newRefresh } = refreshResponse.data;
-              setTokenInfo({ access_token, refresh_token: newRefresh });
-  
-              // Optionally retry original request
-              // error.config.headers['Authorization'] = `Bearer ${access_token}`;
-              // return api.request(error.config);
-  
-            } catch (refreshError) {
-              console.error(refreshError);
-              reset();
-            }
+  // Request interceptor
+  api.interceptors.request.use((config) => {
+    let access_token = localStorage.getItem("accessToken") || "";
+    const isLoginEndpoint = config.url?.endsWith("/login");
+    if (access_token && !isLoginEndpoint) {
+      config.headers["Authorization"] = `Bearer ${access_token}`;
+    }
+    return config;
+  });
+
+  // Response error interceptor
+  api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const response = error.response;
+
+      if (response?.status === 401 || response?.status === 403) {
+        const refresh_token = localStorage.getItem("refreshToken") || "";
+        if (refresh_token?.trim() !== "") {
+          const formData = new FormData();
+          formData.append("refresh_token", refresh_token);
+
+          try {
+            const refreshResponse = await axios.post(
+              `${baseURL}/users/refresh-token`,
+              formData
+            );
+            const { access_token, refresh_token } = refreshResponse.data;
+
+            localStorage.setItem("accessToken", access_token);
+            localStorage.setItem("refreshToken", refresh_token);
+            // setTokenInfo({ access_token, refresh_token: newRefresh });
+
+            // Optionally retry original request
+            // error.config.headers['Authorization'] = `Bearer ${access_token}`;
+            // return api.request(error.config);
+          } catch (refreshError) {
+            console.error(refreshError);
+            // reset();
           }
         }
-  
-        return Promise.reject(error);
       }
-    );
-  
-    return api;
-  };
+
+      return Promise.reject(error);
+    }
+  );
+
+  return api;
+};
