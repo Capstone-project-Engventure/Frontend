@@ -5,20 +5,24 @@ const api = useApi();
 
 interface ApiResponse<T> {
   success: boolean;
-  data: T ;
+  data: T | string;
+  current_page?: number;
+  total_page?: number;
 }
 
 class ExerciseTypeService {
  
    async getAllExerciseTypes(
       page?: number,
-      pageSize?: number
+      pageSize?: number,
+      keyword?: string
     ): Promise<ApiResponse<ExerciseType[]>> {
 
       try {
         const params: Record<string, any> = {};
         if (page) params.page = page;
         if (pageSize) params.page_size = pageSize;
+        if (keyword) params.keyword = keyword;
   
         const res = await api.get("/exercises-types", { params });
   

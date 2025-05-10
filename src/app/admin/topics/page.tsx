@@ -29,6 +29,19 @@ export default function AdminTopic() {
     { key: "order", label: "Order" },
   ];
 
+  const breadcrumbs = [
+    { label: "Home", href: "/admin/home" },
+    { label: "Topic" },
+  ];
+
+  const modalFields = [
+    { key: "title", label: "Title", type: "text" },
+    { key: "level", label: "Level", type: "text" },
+    { key: "description", label: "Description", type: "textarea" },
+    { key: "order", label: "Order", type: "number" },
+  ];
+  
+
   const onPageChange = (page: number) => {
     setPage(page);
   };
@@ -97,25 +110,16 @@ export default function AdminTopic() {
   return (
     // Fix the component with ts
     <>
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={handleAddClick}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
-        >
-          <HiPlus className="text-lg" />
-          Add
-        </button>
-      </div>
       <PaginationTable
         objects={topics}
         fields={fields}
         page={page}
         totalPages={pageSize}
         onPageChange={onPageChange}
-        onAdd={handleAdd}
-        onDelete={handleDelete}
-        onUpdate={handleUpdate}
-        linkBase="/admin/lessons"
+        service={topicService}
+        linkBase="/admin/topics"
+        breadcrumbs={breadcrumbs}
+        modalFields={modalFields}
       />
       {isModalOpen && (
         <div className="fixed inset-0 backdrop-blur-sm bg-white/30 bg-opacity-40 flex items-center justify-center z-50">

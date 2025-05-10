@@ -5,13 +5,16 @@ const api = useApi();
 
 interface ApiResponse<T> {
   success: boolean;
-  data: T ;
+  data: T | string;
+  current_page?: number;
+  total_page?: number;
 }
 
 class LessonService {
   async getAllLessons(
     page?: number,
-    pageSize?: number
+    pageSize?: number,
+    keyword?: string
   ): Promise<ApiResponse<Lesson[]>> {
     const cacheKey = "lesson_cache";
     const saved = localStorage.getItem(cacheKey);
@@ -19,6 +22,7 @@ class LessonService {
       const params: Record<string, any> = {};
       if (page) params.page = page;
       if (pageSize) params.page_size = pageSize;
+      if (keyword) params.keyword = keyword;
 
       const res = await api.get("/lessons", { params });
 

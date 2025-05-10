@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useAuth } from "@/lib/context/AuthContext";
 import { useEffect, useContext, useState } from "react";
 import ThemeChanger from "../themeSelector";
-import LayoutAnimation from "../TestComponent";
 export default function Header() {
   // const { user } = useAuth();
   const tokenInfo = localStorage.getItem("tokenInfo") || null;
