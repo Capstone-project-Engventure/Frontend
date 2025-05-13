@@ -35,6 +35,11 @@ class VocabularyService {
   getById(id: number) {
     return api.get(`/vocabularies/${id}`);
   }
+
+  getVocabByTopic(topicId:string){
+    return api.get(`/vocabularies?topic_id=${topicId}`)
+  }
+
   create(data: Vocabulary) {
     return api.post("/vocabularies", data);
   }

@@ -17,8 +17,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/context/AuthContext";
 import { OrbitProgress } from "react-loading-indicators";
-import { useGoogleLogin } from '@react-oauth/google';
-
+import { useGoogleLogin } from "@react-oauth/google";
+import OAuthService from "@/lib/services/oauth.service";
+import Cookies from "js-cookie";
 interface LoginFormData {
   email: string;
   password: string;
@@ -26,6 +27,7 @@ interface LoginFormData {
 
 export default function LoginForm() {
   const api = useApi();
+  const oauthService = OAuthService;
   const { setTokenInfo } = useAuth();
   const router = useRouter();
   const [loginForm, setLoginForm] = useState<LoginFormData>({
@@ -38,7 +40,7 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const savedEmail = localStorage.getItem("email");
+    const savedEmail = Cookies.get("email");
     if (savedEmail) {
       setLoginForm((prev) => ({ ...prev, email: savedEmail }));
       setRememberMe(true);
@@ -58,43 +60,26 @@ export default function LoginForm() {
       const formData = new FormData();
       formData.append("username", loginForm.email);
       formData.append("password", loginForm.password);
-      const res = await api.post("/users/login", formData);
-      if (res.status == 200) {
-        const { access_token, refresh_token } = res.data;
-        if (access_token && refresh_token) {
-          setTokenInfo({
-            accessToken: access_token,
-            refreshToken: refresh_token,
-          });
 
-          if (rememberMe) {
-            localStorage.setItem("email", loginForm.email);
-            localStorage.setItem("access_token", access_token);
-          } else {
-            sessionStorage.setItem("email", loginForm.email);
-            sessionStorage.setItem("access_token", access_token);
-          }
-        }
-        router.push("/student/my-course");
-
-        console.log("res:", res);
-      } else {
-        console.log("Something went wrong");
-        toast(errorMessage);
-        toast("Incorrect username or password.");
+      const res = await oauthService.login(
+        loginForm.email,
+        loginForm.password,
+        rememberMe
+      );
+      if(res){
+        router.push("/student")
+        toast("Đăng nhập thành công");
       }
+      
     } catch (err) {
       console.log(err);
       // setErrorMessage(err?.response.data);
       toast("System is error");
-      // toast("Incorrect username or password.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  
-  
   return (
     <div className="@container w-full min-h-screen m-0 p-0">
       <div
@@ -243,7 +228,7 @@ export default function LoginForm() {
                   </FacebookButton>
                 </div>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400 text-center">
-                  Bạn chưa có tài khoản? 
+                  Bạn chưa có tài khoản?
                   {/* <a
                     href="/register"
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500"

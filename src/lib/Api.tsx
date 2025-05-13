@@ -1,11 +1,6 @@
 "use client";
 import axios from "axios";
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
-// const reset = () => {
-//   localStorage.setItem("accessToken", "");
-//   localStorage.setItem("refreshToken", "");
-// };
-// import { useAuth } from "@/lib/context/AuthContext";
 export const useApi = () => {
   // const { currentLanguage } = useLocale();
   // const {reset} = useAuth()

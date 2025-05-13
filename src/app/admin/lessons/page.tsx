@@ -40,21 +40,6 @@ export default function AdminLesson() {
     setIsLoading(true);
     try {
       // Step 1: Check localStorage
-      // const cachedLessons = localStorage.getItem(CACHE_KEY);
-      // const cachedTimestamp = localStorage.getItem(TIMESTAMP_KEY);
-      // const now = Date.now();
-
-      // const isCacheValid =
-      //   cachedLessons &&
-      //   cachedTimestamp &&
-      //   (now - parseInt(cachedTimestamp)) / 60000 < CACHE_DURATION_MINUTES;
-
-      //   if (isCacheValid) {
-      //   const lessonsData = JSON.parse(cachedLessons!);
-      //   setLessons(lessonsData);
-      //   console.log("Loaded lessons from cache");
-      //   return;
-      // }
 
       // Step 2: Fetch API
       const res = await lessonService.getAllLessons(page, pageSize);
@@ -65,14 +50,10 @@ export default function AdminLesson() {
       if (Array.isArray(res.data)) {
         setLessons(res.data);
         setPageSize(1);
-        // localStorage.setItem(CACHE_KEY, JSON.stringify(res.data));
-        // localStorage.setItem(TIMESTAMP_KEY, now.toString());
       } else {
         setLessons(res.data.results);
         setPage(res.data.page);
         setPageSize(res.data.page_size);
-        // localStorage.setItem(CACHE_KEY, JSON.stringify(res.data.results));
-        // localStorage.setItem(TIMESTAMP_KEY, now.toString());
       }
     } catch (err) {
       console.error("Fetch lessons failed:", err);

@@ -188,16 +188,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                       key={f.key}
                       className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase"
                     >
-                      {f.key === "image" ? (
-                        <Image
-                          src={f.value ? f.value : null}
-                          alt={f.label}
-                          width={100}
-                          height={100}
-                        />
-                      ) : (
-                        f.label
-                      )}
+                      {f.label}
                     </th>
                   ))}
                   <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
@@ -231,6 +222,14 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             >
                               {item[f.key]}
                             </Link>
+                          ) : f.key === "image" && item[f.key] ? (
+                            <Image
+                              src={item[f.key]}
+                              alt={item.title || "Image"}
+                              width={40}
+                              height={40}
+                              className="rounded object-cover"
+                            />
                           ) : (
                             item[f.key]
                           )}
@@ -240,7 +239,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                         <div className="flex gap-4">
                           <button
                             onClick={() => handleEdit(item)}
-                            className="text-indigo-600 hover:text-indigo-800"
+                            className="border-2 border-gray-300 rounded-sm p-0.5 text-indigo-600 hover:text-indigo-800"
                             title="Edit"
                           >
                             <HiPencil className="text-lg" />
@@ -322,7 +321,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             [field.key]: e.target.value,
                           })
                         }
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-1 px-2 py-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         rows={3}
                       />
                     ) : field.type === "select" ? (
@@ -334,7 +333,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             [field.key]: e.target.value,
                           })
                         }
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       >
                         <option value="">Select {field.label}</option>
                         {field.options?.map((option) => (
@@ -364,7 +363,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             });
                           }
                         }}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       />
                     )}
                   </div>

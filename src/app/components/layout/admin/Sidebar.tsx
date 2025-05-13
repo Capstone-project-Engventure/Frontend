@@ -9,6 +9,8 @@ import {
   MdArrowForwardIos,
   MdOutlineBarChart,
 } from "react-icons/md";
+
+import { BiCategory } from "react-icons/bi";
 import { TbNotes } from "react-icons/tb";
 export default function Sidebar() {
   const [toggleSidebar, setToggleSidebar] = useState(false);
@@ -60,7 +62,7 @@ export default function Sidebar() {
     },
     {
       label: "Kiểu bài học",
-      icon: TbNotes,
+      icon: BiCategory,
       href: "/admin/exercises/types",
     },
     {
@@ -80,14 +82,17 @@ export default function Sidebar() {
       <aside className="w-64 bg-white shadow-md p-4">
         <nav className="flex flex-col gap-4">
           <div className="flex flex-row gap-4 items-center justify-center">
-            <Image
-              src="/engventure-logo.svg"
-              width={60}
-              height={60}
-              alt="Logo"
-            />
-            <span className="text-xl font-bold text-amber-500">EngVenture</span>
-
+            <Link href="/">
+              <Image
+                src="/engventure-logo.svg"
+                width={60}
+                height={60}
+                alt="Logo"
+              />
+              <span className="text-xl font-bold text-amber-500">
+                EngVenture
+              </span>
+            </Link>
             <button
               type="button"
               className="p-2 bg-gray-200 text-black rounded-md"
@@ -129,15 +134,17 @@ export default function Sidebar() {
                       <span className="col-span-2">{item.label}</span>
                     </Link>
                   ) : (
-                    <div className="flex flex-row justify-between">
-                      <div className="grid grid-cols-3 font-semibold">
+                    <div className="grid grid-cols-3">
+                      <div className="col-span-1 font-semibold">
                         {Icon && (
                           <Icon className="w-6 h-6 col-span-1 text-black" />
                         )}
-                        <span className="col-span-2">{item.label}</span>
                       </div>
-                      <div>
-                        <MdArrowDropDown className="w-6 h-6"/>
+                      <div className="flex flex-row col-span-2 gap-2">
+                        <span className="col-span-2">{item.label}</span>
+                        <div className="flex flex-row left-auto">
+                          <MdArrowDropDown className="w-6 h-6" />
+                        </div>
                       </div>
                     </div>
                   )}

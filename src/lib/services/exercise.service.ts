@@ -65,6 +65,27 @@ class ExerciseService {
         };
       }
     }
+
+    async getExerciseByTopic(topic_id: number): Promise<ApiResponse<Exercise[]>> {
+      try {
+        const res = await api.get(`/exercises/topic_id=${topic_id}`);
+        if (res.status === 200) {
+          return {
+            success: true,
+            data: res.data as Exercise[],
+          };
+        }
+        return {
+          success: false,
+          data: "Unexpected status code: " + res.status,
+        };
+      } catch (error: any) {
+        return {
+          success: false,
+          data: error.message,
+        };
+      }
+    }
   
     async createExercise(data: Partial<Exercise>): Promise<ApiResponse<Exercise>> {
       try {

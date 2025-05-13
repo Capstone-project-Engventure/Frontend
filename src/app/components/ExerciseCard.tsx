@@ -1,4 +1,5 @@
 // components/ExerciseCard.tsx
+"use client"
 import React, { useState } from "react";
 import type { Exercise } from "@/lib/types/exercise";
 
