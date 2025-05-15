@@ -66,15 +66,26 @@ export default function LoginForm() {
         loginForm.password,
         rememberMe
       );
-      if(res){
-        router.push("/student")
+      const userData = await oauthService.getUserInfo();
+      console.log("check: ",userData);
+      
+      if (userData) {
+        if (
+          userData &&
+          Array.isArray(userData.roles) &&
+          userData.roles.some((role) => role.name == "Super Administrator")
+        ) {
+          router.push("admin/home");
+        } else {
+          router.push("/student");
+        }
+
         toast("Đăng nhập thành công");
       }
-      
     } catch (err) {
       console.log(err);
       // setErrorMessage(err?.response.data);
-      toast("System is error");
+      toast("Hệ thống xảy ra vấn đề");
     } finally {
       setIsLoading(false);
     }

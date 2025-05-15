@@ -93,7 +93,7 @@ export default function AdminExerciseTypesPage() {
 
     const fetchTopics = async () => {
       // const topicService = new TopicService();
-      const res = await topicService.getAllTopics();
+      const res = await topicService.getAll();
       if (res.success && Array.isArray(res.data)) {
         setTopics(res.data);
       }

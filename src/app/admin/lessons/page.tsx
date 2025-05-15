@@ -17,10 +17,6 @@ import {
 } from "react-icons/hi";
 
 export default function AdminLesson() {
-  // Const :
-  const CACHE_KEY = "lessons";
-  const TIMESTAMP_KEY = "lesson_timestamp";
-  const CACHE_DURATION_MINUTES = 10;
   // State
   const [isLoading, setIsLoading] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -42,7 +38,7 @@ export default function AdminLesson() {
       // Step 1: Check localStorage
 
       // Step 2: Fetch API
-      const res = await lessonService.getAllLessons(page, pageSize);
+      const res = await lessonService.getAll(page, pageSize);
       console.log("check res:", res);
 
       if (!res.success) throw new Error("API response unsuccessful");
@@ -64,7 +60,7 @@ export default function AdminLesson() {
 
   const fetchTopics = async () => {
     const topicService = new TopicService();
-    const res = await topicService.getAllTopics();
+    const res = await topicService.getAll();
     if (res.success && Array.isArray(res.data)) {
       setTopics(res.data);
     }
@@ -77,11 +73,11 @@ export default function AdminLesson() {
     lessonService.createLesson(formData);
   };
   const handleUpdate = (id: number, formData: any) => {
-    lessonService.updateLesson(id, formData);
+    lessonService.update(id, formData);
   };
 
   const handleDelete = (id: number) => {
-    lessonService.deleteLesson(id);
+    lessonService.delete(id);
   };
   const [formData, setFormData] = useState<any>(null);
   const isModalOpen = formData !== null;
@@ -134,10 +130,9 @@ export default function AdminLesson() {
         </button>
       </div>
       <PaginationTable
-        objects={lessons}
         fields={fields}
         page={page}
-        totalPages={pageSize}
+        service={lessonService}
         onPageChange={onPageChange}
         onAdd={handleAdd}
         onDelete={handleDelete}
@@ -145,7 +140,7 @@ export default function AdminLesson() {
         linkBase="/admin/lessons"
       />
       {isModalOpen && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30  flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
               {formData.id ? "Edit" : "Add"} Lesson

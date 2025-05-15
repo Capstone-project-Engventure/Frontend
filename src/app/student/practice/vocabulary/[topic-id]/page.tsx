@@ -29,6 +29,23 @@ export default function VocabByTopic() {
         console.log("err: ", err);
       }
     }
+
+    async function fetchVocabExerciseByTopic() {
+        try {
+          console.log("topic_id", topicId);
+          if (topicId) {
+            const res = await vocabService.getExerciseByTopic(topicId);
+            console.log("res: ", res.data);
+  
+            setVocabList(res.data);
+          } else {
+            alert("check");
+          }
+        } catch (err) {
+          console.log("err: ", err);
+        }
+      }
+
     fetchVocabByTopic();
   }, [topicId]);
 

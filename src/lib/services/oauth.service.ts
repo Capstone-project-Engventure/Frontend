@@ -39,11 +39,43 @@ class OAuthService {
     }
   }
 
-  async getUserInfo():Promise<any>{
+  async getUserInfo(): Promise<any> {
     const api = useApi();
     const res = await api.get("/users/user_info");
     return res.data;
+  }
 
+  async logout() {
+    try {
+      const access_token = Cookies.get("access_token");
+      const refresh_token = Cookies.get("refresh_token");
+
+      if (!access_token || !refresh_token) {
+        throw new Error("No tokens found");
+      }
+      const api = useApi();
+
+      // Call API to revoke tokens
+      const response = await api.post("/users/logout", {
+        access_token,
+        refresh_token,
+      });
+
+      // If the response is successful, clear cookies
+      if (response.status === 200) {
+        // Clear cookies after logout
+        Cookies.remove("access_token");
+        Cookies.remove("refresh_token");
+        Cookies.remove("email");
+
+        // Redirect user or perform any other post-logout logic
+        window.location.href = "/"; // Example redirect to login page
+      } else {
+        console.error("Logout failed:", response.data);
+      }
+    } catch (err) {
+      console.error("Error during logout:", err);
+    }
   }
 }
 

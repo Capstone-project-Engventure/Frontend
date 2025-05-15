@@ -1,22 +1,22 @@
 import { useApi } from "../Api";
 import { Vocabulary } from "@/lib/types/vocabulary";
+import { BaseService } from "./base.service";
 const api = useApi();
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T | string;
-  current_page?: number;
-  total_page?: number;
-}
-
-class VocabularyService {
-  async getAllVocabulary(page: number, pageSize: number, keyword?: string) {
+class VocabularyService extends BaseService<Vocabulary> {
+  constructor() {
+    super("vocabularies");
+  }
+  async getAllVocabulary(page: number, pageSize: number, keyword?: string, topic_id?:string, pos?:string) {
     try {
       const params: Record<string, any> = {
         page,
         page_size: pageSize
       };
       if (keyword) params.keyword = keyword;
+      if (topic_id) params.topic_id = topic_id;
+      if (pos) params.pos = pos;
+      
 
       const res = await api.get('/vocabularies', { params });
       return {
@@ -32,22 +32,11 @@ class VocabularyService {
       };
     }
   }
-  getById(id: number) {
-    return api.get(`/vocabularies/${id}`);
-  }
-
+ 
   getVocabByTopic(topicId:string){
     return api.get(`/vocabularies?topic_id=${topicId}`)
   }
 
-  create(data: Vocabulary) {
-    return api.post("/vocabularies", data);
-  }
-  update(id: number, data: Vocabulary) {
-    return api.put(`/vocabularies/${id}`, data);
-  }
-  delete(id: number) {
-    return api.delete(`/vocabularies/${id}`);
-  }
+
 }
 export default VocabularyService;

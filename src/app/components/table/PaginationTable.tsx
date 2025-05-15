@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   HiPlus,
   HiPencil,
@@ -9,6 +9,8 @@ import {
   HiChevronRight,
 } from "react-icons/hi";
 import Breadcrumb from "../breadcumb";
+import { SearchInput } from "../SearchInput";
+import { set } from "lodash";
 
 interface Field {
   key: string;
@@ -18,10 +20,8 @@ interface Field {
 }
 
 interface PaginationTableProps {
-  objects: any[];
   fields: Field[];
   page: number;
-  totalPages: number;
   onPageChange: (page: number) => void;
   service: any;
   modalFields?: Field[];
@@ -32,10 +32,9 @@ interface PaginationTableProps {
 }
 
 const PaginationTable: React.FC<PaginationTableProps> = ({
-  objects,
+  // objects,
   fields,
   page,
-  totalPages,
   onPageChange,
   service,
   modalFields,
@@ -44,10 +43,25 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   linkBase = "",
   breadcrumbs = [],
 }) => {
+  const [objects, setObjects] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [keyword, setKeyword] = useState("");
+
+  const handleFetchData = async () => {
+    try {
+      const res = await service.getAll(page, 10, keyword);
+      if (res.success) {
+        setObjects(res.data);
+        setTotalPages(res.total_page);
+      }
+    } catch (err) {
+      console.log("Error: ", err);
+    }
+  };
 
   const handleAdd = () => {
     setFormData({});
@@ -122,6 +136,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       alert("Error saving item");
     } finally {
       setIsLoading(false);
+      handleFetchData()
     }
   };
 
@@ -130,6 +145,10 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
+
+  useEffect(() => {
+    handleFetchData();
+  }, [page, keyword]);
 
   return (
     <>
@@ -152,11 +171,12 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         <div className="mt-8">
           <div className="flex justify-between mb-4 px-2">
             <div className="w-1/3">
-              <input
+              {/* <input
                 type="text"
                 placeholder="Search vocabulary..."
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              /> */}
+              <SearchInput keyword={keyword} onChange={setKeyword} />
             </div>
             <button
               onClick={handleAdd}
@@ -303,7 +323,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
         {/* Modal */}
         {isModalOpen && modalFields && (
-          <div className="fixed inset-0 bg-gray-700 bg-opacity-25 flex items-center justify-center">
+          <div className="fixed inset-0 bg-gray-400/70 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg w-96">
               <h2 className="text-xl font-bold mb-4">{modalTitle}</h2>
               <form onSubmit={handleSubmit}>

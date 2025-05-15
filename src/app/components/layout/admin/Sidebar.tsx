@@ -39,7 +39,7 @@ export default function Sidebar() {
       href: "/admin/topics",
     },
     {
-      label: "Bài học",
+      label: "Quản lý dữ liệu",
       icon: TbNotes,
       children: [
         {
@@ -59,6 +59,11 @@ export default function Sidebar() {
           href: "/admin/exercises/pronunciation",
         },
       ],
+    },
+    {
+      label: "Tạo dữ liệu",
+      icon: TbNotes,
+      href: "/admin/generate",
     },
     {
       label: "Kiểu bài học",
