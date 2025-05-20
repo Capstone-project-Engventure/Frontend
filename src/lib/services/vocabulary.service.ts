@@ -14,8 +14,8 @@ class VocabularyService extends BaseService<Vocabulary> {
         page_size: pageSize
       };
       if (keyword) params.keyword = keyword;
-      if (topic_id) params.topic_id = topic_id;
-      if (pos) params.pos = pos;
+      if (topic_id && topic_id !== "") params.topic_id = topic_id;
+      if (pos && pos !== "") params.pos = pos;
       
 
       const res = await api.get('/vocabularies', { params });
@@ -37,6 +37,17 @@ class VocabularyService extends BaseService<Vocabulary> {
     return api.get(`/vocabularies?topic_id=${topicId}`)
   }
 
+  importVocabByFIle(file: File) {
+    const formData = new FormData();
+    console.log("it came here");
+    
+    formData.append("file", file);
+    return api.post("/vocabularies/import-file", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
 
 }
 export default VocabularyService;

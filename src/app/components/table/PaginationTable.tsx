@@ -10,7 +10,16 @@ import {
 } from "react-icons/hi";
 import Breadcrumb from "../breadcumb";
 import { SearchInput } from "../SearchInput";
+import {
+  Description,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
 import { set } from "lodash";
+import { toast } from "react-toastify";
+import ImportModal from "../ImportModal";
+import { ExportFile } from "@/lib/export-json";
 
 interface Field {
   key: string;
@@ -29,6 +38,8 @@ interface PaginationTableProps {
   onSuccess?: () => void;
   linkBase?: string;
   breadcrumbs?: { label: string; href?: string }[];
+  hasImport?: boolean;
+  onHandleFile?: () => void;
 }
 
 const PaginationTable: React.FC<PaginationTableProps> = ({
@@ -42,14 +53,24 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   onSuccess,
   linkBase = "",
   breadcrumbs = [],
+  hasImport = true,
+  onHandleFile = () => {},
 }) => {
   const [objects, setObjects] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
+
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [keyword, setKeyword] = useState("");
+  const [isDialogOpen, setDialogIsOpen] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [dialogBody, setDialogBody] = useState("");
+
+  const [isFileModalOpen, setIsFileModalOpen] = useState(false);
 
   const handleFetchData = async () => {
     try {
@@ -74,45 +95,56 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
-      setIsLoading(true);
-      try {
-        const response = await service.delete(id);
-        if (response.success) {
-          onSuccess?.();
-        } else {
-          alert("Failed to delete item");
-        }
-      } catch (error) {
-        alert("Error deleting item");
-      } finally {
-        setIsLoading(false);
+    setIsLoading(true);
+    try {
+      const response = await service.delete(id);
+      if (response.success) {
+        onSuccess?.();
+        toast.info(`Đã xóa chủ đề ${selectedItem} thành công!`);
+        handleFetchData();
+      } else {
+        alert("Failed to delete item");
       }
+    } catch (error) {
+      alert("Error deleting item");
+    } finally {
+      setSelectedItem(null);
+      setIsLoading(false);
+    }
+  };
+
+  const toggleDeleteDialog = () => {
+    setDialogIsOpen(true);
+    if (selectedItems.length > 1) {
+      setDialogTitle("Xóa nhiều chủ đề");
+      setDialogBody(
+        `Bạn có chắc chắn muốn xóa ${selectedItems.length}này không?`
+      );
+    } else {
+      setDialogTitle("Xóa chủ đề");
+      setDialogBody("Bạn có chắc chắn muốn xóa này không?");
     }
   };
 
   const handleDeleteSelected = async () => {
     if (selectedItems.length === 0) return;
-    if (
-      window.confirm(
-        `Are you sure you want to delete ${selectedItems.length} items?`
-      )
-    ) {
-      setIsLoading(true);
-      try {
-        // Assuming service has a deleteMultiple method
-        const response = await service.deleteMultiple(selectedItems);
-        if (response.success) {
-          setSelectedItems([]);
-          onSuccess?.();
-        } else {
-          alert("Failed to delete items");
-        }
-      } catch (error) {
-        alert("Error deleting items");
-      } finally {
-        setIsLoading(false);
+    setIsLoading(true);
+    try {
+      // Assuming service has a deleteMultiple method
+      console.log("Deleting items: ", selectedItems);
+
+      const response = await service.deleteMultiple(selectedItems);
+      if (response.success) {
+        setSelectedItems([]);
+        onSuccess?.();
+        toast.info(`Đã xóa ${selectedItems.length} chủ đề thành công!`);
+      } else {
+        alert("Failed to delete items");
       }
+    } catch (error) {
+      alert("Error deleting items");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -136,7 +168,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       alert("Error saving item");
     } finally {
       setIsLoading(false);
-      handleFetchData()
+      handleFetchData();
     }
   };
 
@@ -158,13 +190,13 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {selectedItems.length > 0 && (
           <div className="p-4 bg-gray-100 flex justify-between items-center">
-            <span>{selectedItems.length} items selected</span>
+            <span>{selectedItems.length} mục được chọn</span>
             <button
               onClick={handleDeleteSelected}
               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               disabled={isLoading}
             >
-              Delete Selected
+              Xóa {selectedItems.length} mục
             </button>
           </div>
         )}
@@ -178,13 +210,43 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
               /> */}
               <SearchInput keyword={keyword} onChange={setKeyword} />
             </div>
-            <button
-              onClick={handleAdd}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
-            >
-              <HiPlus className="text-lg" />
-              Add
-            </button>
+            <div className="flex flex-row gap-2 items-center">
+              <button
+                onClick={handleAdd}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
+              >
+                <HiPlus className="text-lg" />
+                Add
+              </button>
+              {hasImport ? (
+                <>
+                  <button
+                    onClick={() => {
+                      ExportFile(objects, "data", "json");
+                    }}
+                    className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-light transition text-sm border border-primary"
+                  >
+                    Xuất file
+                  </button>
+
+                  <button
+                    onClick={() => setIsFileModalOpen(true)}
+                    className="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-md hover:bg-secondary-light transition text-sm border border-secondary"
+                  >
+                    Nhập file
+                  </button>
+                  <ImportModal
+                    isOpen={isFileModalOpen}
+                    onClose={() => {
+                      setIsFileModalOpen(false);
+                    }}
+                    onHandleFile={() => onHandleFile()}
+                  />
+                </>
+              ) : (
+                <></>
+              )}
+            </div>
           </div>
           <div className="overflow-x-auto rounded-lg shadow-lg">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -265,7 +327,10 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             <HiPencil className="text-lg" />
                           </button>
                           <button
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => {
+                              setSelectedItem(item?.id);
+                              toggleDeleteDialog();
+                            }}
                             className="text-red-600 hover:text-red-800"
                             title="Delete"
                           >
@@ -278,10 +343,10 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                 ) : (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={fields.length + 2}
                       className="px-6 py-6 text-center text-gray-500 dark:text-gray-400"
                     >
-                      Không co du lieu nào
+                      Không có dữ liệu
                     </td>
                   </tr>
                 )}
@@ -290,7 +355,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
           </div>
 
           {/* Pagination UI */}
-          <div className="flex justify-center items-center gap-2 mt-6">
+          <div className="flex justify-center items-center gap-2 mt-6 mb-4 ">
             <button
               disabled={page <= 1}
               onClick={() => onPageChange(page - 1)}
@@ -408,6 +473,40 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
             </div>
           </div>
         )}
+
+        {/* Dialog */}
+        <Dialog
+          open={isDialogOpen}
+          onClose={() => setDialogIsOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center"
+        >
+          <DialogPanel transition className={"bg-white p-6 rounded-lg"}>
+            <DialogTitle className="text-lg font-bold mb-4">
+              {dialogTitle}
+            </DialogTitle>
+            <p className="p-2 mt-2">{dialogBody}</p>
+            <div className="mt-4">
+              <button
+                onClick={() => {
+                  setDialogIsOpen(false);
+                  handleDelete(selectedItem);
+                }}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Xóa
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedItems([]);
+                  setDialogIsOpen(false);
+                }}
+                className="ml-2 border px-4 py-2 rounded hover:bg-gray-100"
+              >
+                Hủy
+              </button>
+            </div>
+          </DialogPanel>
+        </Dialog>
       </div>
     </>
   );

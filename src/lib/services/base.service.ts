@@ -19,13 +19,17 @@ export abstract class BaseService<T> {
   public async getAll(
     page?: number,
     pageSize?: number,
-    keyword?: string
+    keyword?: string,
+    filters?: Record<string, any>
   ): Promise<ApiResponse<T>> {
     try {
       const params: Record<string, any> = {};
       if (page) params.page = page;
       if (pageSize) params.page_size = pageSize;
       if (keyword) params.keyword = keyword;
+      if (filters) {
+        Object.assign(params, filters);
+      }
 
       const res = await api.get(`${this.endpoint}`, { params });
 
@@ -122,6 +126,29 @@ export abstract class BaseService<T> {
   public async delete(id: number): Promise<ApiResponse<null>> {
     try {
       const res = await api.delete(`${this.endpoint}/${id}`);
+      if (res.status === 204) {
+        return {
+          success: true,
+          data: null,
+        };
+      }
+      return {
+        success: false,
+        data: "Unexpected status code: " + res.status,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error.message,
+      };
+    }
+  }
+
+  public async deleteMultiple(items:Array<number>): Promise<ApiResponse<null>> {
+    try {
+      const res = await api.delete(`${this.endpoint}`, {
+        data: { ids: items },
+      });
       if (res.status === 204) {
         return {
           success: true,

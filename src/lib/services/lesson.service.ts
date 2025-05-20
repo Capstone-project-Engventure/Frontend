@@ -15,6 +15,16 @@ class LessonService extends BaseService<Lesson> {
   constructor() {
     super("lessons");
   }
+  // async function getLessonsByTopic(){
+  //   const res = await api.get<ApiResponse<Lesson[]>>(
+  //     `${this.endpoint}`
+  //   );
+  //   if (res.data.success) {
+  //     return res.data.data;
+  //   } else {
+  //     throw new Error(res.data.data);
+  //   }
+  // }
 }
 
 export default LessonService;
