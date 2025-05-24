@@ -1,11 +1,8 @@
 "use client";
+import dayjs from "dayjs"
 import axios from "axios";
+import Cookies from "js-cookie";
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
-// const reset = () => {
-//   localStorage.setItem("accessToken", "");
-//   localStorage.setItem("refreshToken", "");
-// };
-// import { useAuth } from "@/lib/context/AuthContext";
 export const useApi = () => {
   // const { currentLanguage } = useLocale();
   // const {reset} = useAuth()
@@ -16,7 +13,7 @@ export const useApi = () => {
 
   // Request interceptor
   api.interceptors.request.use((config) => {
-    let access_token = localStorage.getItem("accessToken") || "";
+    let access_token = Cookies.get("access_token") || "";
     const isLoginEndpoint = config.url?.endsWith("/login");
     if (access_token && !isLoginEndpoint) {
       config.headers["Authorization"] = `Bearer ${access_token}`;
@@ -31,7 +28,7 @@ export const useApi = () => {
       const response = error.response;
 
       if (response?.status === 401 || response?.status === 403) {
-        const refresh_token = localStorage.getItem("refreshToken") || "";
+        const refresh_token = Cookies.get("refresh_token") || "";
         if (refresh_token?.trim() !== "") {
           const formData = new FormData();
           formData.append("refresh_token", refresh_token);
@@ -42,17 +39,21 @@ export const useApi = () => {
               formData
             );
             const { access_token, refresh_token } = refreshResponse.data;
-
-            localStorage.setItem("accessToken", access_token);
-            localStorage.setItem("refreshToken", refresh_token);
-            // setTokenInfo({ access_token, refresh_token: newRefresh });
-
-            // Optionally retry original request
-            // error.config.headers['Authorization'] = `Bearer ${access_token}`;
-            // return api.request(error.config);
+            const cookieOptions = {
+              expires: 7, // expires in 7 days or session
+              secure: process.env.NEXT_PUBLIC_PRODUCTION === "production",
+              sameSite: "Lax" as const,
+            };
+            Cookies.set("access_token",access_token, {
+              ...cookieOptions,
+              expires: dayjs().add(1, 'hour').toDate(),
+            })
+            Cookies.set("refresh_token",refresh_token, {
+              ...cookieOptions,
+              expires: dayjs().add(7, 'day').toDate(),
+            })
           } catch (refreshError) {
             console.error(refreshError);
-            // reset();
           }
         }
       }

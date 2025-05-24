@@ -30,7 +30,7 @@ export default function AdminLessonDetail() {
           }
         }
 
-        const res = await lessonService.getAllLessons();
+        const res = await lessonService.getAll();
         if (res.success && Array.isArray(res.data)) {
           setLessons(res.data);
           localStorage.setItem("lessons", JSON.stringify(res.data));

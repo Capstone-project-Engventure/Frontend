@@ -20,7 +20,8 @@ export default function AdminTopic() {
   //   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(2);
+  const [totalPage, setTotalPage] = useState(7);
+  const [keyword, setKeyword] = useState("");
 
   const fields = [
     { key: "title", label: "Title" },
@@ -29,18 +30,41 @@ export default function AdminTopic() {
     { key: "order", label: "Order" },
   ];
 
+  const breadcrumbs = [
+    { label: "Home", href: "/admin/home" },
+    { label: "Topic" },
+  ];
+
+  const modalFields = [
+    { key: "title", label: "Title", type: "text" },
+    {
+      key: "level",
+      label: "Level",
+      type: "select",
+      options: [
+        { key: "A1", label: "A1" },
+        { key: "A2", label: "A2" },
+        { key: "B1", label: "B1" },
+        { key: "B2", label: "B2" },
+        { key: "C1", label: "C2" },
+      ],
+    },
+    { key: "description", label: "Description", type: "textarea" },
+    { key: "order", label: "Order", type: "number" },
+  ];
+
   const onPageChange = (page: number) => {
     setPage(page);
   };
   const handleAdd = (formData: any) => {
-    topicService.createTopic(formData);
+    topicService.create(formData);
   };
   const handleUpdate = (id: number, formData: any) => {
-    topicService.updateTopic(id, formData);
+    topicService.update(id, formData);
   };
 
   const handleDelete = (id: number) => {
-    topicService.deleteTopic(id);
+    topicService.delete(id);
   };
   const [formData, setFormData] = useState<any>(null);
   const isModalOpen = formData !== null;
@@ -72,22 +96,14 @@ export default function AdminTopic() {
   };
 
   useEffect(() => {
-    const fetchTopics = async () => {
-      const topicService = new TopicService();
-      const res = await topicService.getAllTopics(1, 10);
-
-      if (!res.success) throw new Error("API response unsuccessful");
-      if (!Array.isArray(res.data)) {
-        // const paginatedData = res.data as PaginatedResponse<Topic>;
-        setTopics(res.data.results);
-        setPageSize(res.data.page_size);
-        setPage(res.data.page);
-      } else {
-        setTopics(res.data);
-      }
-    };
-
-    fetchTopics();
+    // const fetchTopics = async () => {
+    //   const topicService = new TopicService();
+    //   const res = await topicService.getAll(page, totalPage, keyword);
+    //   console.log(res);
+    //   if (!res.success) throw new Error("API response unsuccessful");
+    //   setTopics(res.data);
+    // };
+    // fetchTopics();
   }, []);
 
   if (isLoading) {
@@ -97,29 +113,18 @@ export default function AdminTopic() {
   return (
     // Fix the component with ts
     <>
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={handleAddClick}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
-        >
-          <HiPlus className="text-lg" />
-          Add
-        </button>
-      </div>
       <PaginationTable
-        objects={topics}
         fields={fields}
         page={page}
-        totalPages={pageSize}
         onPageChange={onPageChange}
-        onAdd={handleAdd}
-        onDelete={handleDelete}
-        onUpdate={handleUpdate}
-        linkBase="/admin/lessons"
+        service={topicService}
+        linkBase="/admin/topics"
+        breadcrumbs={breadcrumbs}
+        modalFields={modalFields}
       />
       {isModalOpen && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md shadow-xl">
+        <div className="fixed inset-0 bg-white  bg-opacity-30 dark:bg-white dark:bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
               {formData.id ? "Edit" : "Add"} Lesson
             </h3>

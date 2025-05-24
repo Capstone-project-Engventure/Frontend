@@ -76,9 +76,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role: role,
     };
 
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-    localStorage.setItem("tokenInfo", JSON.stringify(tokenInfo));
     try {
       const userData = await userService.getOwnUser();
       localStorage.setItem("user", JSON.stringify(userData.data));
@@ -93,9 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const reset = () => {
     setTokenInfoState(null);
     setUser(null);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
+
   };
 
   return (

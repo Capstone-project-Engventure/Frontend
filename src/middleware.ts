@@ -1,18 +1,24 @@
 // // middleware.ts
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { jwtDecode } from "jwt-decode";
+import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
+  const token = request.cookies.get("access_token");
 
+  // Redirect logged-in users from "/" to dashboard
+  if (request.nextUrl.pathname === "/" && token) {
+    return NextResponse.redirect(new URL("/student/my-course", request.url));
+  }
 
-  const url = request.nextUrl.clone();
-
+  // Protect routes
+  if (request.nextUrl.pathname.startsWith("/student") && !token) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   return NextResponse.next();
 }
+
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/", "/student/:path*"],
 };
 
 // // export function middleware(request:NextRequest){

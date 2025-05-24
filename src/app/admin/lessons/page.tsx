@@ -4,60 +4,64 @@ import { useApi } from "@/lib/Api";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
 import { Lesson } from "@/lib/types/lesson";
+import { Topic } from "@/lib/types/topic";
 import Link from "next/link";
-import { log } from "node:console";
 import { useEffect, useState } from "react";
-
-import {
-  HiPlus,
-  HiPencil,
-  HiTrash,
-  HiChevronLeft,
-  HiChevronRight,
-} from "react-icons/hi";
+import { toast } from "react-toastify";
 
 export default function AdminLesson() {
-  // Const :
-  const CACHE_KEY = "lessons";
-  const TIMESTAMP_KEY = "lesson_timestamp";
-  const CACHE_DURATION_MINUTES = 10;
   // State
   const [isLoading, setIsLoading] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [topics, setTopics] = useState([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const lessonService = new LessonService();
   const topicService = new TopicService();
+
+  const topicOptions = topics.map((t) => ({
+    value: t.id,
+    label: t.title,
+  }));
+
+  const breadcrumbs = [
+    { label: "Home", href: "/admin/home" },
+    { label: "Lesson" },
+  ];
+
   const fields = [
     { key: "title", label: "Title" },
     { key: "level", label: "Level" },
-    { key: "topic", label: "Topic" },
+    { key: "topic", label: "Topic", isNest: true, nestKey: "title" },
     { key: "description", label: "Description" },
   ];
+
+  const modalFields = [
+    { key: "title", label: "Title", type: "text" },
+    {
+      key: "level",
+      label: "Level",
+      type: "select",
+      options: [
+        { key: "A1", label: "A1" },
+        { key: "A2", label: "A2" },
+        { key: "B1", label: "B1" },
+        { key: "B2", label: "B2" },
+        { key: "C1", label: "C2" },
+      ],
+    },
+    { key: "topic", label: "Topic", type: "select", options: topicOptions },
+    { key: "description", label: "Description", type: "textarea" },
+  ];
+
   const fetchLessonData = async () => {
     setIsLoading(true);
     try {
       // Step 1: Check localStorage
-      // const cachedLessons = localStorage.getItem(CACHE_KEY);
-      // const cachedTimestamp = localStorage.getItem(TIMESTAMP_KEY);
-      // const now = Date.now();
-
-      // const isCacheValid =
-      //   cachedLessons &&
-      //   cachedTimestamp &&
-      //   (now - parseInt(cachedTimestamp)) / 60000 < CACHE_DURATION_MINUTES;
-
-      //   if (isCacheValid) {
-      //   const lessonsData = JSON.parse(cachedLessons!);
-      //   setLessons(lessonsData);
-      //   console.log("Loaded lessons from cache");
-      //   return;
-      // }
 
       // Step 2: Fetch API
-      const res = await lessonService.getAllLessons(page, pageSize);
+      const res = await lessonService.getAll(page, pageSize);
       console.log("check res:", res);
 
       if (!res.success) throw new Error("API response unsuccessful");
@@ -65,14 +69,10 @@ export default function AdminLesson() {
       if (Array.isArray(res.data)) {
         setLessons(res.data);
         setPageSize(1);
-        // localStorage.setItem(CACHE_KEY, JSON.stringify(res.data));
-        // localStorage.setItem(TIMESTAMP_KEY, now.toString());
       } else {
         setLessons(res.data.results);
         setPage(res.data.page);
         setPageSize(res.data.page_size);
-        // localStorage.setItem(CACHE_KEY, JSON.stringify(res.data.results));
-        // localStorage.setItem(TIMESTAMP_KEY, now.toString());
       }
     } catch (err) {
       console.error("Fetch lessons failed:", err);
@@ -83,7 +83,7 @@ export default function AdminLesson() {
 
   const fetchTopics = async () => {
     const topicService = new TopicService();
-    const res = await topicService.getAllTopics();
+    const res = await topicService.getAll();
     if (res.success && Array.isArray(res.data)) {
       setTopics(res.data);
     }
@@ -92,16 +92,7 @@ export default function AdminLesson() {
   const onPageChange = (page: number) => {
     setPage(page);
   };
-  const handleAdd = (formData: any) => {
-    lessonService.createLesson(formData);
-  };
-  const handleUpdate = (id: number, formData: any) => {
-    lessonService.updateLesson(id, formData);
-  };
 
-  const handleDelete = (id: number) => {
-    lessonService.deleteLesson(id);
-  };
   const [formData, setFormData] = useState<any>(null);
   const isModalOpen = formData !== null;
 
@@ -118,13 +109,8 @@ export default function AdminLesson() {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    if (formData.id) {
-      handleUpdate(formData.id, formData);
-    } else {
-      handleAdd(formData);
-    }
-    setFormData(null);
+  const onSuccess = () => {
+    toast.success("Cập nhật thành công");
   };
 
   const handleCloseModal = () => {
@@ -140,31 +126,39 @@ export default function AdminLesson() {
     return <div>Đang tải dữ liệu...</div>;
   }
 
+  const onHandleFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await lessonService.importLessonByFile(file);
+      if (res.success) {
+        toast.success("Import file thành công");
+        fetchLessonData();
+      } else {
+        toast.error("Import file thất bại");
+      }
+    } catch (error) {
+      console.error("Error importing file:", error);
+      toast.error("Import file thất bại");
+    }
+  };
+
   return (
     // Fix the component with ts
     <>
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={handleAddClick}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
-        >
-          <HiPlus className="text-lg" />
-          Add
-        </button>
-      </div>
       <PaginationTable
-        objects={lessons}
         fields={fields}
         page={page}
-        totalPages={pageSize}
+        service={lessonService}
         onPageChange={onPageChange}
-        onAdd={handleAdd}
-        onDelete={handleDelete}
-        onUpdate={handleUpdate}
+        onSuccess={onSuccess}
         linkBase="/admin/lessons"
+        breadcrumbs={breadcrumbs}
+        modalFields={modalFields}
+        onHandleFile={onHandleFile}
       />
       {isModalOpen && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30  flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
               {formData.id ? "Edit" : "Add"} Lesson

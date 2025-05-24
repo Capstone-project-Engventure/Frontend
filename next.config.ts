@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   publicRuntimeConfig: {
     baseURL: process.env.NEXT_PUBLIC_BASE_URL || "https://yourdomain.com",
   },
+  images: {
+    domains: ['localhost','cloudinary'], //Allowed domains
+  },
 };
 // const withNextIntl = createNextIntlPlugin();
 export default nextConfig;

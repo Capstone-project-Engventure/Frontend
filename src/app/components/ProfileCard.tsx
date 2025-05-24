@@ -59,7 +59,7 @@ export default function ProfileCard() {
         });
       } catch (err) {
         console.log("something went wrong", err);
-        toast("System is error");
+        toast("Hệ thống xảy ra vấn đề");
       } finally {
         setIsLoading(false);
       }
