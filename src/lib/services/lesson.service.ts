@@ -25,6 +25,17 @@ class LessonService extends BaseService<Lesson> {
   //     throw new Error(res.data.data);
   //   }
   // }
+  importLessonByFile(file: File) {
+    const formData = new FormData();
+    console.log("it came here");
+    
+    formData.append("file", file);
+    return api.post("/lessons/import-file", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
 }
 
 export default LessonService;

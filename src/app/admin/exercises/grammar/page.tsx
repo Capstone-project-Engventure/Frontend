@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-export default function AdminListening() {
+export default function AdminGrammar() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
 
@@ -31,7 +31,7 @@ export default function AdminListening() {
   const handleSelect = (option: any) => {
     setSelectedTopic(option?.value || null);
     lessonService
-      .getAll({ page: 1, pageSize: 10, filters: { topic_id: option?.value } })
+      .getAll({ page: 1, pageSize: 10, filters: { topic: option?.label, skill: 'grammar' } })
       .then((res) => setLessons(res.data));
   };
 
@@ -59,7 +59,7 @@ export default function AdminListening() {
         {lessons.map((lesson) => (
           <Link
             key={lesson.id}
-            href={`/admin/exercises/listening/${lesson.id}`}
+            href={`/admin/exercises/grammar/${lesson.id}`}
             className="border p-4 rounded hover:shadow-lg transition"
           >
             <h4 className="font-semibold">{lesson.title}</h4>

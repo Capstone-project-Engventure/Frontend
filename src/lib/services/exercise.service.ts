@@ -10,5 +10,7 @@ class ExerciseService extends BaseService<Exercise> {
     super("exercises");
   }
 
+  
+
 }
 export default ExerciseService;

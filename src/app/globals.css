@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@layer theme, base, components, utilities;
+/* @import "./theme.css" layer(theme);
+@import "./preflight.css" layer(base);
+@import "./utilities.css" layer(utilities); */
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 /* Tailwind v4 has changed */

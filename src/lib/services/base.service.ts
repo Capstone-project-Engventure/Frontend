@@ -16,12 +16,17 @@ export abstract class BaseService<T> {
     this.endpoint = endpoint;
   }
 
-  public async getAll(
-    page?: number,
-    pageSize?: number,
-    keyword?: string,
-    filters?: Record<string, any>
-  ): Promise<ApiResponse<T>> {
+  public async getAll({
+    page,
+    pageSize,
+    keyword,
+    filters
+  }: {
+    page?: number;
+    pageSize?: number;
+    keyword?: string;
+    filters?: Record<string, any>;
+  }): Promise<ApiResponse<T>> {
     try {
       const params: Record<string, any> = {};
       if (page) params.page = page;
@@ -81,9 +86,9 @@ export abstract class BaseService<T> {
     };
   }
 
-  public async create(data: Partial<T>): Promise<ApiResponse<T>> {
+  public async create(data: Partial<T>, config: any): Promise<ApiResponse<T>> {
     try {
-      const res = await api.post(`${this.endpoint}`, data);
+      const res = await api.post(`${this.endpoint}`, data, config);
       if (res.status === 201) {
         return {
           success: true,
@@ -102,9 +107,13 @@ export abstract class BaseService<T> {
     }
   }
 
-  public async update(id: number, data: Partial<T>): Promise<ApiResponse<T>> {
+  public async update(
+    id: number,
+    data: Partial<T>,
+    config: any
+  ): Promise<ApiResponse<T>> {
     try {
-      const res = await api.put(`${this.endpoint}/${id}`, data);
+      const res = await api.put(`${this.endpoint}/${id}`, data, config);
       if (res.status === 200) {
         return {
           success: true,
@@ -144,7 +153,9 @@ export abstract class BaseService<T> {
     }
   }
 
-  public async deleteMultiple(items:Array<number>): Promise<ApiResponse<null>> {
+  public async deleteMultiple(
+    items: Array<number>
+  ): Promise<ApiResponse<null>> {
     try {
       const res = await api.delete(`${this.endpoint}`, {
         data: { ids: items },

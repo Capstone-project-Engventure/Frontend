@@ -82,7 +82,7 @@ export default function AdminExercise() {
     const fetchExerciseData = async () => {
       setIsLoading(true);
       try {
-        const res = await exerciseService.getAllExercises(page, pageSize);
+        const res = await exerciseService.getAll(page, pageSize);
         if (res.success) {
           setExercises(res.data.results);
           setPage(res.data.page);

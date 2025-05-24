@@ -20,12 +20,27 @@ import { set } from "lodash";
 import { toast } from "react-toastify";
 import ImportModal from "../ImportModal";
 import { ExportFile } from "@/lib/export-json";
+import AudioPlayer from "../AudioPlayer";
 
 interface Field {
   key: string;
   label: string;
-  type?: "text" | "image" | "select" | "textarea";
+  type?:
+    | "text"
+    | "image"
+    | "select"
+    | "textarea"
+    | "audio"
+    | "number"
+    | "hidden"
+    | "mcq";
+  placeholder?: string;
+  required?: boolean;
   options?: { value: string; label: string }[];
+  nestKey?: string;
+  isNest?: boolean;
+  default?: string | number;
+  choices?: Array<string>;
 }
 
 interface PaginationTableProps {
@@ -33,13 +48,14 @@ interface PaginationTableProps {
   page: number;
   onPageChange: (page: number) => void;
   service: any;
+  config: any;
   modalFields?: Field[];
   modalTitle?: string;
   onSuccess?: () => void;
   linkBase?: string;
   breadcrumbs?: { label: string; href?: string }[];
   hasImport?: boolean;
-  onHandleFile?: () => void;
+  onHandleFile?: (file:File) => void;
 }
 
 const PaginationTable: React.FC<PaginationTableProps> = ({
@@ -48,13 +64,14 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   page,
   onPageChange,
   service,
+  config,
   modalFields,
   modalTitle = "Add/Edit Item",
   onSuccess,
   linkBase = "",
   breadcrumbs = [],
   hasImport = true,
-  onHandleFile = () => {},
+  onHandleFile = (file:File) => {},
 }) => {
   const [objects, setObjects] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -151,12 +168,27 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log("Check Form data: ", formData);
+
+    const form = new FormData();
+    if (config) {
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "options") {
+          form.append("options", JSON.stringify(value));
+        } else if (value instanceof File) {
+          form.append(key, value);
+        } else {
+          form.append(key, value);
+        }
+      });
+    }
+    console.log("Check Form data after sign: ", form);
     try {
       let response;
-      if (formData.id) {
-        response = await service.update(formData.id, formData);
+      if (form.id) {
+        response = await service.update(form.id, form, config);
       } else {
-        response = await service.create(formData);
+        response = await service.create(form, config);
       }
       if (response.success) {
         setIsModalOpen(false);
@@ -181,6 +213,23 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   useEffect(() => {
     handleFetchData();
   }, [page, keyword]);
+
+  useEffect(() => {
+    if (!modalFields) {
+      console.log("Check not good: ", modalFields);
+
+      return;
+    }
+    modalFields.map((field) => {
+      if (field.type === "hidden") {
+        setFormData({
+          ...formData,
+          [field.key]: field.default,
+        });
+      }
+    });
+    console.log("formData: ", fields, formData);
+  }, [modalFields]);
 
   return (
     <>
@@ -312,7 +361,19 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                               height={40}
                               className="rounded object-cover"
                             />
-                          ) : (
+                          ) : f.key === "audio_file" && item[f.key] ? (
+                            <AudioPlayer src={item[f.key]} />
+                          ) : f.isNest && item[f.key] ? (
+                            <span>{item[f.key]?.[f.nestKey]}</span>
+                          ) : f.key === "options" && typeof item[f.key] === "object" ? (
+                            <ul className="list-disc list-inside">
+                              {Object.entries(item[f.key]).map(([optKey, optValue]) => (
+                                <li key={optKey}>
+                                  <strong>{optKey.toUpperCase()}:</strong> {optValue}
+                                </li>
+                              ))}
+                            </ul>
+                          ):(
                             item[f.key]
                           )}
                         </td>
@@ -388,71 +449,126 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
         {/* Modal */}
         {isModalOpen && modalFields && (
-          <div className="fixed inset-0 bg-gray-400/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg w-96">
+          <div className="fixed inset-0 bg-gray-400/70 flex items-center justify-center z-10 ">
+            <div className="bg-white p-6 rounded-lg w-96 max-h-[calc(100vh-2rem)] overflow-y-auto min-w-xl">
               <h2 className="text-xl font-bold mb-4">{modalTitle}</h2>
               <form onSubmit={handleSubmit}>
-                {modalFields.map((field) => (
-                  <div key={field.key} className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      {field.label}
-                    </label>
-                    {field.type === "textarea" ? (
-                      <textarea
-                        value={formData[field.key] || ""}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            [field.key]: e.target.value,
-                          })
-                        }
-                        className="mt-1 px-2 py-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        rows={3}
-                      />
-                    ) : field.type === "select" ? (
-                      <select
-                        value={formData[field.key] || ""}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            [field.key]: e.target.value,
-                          })
-                        }
-                        className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      >
-                        <option value="">Select {field.label}</option>
-                        {field.options?.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
+                {modalFields.map((field) => {
+                  if (field.type === "hidden") {
+                    return (
                       <input
-                        type={field.type === "image" ? "file" : "text"}
-                        value={
-                          field.type !== "image"
-                            ? formData[field.key] || ""
-                            : undefined
-                        }
-                        onChange={(e) => {
-                          if (field.type === "image") {
+                        key={field.key}
+                        type="hidden"
+                        value={field.default || ""}
+                        name={field.key}
+                      />
+                    );
+                  }
+                  if (
+                    field.type === "mcq" &&
+                    formData.type !== "3aded9b5-2f14-4814-bf39-707d5bffcb76"
+                  ) {
+                    return null;
+                  }
+                  return (
+                    <div key={field.key} className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700">
+                        {field.label}
+                      </label>
+
+                      {field.type === "textarea" ? (
+                        <textarea
+                          value={formData[field.key] || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              [field.key]: e.target.value,
+                            })
+                          }
+                          className="mt-1 px-2 py-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          rows={3}
+                        />
+                      ) : field.type === "select" ? (
+                        <select
+                          value={formData[field.key] || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              [field.key]: e.target.value,
+                            })
+                          }
+                          className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        >
+                          <option value="">Select {field.label}</option>
+                          {field.options?.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : field.type === "mcq" ? (
+                        <>
+                          {field.choices?.map((opt) => (
+                            <div key={opt} className="flex items-center mb-2">
+                              <label className="mr-2">{opt}</label>
+                              <input
+                                key={opt}
+                                type="text"
+                                placeholder={`Option ${opt}`}
+                                value={formData.options?.[opt] || ""}
+                                onChange={(e) =>
+                                  setFormData({
+                                    ...formData,
+                                    options: {
+                                      ...(formData.options || {}),
+                                      [opt]: e.target.value,
+                                    },
+                                  })
+                                }
+                                className="mt-1 mb-2 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                          ))}
+                        </>
+                      ) : field.type === "image" || field.type === "audio" ? (
+                        <input
+                          type="file"
+                          accept={
+                            field.type === "image" ? "image/*" : "audio/*"
+                          }
+                          onChange={(e) => {
+                            console.log(
+                              "File selected: ",
+                              field.key,
+                              e.target.files?.[0]
+                            );
+
                             setFormData({
                               ...formData,
                               [field.key]: e.target.files?.[0],
                             });
-                          } else {
+
+                            console.log("Form data: ", formData);
+                          }}
+                          className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={formData[field.key] || ""}
+                          onChange={(e) =>
                             setFormData({
                               ...formData,
                               [field.key]: e.target.value,
-                            });
+                            })
                           }
-                        }}
-                        className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    )}
-                  </div>
-                ))}
+                          className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+
                 <div className="flex justify-end space-x-2">
                   <button
                     type="button"
@@ -478,7 +594,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         <Dialog
           open={isDialogOpen}
           onClose={() => setDialogIsOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-gray-400/70 z-12 flex items-center justify-center"
         >
           <DialogPanel transition className={"bg-white p-6 rounded-lg"}>
             <DialogTitle className="text-lg font-bold mb-4">

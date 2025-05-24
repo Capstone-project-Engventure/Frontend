@@ -339,7 +339,7 @@ export default function AdminVocabulary() {
 
   const handleImportFile = async (file: any) => {
     try {
-      const res = await vocabularyService.importVocabByFIle(file);
+      const res = await vocabularyService.importVocabByFile(file);
       console.log("res", res);
     } catch (err: any) {
       setError(err.message || "Failed to parse file.");
