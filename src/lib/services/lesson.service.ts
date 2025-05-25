@@ -25,10 +25,18 @@ class LessonService extends BaseService<Lesson> {
   //     throw new Error(res.data.data);
   //   }
   // }
+  getAllByTopic(
+    topicId: string,
+    params?: { page?: number; pageSize?: number }
+  ) {
+    return api.get("/lessons", {
+      params: { topic: topicId, ...params },
+    });
+  }
   importLessonByFile(file: File) {
     const formData = new FormData();
     console.log("it came here");
-    
+
     formData.append("file", file);
     return api.post("/lessons/import-file", formData, {
       headers: {

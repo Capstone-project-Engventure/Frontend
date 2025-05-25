@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from 'next-intl/plugin';
 const nextConfig: NextConfig = {
   /* config options here */
   // allowedDevOrigins:"*",
@@ -9,5 +10,6 @@ const nextConfig: NextConfig = {
     domains: ['localhost','cloudinary'], //Allowed domains
   },
 };
-// const withNextIntl = createNextIntlPlugin();
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin();
+// export default nextConfig;
+export default withNextIntl(nextConfig);

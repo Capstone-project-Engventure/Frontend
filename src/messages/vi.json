@@ -1,9 +1,9 @@
 {
   "HomePage": {
     "title": "Xin chao!",
-    "about": "Go to the about page"
+    "about": "Về chúng tôi"
   },
-  "Register":{
+  "Register": {
     "welcome": "Welcome to the English learning system",
     "register": "Register",
     "or": "Or",
@@ -30,6 +30,12 @@
   "Dashboard": {
     "title": "Xin chao!",
     "about": "Go to the about page"
+  },
+  "AdminHome": {
+    "ExerciseTitle": "Bài tập",
+    "LessonTitle": "Bài học",
+    "TopicTitle": "Chủ đề",
+    "UserTitle": "Người dùng",
+    "BreadcrumbHome": "Trang chủ"
   }
-
 }
