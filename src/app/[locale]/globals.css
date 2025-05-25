@@ -1,0 +1,88 @@
+@import "tailwindcss";
+@layer theme, base, components, utilities;
+/* @import "./theme.css" layer(theme);
+@import "./preflight.css" layer(base);
+@import "./utilities.css" layer(utilities); */
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+/* Tailwind v4 has changed */
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #f59e0b;
+  --primary-light: #fcd34d;
+  --primary-dark: #d97706;
+  --secondary: #3b82f6;
+  --secondary-light: #60a5fa;
+  --secondary-dark: #1d4ed8;
+
+  --success: #10b981;
+  --success-light: #34d399;
+  --success-dark: #059669;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-secondary-light: var(--secondary-light);
+  --color-secondary-dark: var(--secondary-dark);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --primary: #d97706;
+    --secondary: #1d4ed8;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.btn-success {
+  background-color: var(--success);
+  color: white;
+  border: 1px solid var(--success-dark);
+}
+.btn-success:hover {
+  background-color: var(--success-dark);
+}
+
+/* h1 {
+  @apply text-3xl font-bold text-gray-800;
+}
+
+h2 {
+  @apply text-2xl font-semibold text-gray-700;
+}
+
+h3 {
+  @apply text-xl font-medium text-gray-600;
+}
+p {
+  @apply text-base text-gray-500;
+}
+a {
+  @apply text-blue-600 hover:text-blue-800;
+} */
+.heading{
+  @apply text-3xl font-bold text-gray-800;
+}
+
+.card {
+  @apply flex justify-between items-center p-5 bg-white rounded-xl shadow-md
+}

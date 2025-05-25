@@ -26,5 +26,12 @@
     "registerButton": "Đăng ký",
     "googleLogin": "Google",
     "facebookLogin": "Facebook"
+  },
+  "AdminHome":{
+    "ExerciseTitle": "Exercises",
+    "LessonTitle": "Lessons",
+    "TopicTitle": "Topics",
+    "UserTitle": "Users",
+    "BreadcrumbHome": "Home"
   }
 }

@@ -26,7 +26,7 @@ export abstract class BaseService<T> {
     pageSize?: number;
     keyword?: string;
     filters?: Record<string, any>;
-  }): Promise<ApiResponse<T>> {
+  }={}): Promise<ApiResponse<T>> {
     try {
       const params: Record<string, any> = {};
       if (page) params.page = page;
