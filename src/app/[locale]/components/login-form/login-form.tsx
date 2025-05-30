@@ -70,8 +70,12 @@ export default function LoginForm() {
         loginForm.password,
         rememberMe
       );
+      await setTokenInfo({
+        accessToken: res.access_token,
+        refreshToken: res.refresh_token,
+      });
+      
       const userData = await oauthService.getUserInfo();
-      console.log("check: ",userData);
       
       if (userData) {
         if (

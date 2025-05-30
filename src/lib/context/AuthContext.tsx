@@ -9,7 +9,6 @@ import {
 import { jwtDecode } from "jwt-decode";
 import { useApi } from "../Api";
 import UserService from "../services/user.service";
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 interface TokenInfo {
   accessToken: string;
   refreshToken: string;
@@ -28,26 +27,23 @@ interface User {
   id: string;
   email: string;
   roles: string[];
-};
-
+}
 
 // username: string | null;
 interface AuthContextProps {
   tokenInfo: TokenInfo | null;
   setTokenInfo: (info: TokenInfo) => void;
   reset: () => void;
-  user:User|null;
+  user: User | null;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [tokenInfo, setTokenInfoState] = useState<TokenInfo | null>(null);
-  const [user, setUser] = useState<User|null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const userService = new UserService()
+  const userService = new UserService();
 
   const setTokenInfo = async ({
     accessToken,
@@ -58,13 +54,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }) => {
     // if (!accessToken) return;
     const decoded = jwtDecode(accessToken);
-    const { sub, iat, exp, nbf, scope } = decoded
+    const { sub, iat, exp, nbf, scope } = decoded;
     // console.log("decoded: ", decoded);
-    
+
     const scopes = Array.isArray(decoded.scope)
       ? decoded.scope
       : decoded.scope?.split(" ") || [];
-      console.log("scopes",scopes);
+    console.log("scopes", scopes);
     let role = "user";
     if (scopes.includes("admin")) {
       role = "admin";
@@ -85,12 +81,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setTokenInfoState(tokenInfo);
-
   };
   const reset = () => {
     setTokenInfoState(null);
     setUser(null);
-
   };
 
   return (

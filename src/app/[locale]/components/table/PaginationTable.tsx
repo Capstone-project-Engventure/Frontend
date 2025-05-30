@@ -21,10 +21,11 @@ import { toast } from "react-toastify";
 import ImportModal from "../ImportModal";
 import { ExportFile } from "@/lib/export-json";
 import AudioPlayer from "../AudioPlayer";
-import TopicSelect from "../TopicSelector";
+import CustomSelector from "../TopicSelector";
 import { OptionProps } from "react-select";
 import TopicService from "@/lib/services/topic.service";
 import LessonService from "@/lib/services/lesson.service";
+import { useTranslations } from "next-intl";
 
 interface Field {
   key: string;
@@ -48,11 +49,13 @@ interface Field {
 }
 
 interface PaginationTableProps {
+  customObjects?: [];
+  customTotalPages?: number;
   fields: Field[];
   page: number;
   onPageChange: (page: number) => void;
-  service: any;
-  config: any;
+  service?: any;
+  config?: any;
   modalFields?: Field[];
   modalTitle?: string;
   onSuccess?: () => void;
@@ -62,10 +65,14 @@ interface PaginationTableProps {
   onHandleFile?: (file: File) => void;
   hasTopicSelector?: boolean;
   hasLessonSelector?: boolean;
+  hasBreadcrumb?: boolean;
+  hasCustomFetch?: boolean;
 }
 
 const PaginationTable: React.FC<PaginationTableProps> = ({
   // objects,
+  customObjects,
+  customTotalPages,
   fields,
   page,
   onPageChange,
@@ -80,6 +87,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   onHandleFile,
   hasTopicSelector = false,
   hasLessonSelector = false,
+  hasBreadcrumb = true,
+  hasCustomFetch = false,
 }) => {
   const [objects, setObjects] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -103,20 +112,37 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
-
+  const t = useTranslations("PaginationTable");
   const topicService = new TopicService();
   const lessonService = new LessonService();
 
   const handleFetchData = async () => {
     try {
+      if (hasCustomFetch) {
+        if (
+          customObjects &&
+          Array.isArray(customObjects) &&
+          customObjects.length > 0
+        ) {
+          setObjects(customObjects);
+          setTotalPages(customTotalPages || 1);
+          return;
+        } else {
+          console.error(
+            "Custom objects is not an array or is undefined",
+            customObjects
+          );
+          return;
+        }
+      }
       const res = await service.getAll({
         page: page,
         pageSize: 10,
         keyword: keyword,
       });
+
       if (res.success && Array.isArray(res.data)) {
         // Handling sorting:
-
         setObjects(res.data);
         setTotalPages(res.total_page);
       }
@@ -179,6 +205,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         setSelectedItems([]);
         onSuccess?.();
         toast.info(`Đã xóa ${selectedItems.length} chủ đề thành công!`);
+        handleFetchData();
       } else {
         alert("Failed to delete items");
       }
@@ -196,6 +223,20 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
     const form = new FormData();
     if (config) {
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "options") {
+          form.append("options", JSON.stringify(value));
+        } else if (value instanceof File) {
+          form.append(key, value);
+        } else if (typeof value === "string" && value.startsWith("http")) {
+          // This is a URL of the already-uploaded file -> skip
+        } else if (value === null || value === undefined || value === "") {
+          // Skip empty fields
+        } else {
+          form.append(key, value);
+        }
+      });
+    } else {
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "options") {
           form.append("options", JSON.stringify(value));
@@ -240,7 +281,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
   useEffect(() => {
     handleFetchData();
-  }, [page, keyword]);
+  }, [page, keyword, customObjects]);
 
   useEffect(() => {
     // Reset selected items when page changes
@@ -296,15 +337,13 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
     fetchTopics();
   }, []);
 
-  
-
-  if (!objects || objects.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <h1 className="text-2xl font-bold">Không có dữ liệu</h1>
-      </div>
-    );
-  }
+  // if (!objects || objects.length === 0) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <h1 className="text-2xl font-bold">Không có dữ liệu</h1>
+  //     </div>
+  //   );
+  // }
 
   function handleSort(key: any) {
     if (sortKey === key) {
@@ -317,10 +356,13 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
   return (
     <>
-      <div className="py-2">
-        <Breadcrumb items={breadcrumbs} />
-      </div>
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      {hasBreadcrumb && (
+        <div className="py-2">
+          <Breadcrumb items={breadcrumbs} />
+        </div>
+      )}
+
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg w-full">
         {selectedItems.length > 0 && (
           <div className="p-4 bg-gray-100 flex justify-between items-center">
             <span>{selectedItems.length} mục được chọn</span>
@@ -344,7 +386,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
               <SearchInput keyword={keyword} onChange={setKeyword} />
               <div className="flex flex-row gap-2">
                 {hasTopicSelector ? (
-                  <TopicSelect
+                  <CustomSelector
                     topics={topics}
                     value={selectedTopic}
                     onChange={setSelectedTopic}
@@ -360,7 +402,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
               >
                 <HiPlus className="text-lg" />
-                Add
+                {t("add")}
               </button>
               {hasImport ? (
                 <>
@@ -370,14 +412,14 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                     }}
                     className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-light transition text-sm border border-primary"
                   >
-                    Xuất file
+                     {t("exportFile")}
                   </button>
 
                   <button
                     onClick={() => setIsFileModalOpen(true)}
                     className="flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-md hover:bg-secondary-light transition text-sm border border-secondary"
                   >
-                    Nhập file
+                    {t("importFile")}
                   </button>
                   <ImportModal
                     isOpen={isFileModalOpen}
@@ -396,7 +438,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     <input
                       type="checkbox"
                       onChange={(e) => {
@@ -424,7 +466,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                     </th>
                   ))}
                   <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
-                    Actions
+                    {t("actions")}
                   </th>
                 </tr>
               </thead>
@@ -435,7 +477,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                       key={item.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                     >
-                      <td className="p-4">
+                      <td className="p-4 text-center">
                         <input
                           type="checkbox"
                           checked={selectedItems.includes(item.id)}
@@ -466,7 +508,9 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             <AudioPlayer src={item[f.key]} />
                           ) : f.isNest && item[f.key] ? (
                             <span>{item[f.key]?.[f.nestKey]}</span>
-                          ) : f.key === "options" && Array(item[f.key]) ? (
+                          ) : f.key === "options" &&
+                            item[f.key] &&
+                            Array(item[f.key]) ? (
                             <ul className="list-disc list-inside">
                               {item[f.key].map(
                                 (opt: { key: string; option: string }) => (
@@ -487,7 +531,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                           <button
                             onClick={() => handleEdit(item)}
                             className="border-2 border-gray-300 rounded-sm p-0.5 text-indigo-600 hover:text-indigo-800"
-                            title="Edit"
+                            title={t("edit")}
                           >
                             <HiPencil className="text-lg" />
                           </button>
@@ -497,7 +541,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                               toggleDeleteDialog();
                             }}
                             className="text-red-600 hover:text-red-800"
-                            title="Delete"
+                            title={t("delete")}
                           >
                             <HiTrash className="text-lg" />
                           </button>
@@ -757,7 +801,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                 }}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >
-                Xóa
+                {t("delete")}
               </button>
               <button
                 onClick={() => {
@@ -766,7 +810,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                 }}
                 className="ml-2 border px-4 py-2 rounded hover:bg-gray-100"
               >
-                Hủy
+                {t("cancel")}
               </button>
             </div>
           </DialogPanel>

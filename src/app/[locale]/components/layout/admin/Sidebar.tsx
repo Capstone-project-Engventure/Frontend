@@ -185,15 +185,6 @@ export default function Sidebar() {
               );
             })}
           </div>
-          {/* <Link href="/my-course" className="hover:text-blue-600">
-            Home
-          </Link>
-          <Link href="/my-course" className="hover:text-blue-600">
-            My Courses
-          </Link>
-          <Link href="/dashboard/settings" className="hover:text-blue-600">
-            Settings
-          </Link> */}
         </nav>
       </aside>
     </div>

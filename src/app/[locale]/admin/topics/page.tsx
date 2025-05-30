@@ -1,6 +1,7 @@
 "use client";
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
 import { useApi } from "@/lib/Api";
+import { CategoryOptions } from "@/lib/constants/category";
 import TopicService from "@/lib/services/topic.service";
 import { PaginatedResponse } from "@/lib/types/response";
 import { Topic } from "@/lib/types/topic";
@@ -25,9 +26,9 @@ export default function AdminTopic() {
 
   const fields = [
     { key: "title", label: "Title" },
-    { key: "level", label: "Level" },
+    { key: "category", label: "Category" },
     { key: "description", label: "Description" },
-    { key: "order", label: "Order" },
+    // { key: "order", label: "Order" },
   ];
 
   const breadcrumbs = [
@@ -38,34 +39,19 @@ export default function AdminTopic() {
   const modalFields = [
     { key: "title", label: "Title", type: "text" },
     {
-      key: "level",
-      label: "Level",
+      key: "category",
+      label: "Category",
       type: "select",
-      options: [
-        { key: "A1", label: "A1" },
-        { key: "A2", label: "A2" },
-        { key: "B1", label: "B1" },
-        { key: "B2", label: "B2" },
-        { key: "C1", label: "C2" },
-      ],
+      options: CategoryOptions,
     },
     { key: "description", label: "Description", type: "textarea" },
-    { key: "order", label: "Order", type: "number" },
+    // { key: "order", label: "Order", type: "number" },
   ];
 
   const onPageChange = (page: number) => {
     setPage(page);
   };
-  const handleAdd = (formData: any) => {
-    topicService.create(formData);
-  };
-  const handleUpdate = (id: number, formData: any) => {
-    topicService.update(id, formData);
-  };
 
-  const handleDelete = (id: number) => {
-    topicService.delete(id);
-  };
   const [formData, setFormData] = useState<any>(null);
   const isModalOpen = formData !== null;
 
@@ -78,37 +64,26 @@ export default function AdminTopic() {
     });
   };
 
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSave = () => {
-    if (formData.id) {
-      handleUpdate(formData.id, formData);
-    } else {
-      handleAdd(formData);
+  const onHandleFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await lessonService.importLessonByFile(file);
+      if (res.success) {
+        toast.success("Import file thành công");
+        fetchLessonData();
+      } else {
+        toast.error("Import file thất bại");
+      }
+    } catch (error) {
+      console.error("Error importing file:", error);
+      toast.error("Import file thất bại");
     }
-    setFormData(null);
   };
 
-  const handleCloseModal = () => {
-    setFormData(null);
-  };
-
-  useEffect(() => {
-    // const fetchTopics = async () => {
-    //   const topicService = new TopicService();
-    //   const res = await topicService.getAll(page, totalPage, keyword);
-    //   console.log(res);
-    //   if (!res.success) throw new Error("API response unsuccessful");
-    //   setTopics(res.data);
-    // };
-    // fetchTopics();
-  }, []);
-
-  if (isLoading) {
-    return <div>Đang tải dữ liệu...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Đang tải dữ liệu...</div>;
+  // }
 
   return (
     // Fix the component with ts
@@ -121,8 +96,9 @@ export default function AdminTopic() {
         linkBase="/admin/topics"
         breadcrumbs={breadcrumbs}
         modalFields={modalFields}
+        onHandleFile={onHandleFile}
       />
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <div className="fixed inset-0 bg-white  bg-opacity-30 dark:bg-white dark:bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
@@ -188,7 +164,7 @@ export default function AdminTopic() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 }

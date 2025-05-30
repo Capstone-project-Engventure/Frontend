@@ -1,6 +1,6 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
-import TopicSelect from "@/app/[locale]/components/TopicSelector";
+import CustomSelector from "@/app/[locale]/components/TopicSelector";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
 import { Topic } from "@/lib/types/topic";
@@ -55,7 +55,7 @@ export default function AdminListening() {
         <label htmlFor="topic" className="block mb-1 font-semibold">
           Select Topic:
         </label>
-        <TopicSelect
+        <CustomSelector
           topics={topicOptions}
           onChange={handleSelect}
           value={selectedTopic}

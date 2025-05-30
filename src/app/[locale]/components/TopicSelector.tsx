@@ -6,16 +6,16 @@ interface OptionType {
   label: string;
 }
 
-interface TopicSelectProps {
-  topics: OptionType[];
+interface ObjectSelectProps {
+  objects: OptionType[];
   onChange: (value: OptionType | null) => void;
   value?: OptionType | null;
 }
 
-const TopicSelect = ({ topics, onChange, value }: TopicSelectProps) => {
+const CustomSelector = ({ objects, onChange, value }: ObjectSelectProps) => {
   return (
     <Select
-      options={topics}
+      options={objects}
       value={value}
       onChange={onChange}
       isSearchable
@@ -32,4 +32,4 @@ const TopicSelect = ({ topics, onChange, value }: TopicSelectProps) => {
   );
 };
 
-export default TopicSelect;
+export default CustomSelector;

@@ -27,11 +27,65 @@
     "googleLogin": "Google",
     "facebookLogin": "Facebook"
   },
-  "AdminHome":{
+  "AdminHome": {
     "ExerciseTitle": "Exercises",
     "LessonTitle": "Lessons",
     "TopicTitle": "Topics",
     "UserTitle": "Users",
     "BreadcrumbHome": "Home"
+  },
+  "Sidebar": {
+    "dashboard": "Dashboard",
+    "courses": "Courses",
+    "lessons": "Lessons",
+    "topics": "Topics",
+    "data": "Data Management",
+    "vocabulary": "Vocabulary",
+    "grammar": "Grammar",
+    "listening": "Listening",
+    "writing": "Writing",
+    "pronunciation": "Pronunciation",
+    "generate": "Generate",
+    "types": "Exercise Types",
+    "flashcard": "Flashcard",
+    "myNote": "My Notes",
+    "myCourses": "My Courses",
+    "myLessons": "Lessons",
+    "favoriteLessons": "Favorite Lessons",
+    "practice": "Practice"
+  },
+  "PaginationTable": {
+    "add": "Add new",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "search": "Search",
+    "searchPlaceholder": "Search here...",
+    "noData": "No data available",
+    "loading": "Loading...",
+    "importFile": "Import file",
+    "exportFile": "Export file",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "actions": "Actions",
+    "confirmDelete": "Are you sure you want to delete this item?"
+  },
+  "StudentWritingPractice": {
+    "title": "Writing Practice",
+    "description": "Practice your writing skills with various topics and receive feedback.",
+    "startWriting": "Start Writing",
+    "submit": "Submit",
+    "viewFeedback": "View Feedback",
+    "noSubmissions": "You have not submitted any writings yet.",
+    "loading": "Loading your writings...",
+    "writeHere": "Write your text here...",
+    "feedback": "Feedback from the instructor will appear here.",
+    "submissionSuccessful": "Submit your writing successfully",
+    "submissionFailed": "Fail to submit your writing",
+    "content_placeholder": "Type your writing content here..."
   }
+
+
 }
