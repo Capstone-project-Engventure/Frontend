@@ -39,8 +39,7 @@ class VocabularyService extends BaseService<Vocabulary> {
 
   importVocabByFile(file: File) {
     const formData = new FormData();
-    console.log("it came here");
-    
+ 
     formData.append("file", file);
     return api.post("/vocabularies/import-file", formData, {
       headers: {

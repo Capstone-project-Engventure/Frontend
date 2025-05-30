@@ -75,7 +75,7 @@
     "actions": "Hành động",
     "confirmDelete": "Bạn có chắc chắn muốn xóa mục này không?"
   },
- "StudentWritingPractice": {
+  "StudentWritingPractice": {
     "title": "Viết",
     "description": "Thực hành kỹ năng viết của bạn với các bài tập đa dạng.",
     "startWriting": "Bắt đầu viết",
@@ -88,5 +88,13 @@
     "submissionSuccessful": "Nộp bài thành công",
     "submissionFailed": "Nộp bài viết thất bại",
     "content_placeholder": "Nhập hoặc dán (Ctrl + V) nội dung bài viết của bạn tại đây"
+  },
+  "PronunciationPractice": {
+    "title": "Luyện phát âm",
+    "subtitle": "Nhấn vào từ để nghe cách phát âm hoặc thử các bài tập:",
+    "playSound": "Phát âm",
+    "goToExercise": "Đi đến bài tập",
+    "vowels": "Nguyên âm",
+    "consonants": "Phụ âm"
   }
 }

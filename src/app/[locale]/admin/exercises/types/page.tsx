@@ -21,6 +21,11 @@ export default function AdminExerciseTypesPage() {
     { key: "description", label: "Description" },
   ];
 
+  const modalFields = [
+    { key: "name", label: "Name", type: "text" },
+    { key: "description", label: "Description", type: "text" },
+  ];
+
   const breadcrumbs = [
     { label: "Home", href: "/admin/home" },
     { label: "Exercises", href: "/admin/exercises" },
@@ -30,78 +35,43 @@ export default function AdminExerciseTypesPage() {
   const onPageChange = (page: number) => {
     setPage(page);
   };
-  const handleAdd = (formData: any) => {
-    exerciseTypeService.createExerciseType(formData);
-  };
-  const handleUpdate = (id: number, formData: any) => {
-    exerciseTypeService.updateExerciseType(id, formData);
-  };
-
-  const handleDelete = (id: number) => {
-    exerciseTypeService.deleteExerciseType(id);
-  };
   const [formData, setFormData] = useState<any>(null);
   const isModalOpen = formData !== null;
 
-  const handleAddClick = () => {
-    setFormData({
-      title: "",
-      level: "",
-      topic: "",
-      description: "",
-    });
-  };
 
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
-  };
+  // useEffect(() => {
+  //   const fetchExerciseData = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //       const res = await exerciseTypeService.getAllExerciseTypes(
+  //         page,
+  //         pageSize
+  //       );
+  //       if (res.success) {
+  //         setExerciseTypes(res.data.results);
+  //         setPage(res.data.page);
+  //         setPageSize(res.data.page_size);
+  //         setTotalPages(res.data.num_pages);
+  //         console.log("Fetched exercises from API and cached");
+  //       }
+  //     } catch (err) {
+  //       console.error("Fetch exercises failed:", err);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-  const handleSave = () => {
-    if (formData.id) {
-      handleUpdate(formData.id, formData);
-    } else {
-      handleAdd(formData);
-    }
-    setFormData(null);
-  };
+  //   const fetchTopics = async () => {
+  //     // const topicService = new TopicService();
+  //     const res = await topicService.getAll();
+  //     if (res.success && Array.isArray(res.data)) {
+  //       setTopics(res.data);
+  //     }
+  //   };
 
-  const handleCloseModal = () => {
-    setFormData(null);
-  };
-
-  useEffect(() => {
-    const fetchExerciseData = async () => {
-      setIsLoading(true);
-      try {
-        const res = await exerciseTypeService.getAllExerciseTypes(
-          page,
-          pageSize
-        );
-        if (res.success) {
-          setExerciseTypes(res.data.results);
-          setPage(res.data.page);
-          setPageSize(res.data.page_size);
-          setTotalPages(res.data.num_pages);
-          console.log("Fetched exercises from API and cached");
-        }
-      } catch (err) {
-        console.error("Fetch exercises failed:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchTopics = async () => {
-      // const topicService = new TopicService();
-      const res = await topicService.getAll();
-      if (res.success && Array.isArray(res.data)) {
-        setTopics(res.data);
-      }
-    };
-
-    fetchTopics();
-    fetchExerciseData();
-  }, [page]);
+  //   fetchTopics();
+  //   fetchExerciseData();
+  // }, [page]);
 
   if (isLoading) {
     return <div>Đang tải dữ liệu...</div>;
@@ -113,27 +83,17 @@ export default function AdminExerciseTypesPage() {
       <div className="py-2">
         <Breadcrumb items={breadcrumbs} />
       </div>
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={handleAddClick}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
-        >
-          <HiPlus className="text-lg" />
-          Add
-        </button>
-      </div>
       <PaginationTable
-        objects={exerciseTypes}
+        // objects={exerciseTypes}
         fields={fields}
         page={page}
-        totalPages={totalPages}
+        service={exerciseTypeService}
+        // totalPages={totalPages}
+        modalFields={modalFields}
         onPageChange={onPageChange}
-        onAdd={handleAdd}
-        onDelete={handleDelete}
-        onUpdate={handleUpdate}
         linkBase="/admin/exercises"
       />
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <div className="fixed inset-0 backdrop-blur-sm bg-white/30 bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
@@ -199,7 +159,7 @@ export default function AdminExerciseTypesPage() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 }
