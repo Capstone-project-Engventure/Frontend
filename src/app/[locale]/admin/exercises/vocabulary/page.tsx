@@ -8,7 +8,7 @@ import { HiPlus, HiPencil, HiTrash } from "react-icons/hi";
 import debounce from "lodash.debounce";
 import TopicService from "@/lib/services/topic.service";
 import { Topic } from "@/lib/types/topic";
-import TopicSelect from "@/app/[locale]/components/TopicSelector";
+import CustomSelector from "@/app/[locale]/components/TopicSelector";
 import { OptionType } from "@/lib/types/option";
 import { ExportFile } from "@/lib/export-json";
 import ImportModal from "@/app/[locale]/components/ImportModal";
@@ -394,7 +394,7 @@ export default function AdminVocabulary() {
           <div className="flex flex-row">
             <div className="flex flex-col sm:flex-row gap-4 mb-4 justify-between w-full">
               <div className="flex flex-row gap-2">
-                <TopicSelect
+                <CustomSelector
                   topics={topicListSelection}
                   onChange={setSelectedTopic}
                   value={selectedTopic}

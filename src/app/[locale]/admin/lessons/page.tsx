@@ -1,6 +1,8 @@
 "use client";
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
 import { useApi } from "@/lib/Api";
+import { CategoryOptions } from "@/lib/constants/category";
+import { LevelOptions } from "@/lib/constants/level";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
 import { Lesson } from "@/lib/types/lesson";
@@ -43,15 +45,9 @@ export default function AdminLesson() {
       key: "level",
       label: "Level",
       type: "select",
-      options: [
-        { key: "A1", label: "A1" },
-        { key: "A2", label: "A2" },
-        { key: "B1", label: "B1" },
-        { key: "B2", label: "B2" },
-        { key: "C1", label: "C2" },
-      ],
+      options: LevelOptions,
     },
-    { key: "topic", label: "Topic", type: "select", options: topicOptions },
+    { key: "topic_id", label: "Topic", type: "select", options: topicOptions },
     { key: "description", label: "Description", type: "textarea" },
   ];
 
@@ -96,15 +92,6 @@ export default function AdminLesson() {
   const [formData, setFormData] = useState<any>(null);
   const isModalOpen = formData !== null;
 
-  // const handleAddClick = () => {
-  //   setFormData({
-  //     title: "",
-  //     level: "",
-  //     topic: "",
-  //     description: "",
-  //   });
-  // };
-
   const handleChange = (field: string, value: string) => {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
@@ -122,9 +109,9 @@ export default function AdminLesson() {
     fetchLessonData();
   }, [page]);
 
-  if (isLoading) {
-    return <div>Đang tải dữ liệu...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Đang tải dữ liệu...</div>;
+  // }
 
   const onHandleFile = async (file: File) => {
     const formData = new FormData();
@@ -156,9 +143,9 @@ export default function AdminLesson() {
         breadcrumbs={breadcrumbs}
         modalFields={modalFields}
         onHandleFile={onHandleFile}
-        hasTopicSelector={true}
+        hasTopicSelector={false}
       />
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <div className="fixed inset-0 backdrop-blur-sm bg-white/30  flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
@@ -224,7 +211,7 @@ export default function AdminLesson() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 }

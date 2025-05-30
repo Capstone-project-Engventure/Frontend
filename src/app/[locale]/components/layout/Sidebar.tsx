@@ -10,14 +10,29 @@ import {
   MdArrowBackIosNew,
   MdArrowForwardIos,
   MdOutlineBarChart,
+  MdLibraryBooks,
+  MdOutlineVolumeUp,
+  MdOutlineRecordVoiceOver,
+  MdEditNote,
 } from "react-icons/md";
+
+import { BiCategory } from "react-icons/bi";
 import { TbNotes } from "react-icons/tb";
+import { FaRegLightbulb } from "react-icons/fa6";
+import { GiSpellBook } from "react-icons/gi";
+
 import { User } from "@/lib/types/user";
 import Cookies from "js-cookie";
+import { useTranslations } from "next-intl";
 
-export default function Sidebar() {
+export default function Sidebar({ role }: { role: "admin" | "student" }) {
   const pathname = usePathname();
-  const [toggleSidebar, setToggleSidebar] = useState(false);
+  const t = useTranslations("Sidebar");
+  const locale = pathname.split("/")[1];
+  const basePath = `/${locale}/${role}`;
+
+  const [toggleSidebar, setToggleSidebar] = useState(true);
+  const [isPracticeOpen, setIsPracticeOpen] = useState(true);
 
   const tokenInfo = Cookies.get("tokenInfo") || null;
   const userStr = Cookies.get("user") || null;
@@ -39,62 +54,96 @@ export default function Sidebar() {
 
   const mainNavItems = [
     {
-      label: "Thống kê",
+      label: t("dashboard"),
       icon: MdOutlineBarChart,
-      href: "/student/statistic",
+      href: `${basePath}/${role === "admin" ? "dashboard" : "statistic"}`,
     },
     {
-      label: "Lớp học của tôi",
+      label: t(role === "admin" ? "courses" : "myCourses"),
       icon: TbNotes,
-      href: "/student/my-course",
+      href: `${basePath}/${role === "admin" ? "courses" : "my-course"}`,
     },
   ];
 
   const learnNavItems = [
     {
-      label: "Khóa học",
+      label: t(role === "admin" ? "lessons" : "myLessons"),
       icon: MdOutlineBarChart,
-      href: "/student/my-lesson",
+      href: `${basePath}/${role === "admin" ? "lessons" : "my-lesson"}`,
     },
     {
-      label: "Bài học yêu thích",
+      label: t(role === "admin" ? "topics" : "favoriteLessons"),
       icon: TbNotes,
-      href: "/student/favorite-course",
+      href: `${basePath}/${role === "admin" ? "topics" : "favorite-course"}`,
     },
     {
-      label: "Luyện tập",
+      label: t(role === "admin" ? "data" : "practice"),
       icon: TbNotes,
       children: [
         {
-          label: "Từ vựng",
-          href: "/student/practice/vocabulary",
+          label: t("vocabulary"),
+          href: `${basePath}/${
+            role === "admin" ? "exercises/vocabulary" : "practice/vocabulary"
+          }`,
+          icon: MdLibraryBooks,
         },
         {
-          label: "Ngữ pháp",
-          href: "/student/practice/grammar",
+          label: t("grammar"),
+          href: `${basePath}/${
+            role === "admin" ? "exercises/grammar" : "practice/grammar"
+          }`,
+          icon: GiSpellBook,
         },
         {
-          label: "Nghe",
-          href: "/student/practice/listening",
+          label: t("listening"),
+          href: `${basePath}/${
+            role === "admin" ? "exercises/listening" : "practice/listening"
+          }`,
+          icon: MdOutlineVolumeUp,
         },
         {
-          label: "Phát âm",
-          href: "/student/practice/pronunciation",
+          label: t("pronunciation"),
+          href: `${basePath}/${
+            role === "admin"
+              ? "exercises/pronunciation"
+              : "practice/pronunciation"
+          }`,
+          icon: MdOutlineRecordVoiceOver,
+        },
+        {
+          label: t("writing"),
+          href: `${basePath}/${
+            role === "admin" ? "exercises/writing" : "practice/writing"
+          }`,
+          icon: MdEditNote,
         },
       ],
     },
+    ...(role === "admin"
+      ? [
+          {
+            label: t("generate"),
+            icon: FaRegLightbulb,
+            href: `${basePath}/generate`,
+          },
+          {
+            label: t("types"),
+            icon: BiCategory,
+            href: `${basePath}/exercises/types`,
+          },
+        ]
+      : []),
     {
-      label: "Flashcard",
-      icon: TbNotes,
-      href: "/student/flashcard",
+      label: t("flashcard"),
+      icon: MdLibraryBooks,
+      href: `${basePath}/flashcard`,
     },
     {
-      label: "Ghi chú",
+      label: t("myNote"),
       icon: TbNotes,
-      href: "/student/my-note",
+      href: `${basePath}/my-note`,
     },
   ];
-
   useEffect(() => {
     console.log("pathname: ", pathname);
   }, [pathname]);
@@ -182,8 +231,14 @@ export default function Sidebar() {
             </p>
             {learnNavItems.map((item, index) => {
               const Icon = item.icon;
+              const isActive = pathname?.startsWith(item.href);
               return (
-                <div key={index} className="px-3 py-2">
+                <div
+                  key={index}
+                  className={`px-2 py-2 ${
+                    isActive ? "bg-blue-100 rounded-md" : ""
+                  }`}
+                >
                   {/* Render parent item */}
                   {item.href ? (
                     <Link
@@ -202,7 +257,10 @@ export default function Sidebar() {
                       </span>
                     </Link>
                   ) : (
-                    <div className="grid grid-cols-3">
+                    <div
+                      className="grid grid-cols-3 cursor-pointer hover:text-blue-600"
+                      onClick={() => setIsPracticeOpen((prev) => !prev)}
+                    >
                       <div className="col-span-1 font-semibold">
                         {Icon && (
                           <Icon className="w-6 h-6 col-span-1 text-black" />
@@ -224,37 +282,32 @@ export default function Sidebar() {
                   )}
 
                   {/* Render children if they exist */}
-                  {item.children && (
+                  {item.children && isPracticeOpen && (
                     <div className="ml-6 mt-2 space-y-1 text-sm text-gray-700">
-                      {item.children.map((child, childIndex) => (
-                        <Link
-                          key={childIndex}
-                          href={child.href}
-                          className="block hover:text-blue-600"
-                        >
-                          <span
-                            className={`flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group 
-                           ${toggleSidebar ? "" : "hidden"}`}
+                      {item.children.map((child, childIndex) => {
+                        const isChildActive = pathname?.startsWith(child.href);
+                        const ChildIcon = child.icon;
+                        return (
+                          <Link
+                            key={childIndex}
+                            href={child.href}
+                            className={`flex items-center gap-2 p-2 rounded-md transition duration-150 ${
+                              isChildActive
+                                ? "bg-blue-200 text-blue-800 font-medium"
+                                : "hover:bg-gray-100 text-gray-800"
+                            } ${toggleSidebar ? "" : "hidden"}`}
                           >
-                            {child.label}
-                          </span>
-                        </Link>
-                      ))}
+                            {ChildIcon && <ChildIcon className="w-5 h-5" />}
+                            <span>{child.label}</span>
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
               );
             })}
           </div>
-          {/* <Link href="/my-course" className="hover:text-blue-600">
-            Home
-          </Link>
-          <Link href="/my-course" className="hover:text-blue-600">
-            My Courses
-          </Link>
-          <Link href="/dashboard/settings" className="hover:text-blue-600">
-            Settings
-          </Link> */}
         </nav>
       </aside>
     </div>

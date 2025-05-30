@@ -18,7 +18,6 @@ import { useState } from "react";
 import GenderSelect from "../components/GenderSelect";
 import NationSelect from "../components/NationSelector";
 import { toast } from "react-toastify";
-import { log } from "console";
 import { useRouter } from "next/navigation";
 // import {getTranslations} from 'next-intl';
 

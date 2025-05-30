@@ -2,29 +2,21 @@
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
 import CustomSelector from "@/app/[locale]/components/TopicSelector";
-import { LevelOptions } from "@/lib/constants/level";
 import ExerciseService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
 import { Exercise } from "@/lib/types/exercise";
 import { Lesson } from "@/lib/types/lesson";
-import { OptionType } from "@/lib/types/option";
-import { Topic } from "@/lib/types/topic";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-export default function AdminGrammar() {
+export default function WritingExercise() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [totalPage, setTotalPage] = useState(7);
   const [lessonsByTopic, setLessonsByTopic] = useState<Lesson[]>([]);
-  const [topicOptions, setTopicOptions] = useState<OptionType[]>([]);
-  const [allLessons, setAllLessons] = useState<Lesson[]>([]);
-  const [allLessonOptions, setAllLessonsOptions] = useState<OptionType[]>([]);
-  const [filteredLessons, setFilteredLessons] = useState<Lesson[]>([]);
+  const [topics, setTopics] = useState([]);
 
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
@@ -38,9 +30,9 @@ export default function AdminGrammar() {
   const fields = [
     { key: "name", label: "Name" },
     { key: "question", label: "Question" },
-    { key: "options", label: "Options" },
-    { key: "level", label: "Level" },
-    { key: "system_answer", label: "Answer" },
+    // { key: "options", label: "Options" },
+    // { key: "audio_file", label: "Audio", type: "audio" },
+    // { key: "system_answer", label: "Answer" },
     { key: "description", label: "Description" },
   ];
 
@@ -63,15 +55,16 @@ export default function AdminGrammar() {
       key: "level",
       label: "Level",
       type: "select",
-      options: LevelOptions,
+      options: [
+        { key: "A1", label: "A1" },
+        { key: "A2", label: "A2" },
+        { key: "B1", label: "B1" },
+        { key: "B2", label: "B2" },
+        { key: "C1", label: "C2" },
+      ],
     },
     { key: "description", label: "Description", type: "textarea" },
-    {
-      key: "skill",
-      label: "Skill",
-      type: "select",
-      options: [{ key: "writing", label: "Writing" }],
-    },
+    { key: "skill", label: "Skill", type: "select", options: [{ key: "writing", label: "Writing" }] },
     { key: "generated_by", type: "hidden", default: "system" },
   ];
 
@@ -89,13 +82,13 @@ export default function AdminGrammar() {
         const response = await topicService.getAll();
         if (!response.success || Array.isArray(response.data) === false) {
           toast.error("Failed to fetch topics");
-          return;
+        //   throw new Error(response.message || "Failed to fetch topics");
         }
         const tempList = response.data.map((topic: any) => ({
           value: topic.id,
           label: topic.title,
         }));
-        setTopicOptions(tempList);
+        setTopics(tempList);
       } catch (error) {
         console.error("Error fetching topics:", error);
       }
@@ -105,68 +98,42 @@ export default function AdminGrammar() {
   }, []);
 
   useEffect(() => {
-    const fetchAllLessons = async () => {
+    const fetchLessonsByTopic = async () => {
+      if (!selectedTopic) {
+        setLessonsByTopic([]);
+        return;
+      }
       try {
-        const response = await lessonService.getAll();
-        if (response.success) {
-          setAllLessons(response.data);
-        } else {
-          toast.error("Failed to fetch lessons");
+        const response = await lessonService.getAllByTopic(selectedTopic.value);
+        if (!response.success || Array.isArray(response.data) === false) {
+          toast.error("Failed to fetch lessons for the selected topic");
+        //   throw new Error(response.message || "Failed to fetch lessons");
         }
+        setLessonsByTopic(response.data);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching lessons by topic:", error);
       }
     };
-    fetchAllLessons();
-  }, []);
-
-  useEffect(() => {
-    const tempList = allLessons.map((lesson: any) => ({
-      value: lesson.id,
-      label: lesson.title,
-    }));
-    if (!selectedTopic) {
-      setFilteredLessons(tempList);
-      return;
-    }
-
-    const filtered = allLessons
-      .filter((lesson) => lesson.topic?.id === selectedTopic.value)
-      .map((lesson) => ({
-        value: lesson.id,
-        label: lesson.title,
-      }));
-
-    setFilteredLessons(filtered);
-
-    // Reset selectedLesson if it doesn't belong to this topic
-    if (selectedLesson) {
-      const found = filtered.find((l) => l.id === selectedLesson);
-      if (!found) setSelectedLesson(null);
-    }
-  }, [selectedTopic, allLessons]);
+    fetchLessonsByTopic();
+  }, [selectedTopic]);
 
   useEffect(() => {
     const fetchWritingExerciseData = async () => {
       setIsLoading(true);
-      const filters = { skill: "grammar" };
+      const filters = { skill: "writing" };
       if (selectedLesson) {
         filters.lesson = selectedLesson;
       }
       try {
         const response = await exerciseService.getAll({
-          page: page,
-          pageSize: pageSize,
           filters: filters,
         });
         if (!response.success || Array.isArray(response.data) === false) {
           toast.error("Failed to fetch exercises");
-          return;
-          //   throw new Error(response.message || "Failed to fetch exercises");
+        //   throw new Error(response.message || "Failed to fetch exercises");
         }
         console.log("Fetched exercises:", response.data);
         setExercises(response.data);
-        setTotalPage(response.total_page);
       } catch (error) {
         console.error("Error fetching exercises:", error);
       } finally {
@@ -174,7 +141,7 @@ export default function AdminGrammar() {
       }
     };
     fetchWritingExerciseData();
-  }, [page, selectedLesson]);
+  }, [selectedLesson]);
 
   const onHandleFile = async (file: File) => {
     if (!file) {
@@ -194,30 +161,24 @@ export default function AdminGrammar() {
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
       <div className="flex flex-col justify-between items-start mb-2 mt-4">
-        <div className="flex flex-wrap gap-4 mb-4 items-center">
-          <div>
-            <label className="block text-sm font-medium">Topic</label>
-            <CustomSelector
-              objects={topicOptions}
-              value={selectedTopic}
-              onChange={setSelectedTopic}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Lesson</label>
-            <CustomSelector
-              objects={filteredLessons}
-              value={selectedLesson}
-              onChange={setSelectedLesson}
-            />
-          </div>
+        <div className="flex flex-row items-center space-x-4">
+          <label className="text-sm font-semibold">Topics</label>
+          <CustomSelector
+            objects={topics}
+            value={selectedTopic}
+            onChange={setSelectedTopic}
+          />
+          <label className="text-sm font-semibold">Lessons</label>
+          <CustomSelector
+            objects={lessonsByTopic}
+            value={selectedLesson}
+            onChange={setSelectedLesson}
+          />
         </div>
 
         <PaginationTable
           customObjects={exercises}
-          customTotalPages={totalPage}
           fields={fields}
-          page={page}
           onPageChange={onPageChange}
           service={exerciseService}
           linkBase="/admin/exercises"

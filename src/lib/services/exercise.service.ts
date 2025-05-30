@@ -21,6 +21,10 @@ class ExerciseService extends BaseService<Exercise> {
       },
     });
   }
+
+  submitExercise(exerciseId: string, content: string) {
+    return api.post(`exercises/${exerciseId}/submit`, { content });
+  }
   
 
 }

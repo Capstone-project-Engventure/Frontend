@@ -24,19 +24,24 @@ export default function AdminCourse() {
   const onPageChange = (page: number) => {
     setPage(page);
   };
-  const handleAdd = (formData: any) => {
-    courseService.createCourse(formData);
-  };
-  const handleUpdate = (id: number, formData: any) => {
-    courseService.updateCourse(id, formData);
-  };
+  // const handleAdd = (formData: any) => {
+  //   courseService.createCourse(formData);
+  // };
+  // const handleUpdate = (id: number, formData: any) => {
+  //   courseService.updateCourse(id, formData);
+  // };
 
-  const handleDelete = (id: number) => {
-    courseService.deleteCourse(id);
-  };
+  // const handleDelete = (id: number) => {
+  //   courseService.deleteCourse(id);
+  // };
   const [formData, setFormData] = useState<any>(null);
   const isModalOpen = formData !== null;
-
+  const fields =[
+    { key: "name", label: "Name" },
+    { key: "description", label: "Description" },
+    { key: "begin", label: "Begin Date" },
+    { key: "end", label: "End Date" },
+  ]
   const handleAddClick = () => {
     setFormData({
       name: "",
@@ -50,14 +55,7 @@ export default function AdminCourse() {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    if (formData.id) {
-      handleUpdate(formData.id, formData);
-    } else {
-      handleAdd(formData);
-    }
-    setFormData(null);
-  };
+
 
   const handleCloseModal = () => {
     setFormData(null);
@@ -66,14 +64,14 @@ export default function AdminCourse() {
   useEffect(() => {
     const fetchCourses = async () => {
       const courseService = new CourseService();
-      const res = await courseService.getAllCourses(1, 10);
+      const res = await courseService.getAll(1, 10);
 
       if (!res.success) throw new Error("API response unsuccessful");
       if (!Array.isArray(res.data)) {
         // const paginatedData = res.data as PaginatedResponse<Course>;
         setCourses(res.data.results);
-        setPageSize(res.data.page_size);
-        setPage(res.data.page);
+        // setPageSize(res.data.page_size);
+        // setPage(res.data.page);
       } else {
         setCourses(res.data);
       }
@@ -98,19 +96,10 @@ export default function AdminCourse() {
         </button>
       </div>
       <PaginationTable
-        objects={courses}
-        fields={[
-          { key: "name", label: "Name" },
-          { key: "description", label: "Description" },
-          { key: "begin", label: "Begin Date" },
-          { key: "end", label: "End Date" },
-        ]}
+        fields={fields}
         page={page}
-        totalPages={pageSize}
+        service={courseService}
         onPageChange={onPageChange}
-        onAdd={handleAdd}
-        onDelete={handleDelete}
-        onUpdate={handleUpdate}
         linkBase="/admin/lessons"
       />
       {isModalOpen && (
