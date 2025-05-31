@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { useApi } from "../Api";
 import { User } from "../types/user";
+import { saveTokenCookies } from "../utils/jwt";
 
 type LoginResponse = {
   access_token: string;
@@ -23,15 +24,7 @@ class OAuthService {
 
     if (access_token && refresh_token) {
       // Set token in cookie
-      const cookieOptions = {
-        expires: rememberMe ? 7 : undefined, // expires in 7 days or session
-        secure: process.env.NEXT_PUBLIC_PRODUCTION === "production",
-        sameSite: "Lax" as const,
-      };
-
-      Cookies.set("access_token", access_token, cookieOptions);
-      Cookies.set("refresh_token", refresh_token, cookieOptions);
-      Cookies.set("email", email, cookieOptions);
+      saveTokenCookies(access_token, refresh_token, rememberMe, email);
 
       return { access_token, refresh_token };
     } else {
@@ -79,5 +72,4 @@ class OAuthService {
   }
 }
 
-const oauthService = new OAuthService();
-export default oauthService;
+export default OAuthService;

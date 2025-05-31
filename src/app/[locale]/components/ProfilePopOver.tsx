@@ -12,11 +12,11 @@ import Image from "next/image";
 import { MdArrowDropDown, MdArrowDropUp, MdLogout } from "react-icons/md";
 import { useAuth } from "@/lib/context/AuthContext";
 import { useRouter } from "next/navigation";
-import OauthService from "@/lib/services/oauth.service";
+import OAuthService from "@/lib/services/oauth.service";
 import { toast } from "react-toastify";
 export default function ProfilePopOVer() {
   const router = useRouter();
-  const oauthService = OauthService;
+  const oauthService = new OAuthService();
   // const { reset } = useAuth();
   const items = [
     {
