@@ -496,7 +496,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             >
                               {item[f.key]}
                             </Link>
-                          ) : f.key === "image" && item[f.key] ? (
+                          ) : f.type === "image" && item[f.key] ? (
                             <Image
                               src={item[f.key]}
                               alt={item.title || "Image"}
@@ -504,11 +504,11 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                               height={40}
                               className="rounded object-cover"
                             />
-                          ) : f.key === "audio_file" && item[f.key] ? (
+                          ) : f.type === "audio" && item[f.key] ? (
                             <AudioPlayer src={item[f.key]} />
                           ) : f.isNest && item[f.key] ? (
                             <span>{item[f.key]?.[f.nestKey]}</span>
-                          ) : f.key === "options" &&
+                          ) : f.type === "mcq" &&
                             item[f.key] &&
                             Array(item[f.key]) ? (
                             <ul className="list-disc list-inside">

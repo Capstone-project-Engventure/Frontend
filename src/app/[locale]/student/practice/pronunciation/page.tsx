@@ -1,7 +1,7 @@
 "use client";
 import SoundService from "@/lib/services/sound.service";
 import { Sound } from "@/lib/types/sound";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FiVolume2 } from "react-icons/fi";
@@ -10,6 +10,7 @@ const PronunciationPracticePage = () => {
   const [sounds, setSounds] = useState<Sound[]>([]);
   const soundService = new SoundService();
   const t = useTranslations("PronunciationPractice");
+  const locale = useLocale()
   useEffect(() => {
     soundService.getAll().then((response) => {
       if (!response.success) {
@@ -58,8 +59,8 @@ const PronunciationPracticePage = () => {
           </div>
 
           <Link
-            href={`/student/pronunciation/${encodeURIComponent(sound.word)}`}
-            className="text-blue-600 font-medium border border-blue-600 px-4 py-2 rounded hover:bg-blue-600 hover:text-white transition text-center w-full"
+            href={`/${locale}/student/practice/pronunciation/${encodeURIComponent(sound.symbol)}`}
+            className="text-white bg-teal-600 font-medium border border-gray-300 px-4 py-2 rounded hover:bg-teal-400 hover:text-white transition text-center w-full"
           >
             {t("goToExercise")}
           </Link>

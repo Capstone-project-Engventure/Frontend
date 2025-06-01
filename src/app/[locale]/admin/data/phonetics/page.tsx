@@ -2,31 +2,32 @@
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
 import SoundService from "@/lib/services/sound.service";
 import { Sound } from "@/lib/types/sound";
+import { useLocale } from "next-intl";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 // import { Table, Pagination } from 'antd';
 // import axios from 'axios';
 
 const PronunciationPage: React.FC = () => {
-
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
 
   const soundService = new SoundService();
+  const locale = useLocale();
 
   const breadcrumbs = [
     { label: "Home", href: "/admin/home" },
-    { label: "Pronunciation practice", href: "/admin/exercises/pronunciation" },
-  ]
+    { label: "Phonetics", href: "/admin/data/phonetics" },
+  ];
   const fields = [
-    { key: "symbol", label: "Symbol" },
-    { key: "word", label: "Word" },
-    { key: "sound_pronounce", label: "Sound pronounce" },
-    { key: "word_pronounce", label: "Word pronounce" },
-    { key: "sound_audio", label: "Audio", type: "audio" },
-    { key: "word_audio", label: "Audio", type: "audio" },
+    { key: "symbol", label: "Symbol", type: "text" },
+    { key: "sound_audio_url", label: "Sound audio", type: "audio" },
+    { key: "word", label: "Word", type: "text" },
+    // { key: "sound_pronounce", label: "Sound pronounce" },
+    // { key: "word_pronounce", label: "Word pronounce" },
+    { key: "word_audio_url", label: "Word audio", type: "audio" },
     { key: "description", label: "Description" },
   ];
 
@@ -35,8 +36,8 @@ const PronunciationPage: React.FC = () => {
     { key: "word", label: "Word", type: "text" },
     { key: "sound_pronounce", label: "Sound pronounce", type: "textarea" },
     { key: "word_pronounce", label: "Word pronounce", type: "textarea" },
-    { key: "sound_audio", label: "Audio", type: "audio" },
-    { key: "word_audio", label: "Audio", type: "audio" },
+    { key: "sound_audio", label: "Sound audio", type: "audio" },
+    { key: "word_audio", label: "Word audio", type: "audio" },
     { key: "description", label: "Description", type: "text" },
     { key: "translation", label: "Translation", type: "text" },
   ];
@@ -58,7 +59,7 @@ const PronunciationPage: React.FC = () => {
   const onPageChange = (page: number) => {
     setPage(page);
   };
-  
+
   return (
     <div>
       <PaginationTable
@@ -67,7 +68,7 @@ const PronunciationPage: React.FC = () => {
         page={page}
         onPageChange={onPageChange}
         service={soundService}
-        linkBase="/admin/sounds"
+        linkBase="/admin/data/sounds"
         modalFields={modalFields}
         onHandleFile={onHandleFile}
       />
