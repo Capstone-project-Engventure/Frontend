@@ -46,7 +46,7 @@ type User = {
 export default function Header() {
   const accessToken = Cookies.get("access_token") || null;
   const userStr = Cookies.get("user") || null;
-  const oauthService = OauthService;
+  const oauthService = new OauthService();
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser]= useState();
   useEffect(() => {

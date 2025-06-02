@@ -29,7 +29,7 @@ interface LoginFormData {
 
 export default function LoginForm() {
   const api = useApi();
-  const oauthService = OAuthService;
+  const oauthService = new OAuthService;
   const { setTokenInfo } = useAuth();
   const router = useRouter();
   const locale = useLocale();

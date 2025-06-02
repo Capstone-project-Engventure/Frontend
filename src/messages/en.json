@@ -41,6 +41,7 @@
     "topics": "Topics",
     "data": "Data Management",
     "vocabulary": "Vocabulary",
+    "phonetics": "Phonetics",
     "grammar": "Grammar",
     "listening": "Listening",
     "writing": "Writing",
@@ -85,7 +86,13 @@
     "submissionSuccessful": "Submit your writing successfully",
     "submissionFailed": "Fail to submit your writing",
     "content_placeholder": "Type your writing content here..."
+  },
+  "PronunciationPractice":{
+    "title": "Pronunciation Practice",
+    "subtitle": "Click on a word to hear its pronunciation or try the exercises:",
+    "playSound": "Play Sound",
+    "goToExercise": "Go to Exercise",
+    "vowels":"Vowels",
+    "consonants":"Consonants"
   }
-
-
 }

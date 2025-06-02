@@ -122,6 +122,22 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
     ...(role === "admin"
       ? [
           {
+            label: t("data"),
+            icon: TbNotes,
+            children: [
+              {
+                label: t("vocabulary"),
+                href: `${basePath}/${"data/vocabularies"}`,
+                icon: MdLibraryBooks,
+              },
+              {
+                label: t("phonetics"),
+                href: `${basePath}/${"data/phonetics"}`,
+                icon: MdOutlineRecordVoiceOver,
+              },
+            ],
+          },
+          {
             label: t("generate"),
             icon: FaRegLightbulb,
             href: `${basePath}/generate`,
