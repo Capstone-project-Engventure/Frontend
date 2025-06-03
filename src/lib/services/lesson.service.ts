@@ -15,16 +15,7 @@ class LessonService extends BaseService<Lesson> {
   constructor() {
     super("lessons");
   }
-  // async function getLessonsByTopic(){
-  //   const res = await api.get<ApiResponse<Lesson[]>>(
-  //     `${this.endpoint}`
-  //   );
-  //   if (res.data.success) {
-  //     return res.data.data;
-  //   } else {
-  //     throw new Error(res.data.data);
-  //   }
-  // }
+
   getAllByTopic(
     topicId: string,
     params?: { page?: number; pageSize?: number }
@@ -33,7 +24,7 @@ class LessonService extends BaseService<Lesson> {
       params: { topic: topicId, ...params },
     });
   }
-  importLessonByFile(file: File) {
+  importByFile(file: File) {
     const formData = new FormData();
     console.log("it came here");
 

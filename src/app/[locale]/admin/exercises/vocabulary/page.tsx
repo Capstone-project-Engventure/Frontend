@@ -8,7 +8,7 @@ import { HiPlus, HiPencil, HiTrash } from "react-icons/hi";
 import debounce from "lodash.debounce";
 import TopicService from "@/lib/services/topic.service";
 import { Topic } from "@/lib/types/topic";
-import CustomSelector from "@/app/[locale]/components/TopicSelector";
+import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import { OptionType } from "@/lib/types/option";
 import { ExportFile } from "@/lib/export-json";
 import ImportModal from "@/app/[locale]/components/ImportModal";

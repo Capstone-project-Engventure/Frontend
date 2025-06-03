@@ -74,7 +74,8 @@
     "next": "Tiếp theo",
     "previous": "Trước đó",
     "actions": "Hành động",
-    "confirmDelete": "Bạn có chắc chắn muốn xóa mục này không?"
+    "confirmDelete": "Bạn có chắc chắn muốn xóa mục này không?",
+    "apiError": "Lỗi server, vui lòng thử lại sau"
   },
   "StudentWritingPractice": {
     "title": "Viết",
@@ -127,5 +128,67 @@
     "try_again": "Hãy thử lại!",
     "listen_normal": "Bình thường",
     "listen_slow": "Chậm"
+  },
+  "Admin": {
+    "Exercises": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "writingExercises": "Bài tập Viết",
+        "grammarExercises": "Bài tập Ngữ pháp"
+      },
+      "topic": "Chủ đề",
+      "lesson": "Bài học",
+      "fields": {
+        "name": "Tên",
+        "question": "Câu hỏi",
+        "options": "Tùy chọn",
+        "level": "Trình độ",
+        "answer": "Đáp án",
+        "description": "Mô tả",
+        "skill": "Kỹ năng",
+        "audio": "Âm thanh",
+        "questionType": "Loại câu hỏi",
+        "audioFile": "Tệp âm thanh",
+        "lesson": "Bài học",
+        "topic": "Chủ đề"
+      },
+      "skills": {
+        "writing": "Viết",
+        "grammar": "Ngữ pháp",
+        "listening": "Nghe",
+        "pronunciation": "Phát âm",
+        "vocabulary": "Từ vựng"
+      },
+      "placeholders": {
+        "name": "Nhập tên bài tập",
+        "question": "Nhập câu hỏi",
+        "options": "Nhập các tùy chọn (cách nhau bằng dấu phẩy)",
+        "level": "Chọn trình độ",
+        "answer": "Nhập đáp án",
+        "description": "Nhập mô tả bài tập",
+        "skill": "Chọn kỹ năng",
+        "audioFile": "Chọn tệp âm thanh",
+        "lesson": "Chọn bài học",
+        "topic": "Chọn chủ đề"
+      }
+    },
+    "Lessons": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "lesson": "Bài học"
+      },
+      "fields": {
+        "title": "Tiêu đề",
+        "level": "Trình độ",
+        "topic": "Chủ đề",
+        "description": "Mô tả"
+      },
+      "messages": {
+        "success": "Cập nhật thành công",
+        "fetchTopicFail": "Lấy danh sách chủ đề thất bại",
+        "importOk": "Import file thành công",
+        "importFail": "Import file thất bại"
+      }
+    }
   }
 }

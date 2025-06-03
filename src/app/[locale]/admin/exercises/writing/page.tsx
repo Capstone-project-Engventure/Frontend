@@ -1,7 +1,7 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
-import CustomSelector from "@/app/[locale]/components/TopicSelector";
+import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import ExerciseService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
