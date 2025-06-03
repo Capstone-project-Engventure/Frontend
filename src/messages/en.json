@@ -87,12 +87,42 @@
     "submissionFailed": "Fail to submit your writing",
     "content_placeholder": "Type your writing content here..."
   },
-  "PronunciationPractice":{
+  "PronunciationPractice": {
     "title": "Pronunciation Practice",
     "subtitle": "Click on a word to hear its pronunciation or try the exercises:",
     "playSound": "Play Sound",
     "goToExercise": "Go to Exercise",
-    "vowels":"Vowels",
-    "consonants":"Consonants"
+    "vowels": "Vowels",
+    "consonants": "Consonants",
+    "fetch_unsuccessful": "The server is not connect"
+  },
+  "PhoneticDetail": {
+    "create_successful": "Exercise created successfully.",
+    "create_unsuccessful": "Failed to create exercise.",
+    "name": "Name",
+    "question": "Question",
+    "level": "Level",
+    "answer": "Answer",
+    "audio": "Audio",
+    "description": "Description",
+    "audio_file": "Audio file",
+    "title": "Pronunciation Exercises for \"{symbol}\""
+  },
+  "StudentPronunciationPractice": {
+    "home": "Home",
+    "pronunciation": "Pronunciation",
+    "title": "Practice sound: {symbol}",
+    "fetch_unsuccessful": "Could not fetch data. Please try again.",
+    "no_audio_available": "No audio available for this exercise.",
+    "check_unsuccessful": "Unable to check pronunciation. Please try again.",
+    "loading": "Loading…",
+    "no_exercises": "No exercises found.",
+    "listen": "Listen",
+    "start_recording": "Start recording",
+    "recording": "Recording…",
+    "good_pronunciation": "Good pronunciation!",
+    "try_again": "Try again!",
+    "listen_normal": "Normal",
+    "listen_slow": "Slow"
   }
 }

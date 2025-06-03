@@ -2,6 +2,7 @@
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
 import SoundService from "@/lib/services/sound.service";
 import { Sound } from "@/lib/types/sound";
+import { useLocale } from "next-intl";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 // import { Table, Pagination } from 'antd';
@@ -13,7 +14,7 @@ const PronunciationPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
-
+  const locale = useLocale()
   const soundService = new SoundService();
 
   const breadcrumbs = [
@@ -46,8 +47,7 @@ const PronunciationPage: React.FC = () => {
       toast.error("Please select a file to import");
       return;
     }
-    console.log("Check");
-
+  
     try {
       soundService.importByFile(file);
     } catch (error) {
@@ -63,11 +63,12 @@ const PronunciationPage: React.FC = () => {
     <div>
       <PaginationTable
         fields={fields}
+        keyField="symbol"
         breadcrumbs={breadcrumbs}
         page={page}
         onPageChange={onPageChange}
         service={soundService}
-        linkBase="/admin/sounds"
+        linkBase={"/"+ locale + "/admin/exercises/pronunciation/id"}
         modalFields={modalFields}
         onHandleFile={onHandleFile}
       />

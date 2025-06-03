@@ -96,6 +96,36 @@
     "playSound": "Phát âm",
     "goToExercise": "Đi đến bài tập",
     "vowels": "Nguyên âm",
-    "consonants": "Phụ âm"
+    "consonants": "Phụ âm",
+    "fetch_unsuccessful": "Hệ thống đã mất kết nối"
+  },
+  "PhoneticDetail": {
+    "create_successful": "Tạo bài luyện phát âm thành công.",
+    "create_unsuccessful": "Tạo bài luyện phát âm thất bại.",
+    "name": "Tên",
+    "question": "Câu hỏi",
+    "level": "Trình độ",
+    "answer": "Đáp án",
+    "audio": "Âm thanh",
+    "description": "Mô tả",
+    "audio_file": "Tệp âm thanh",
+    "title": "Bài luyện phát âm cho \"{symbol}\""
+  },
+  "StudentPronunciationPractice": {
+    "home": "Trang chủ",
+    "pronunciation": "Phát âm",
+    "title": "Bài luyện phát âm cho \"{symbol}\"",
+    "fetch_unsuccessful": "Không thể lấy dữ liệu. Vui lòng thử lại.",
+    "no_audio_available": "Không có âm thanh cho bài luyện này.",
+    "check_unsuccessful": "Không thể kiểm tra phát âm. Vui lòng thử lại.",
+    "loading": "Đang tải…",
+    "no_exercises": "Không tìm thấy bài luyện nào.",
+    "listen": "Nghe mẫu",
+    "start_recording": "Bắt đầu ghi âm",
+    "recording": "Đang ghi âm…",
+    "good_pronunciation": "Phát âm tốt!",
+    "try_again": "Hãy thử lại!",
+    "listen_normal": "Bình thường",
+    "listen_slow": "Chậm"
   }
 }

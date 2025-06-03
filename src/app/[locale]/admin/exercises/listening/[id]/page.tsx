@@ -125,7 +125,7 @@ export default function ListeningByLesson({
       toast.error("Please select a file to import");
       return;
     }
-    console.log("Check");
+    
 
     try {
       exerciseService.importByFile(file);

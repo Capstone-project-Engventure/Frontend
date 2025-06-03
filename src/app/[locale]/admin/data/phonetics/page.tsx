@@ -22,7 +22,7 @@ const PronunciationPage: React.FC = () => {
     { label: "Phonetics", href: "/admin/data/phonetics" },
   ];
   const fields = [
-    { key: "symbol", label: "Symbol", type: "text" },
+    { key: "symbol", label: "Symbol", type: "key" },
     { key: "sound_audio_url", label: "Sound audio", type: "audio" },
     { key: "word", label: "Word", type: "text" },
     // { key: "sound_pronounce", label: "Sound pronounce" },
@@ -47,8 +47,6 @@ const PronunciationPage: React.FC = () => {
       toast.error("Please select a file to import");
       return;
     }
-    console.log("Check");
-
     try {
       soundService.importByFile(file);
     } catch (error) {
@@ -64,11 +62,12 @@ const PronunciationPage: React.FC = () => {
     <div>
       <PaginationTable
         fields={fields}
+        keyField="id"
         breadcrumbs={breadcrumbs}
         page={page}
         onPageChange={onPageChange}
         service={soundService}
-        linkBase="/admin/data/sounds"
+        linkBase={"/" + locale + "/admin/data/phonetics"}
         modalFields={modalFields}
         onHandleFile={onHandleFile}
       />

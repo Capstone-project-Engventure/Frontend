@@ -26,11 +26,13 @@ import { OptionProps } from "react-select";
 import TopicService from "@/lib/services/topic.service";
 import LessonService from "@/lib/services/lesson.service";
 import { useTranslations } from "next-intl";
+import { FetchArgs, ServiceResponse } from "@/lib/types/api";
 
 interface Field {
   key: string;
   label: string;
   type?:
+    | "key"
     | "text"
     | "image"
     | "select"
@@ -52,9 +54,11 @@ interface PaginationTableProps {
   customObjects?: [];
   customTotalPages?: number;
   fields: Field[];
+  keyField?: string;
   page: number;
   onPageChange: (page: number) => void;
   service?: any;
+  objectType?: any;
   config?: any;
   modalFields?: Field[];
   modalTitle?: string;
@@ -62,6 +66,11 @@ interface PaginationTableProps {
   linkBase?: string;
   breadcrumbs?: { label: string; href?: string }[];
   hasImport?: boolean;
+  fetchArgs?: FetchArgs;
+  filterArgs?: any;
+  fetchFunction?: (args: FetchArgs) => Promise<ServiceResponse>;
+  onAdd?: (data: any, config: any) => void;
+  onUpdate?: (id: string, data: any, config: any) => void;
   onHandleFile?: (file: File) => void;
   hasTopicSelector?: boolean;
   hasLessonSelector?: boolean;
@@ -74,6 +83,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   customObjects,
   customTotalPages,
   fields,
+  keyField = "id",
   page,
   onPageChange,
   service,
@@ -84,7 +94,12 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   linkBase = "",
   breadcrumbs = [],
   hasImport = true,
+  fetchFunction,
+  filterArgs,
+  // fetchArgs,
   onHandleFile,
+  onAdd,
+  onUpdate,
   hasTopicSelector = false,
   hasLessonSelector = false,
   hasBreadcrumb = true,
@@ -135,11 +150,25 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
           return;
         }
       }
-      const res = await service.getAll({
-        page: page,
+
+      const fetchArgs: FetchArgs = {
+        page,
         pageSize: 10,
-        keyword: keyword,
-      });
+        keyword,
+        filter: filterArgs ? filterArgs : null,
+        sortKey,
+        sortOrder,
+      };
+      console.log("check args: ", fetchArgs);
+
+      const res = fetchFunction
+        ? await fetchFunction(fetchArgs)
+        : await service.getAll(fetchArgs);
+      // const res = await service.getAll({
+      //   page: page,
+      //   pageSize: 10,
+      //   keyword: keyword,
+      // });
 
       if (res.success && Array.isArray(res.data)) {
         // Handling sorting:
@@ -170,7 +199,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         toast.info(`Đã xóa chủ đề ${selectedItem} thành công!`);
         handleFetchData();
       } else {
-        alert("Failed to delete item");
+        toast.error("Failed to delete item");
       }
     } catch (error) {
       alert("Error deleting item");
@@ -222,42 +251,28 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
     console.log("Check formData: ", formData);
 
     const form = new FormData();
-    if (config) {
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "options") {
-          form.append("options", JSON.stringify(value));
-        } else if (value instanceof File) {
-          form.append(key, value);
-        } else if (typeof value === "string" && value.startsWith("http")) {
-          // This is a URL of the already-uploaded file -> skip
-        } else if (value === null || value === undefined || value === "") {
-          // Skip empty fields
-        } else {
-          form.append(key, value);
-        }
-      });
-    } else {
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "options") {
-          form.append("options", JSON.stringify(value));
-        } else if (value instanceof File) {
-          form.append(key, value);
-        } else if (typeof value === "string" && value.startsWith("http")) {
-          // This is a URL of the already-uploaded file -> skip
-        } else if (value === null || value === undefined || value === "") {
-          // Skip empty fields
-        } else {
-          form.append(key, value);
-        }
-      });
-    }
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "options") {
+        form.append("options", JSON.stringify(value));
+      } else if (value instanceof File) {
+        form.append(key, value);
+      } else if (typeof value === "string" && value.startsWith("http")) {
+        // Already uploaded file, skip
+      } else if (value !== null && value !== undefined && value !== "") {
+        form.append(key, value);
+      }
+    });
 
     try {
       let response;
       if (formData.id) {
-        response = await service.update(formData.id, form, config);
+        response = onUpdate
+          ? await onUpdate(formData.id, form, config)
+          : await service.update(formData.id, form, config);
       } else {
-        response = await service.create(form, config);
+        response = onAdd
+          ? await onAdd(form, config)
+          : service.create(form, config);
       }
       if (response.success) {
         setIsModalOpen(false);
@@ -412,7 +427,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                     }}
                     className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-light transition text-sm border border-primary"
                   >
-                     {t("exportFile")}
+                    {t("exportFile")}
                   </button>
 
                   <button
@@ -489,9 +504,10 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                           key={f.key}
                           className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300"
                         >
-                          {f.key === "title" && linkBase ? (
+                          {(f.key === "title" || f.type === "key") &&
+                          linkBase ? (
                             <Link
-                              href={`${linkBase}/${item.id}`}
+                              href={`${linkBase}/${item[keyField]}`}
                               className="text-blue-600 dark:text-blue-400 hover:underline"
                             >
                               {item[f.key]}

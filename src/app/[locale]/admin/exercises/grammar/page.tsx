@@ -10,6 +10,7 @@ import { Exercise } from "@/lib/types/exercise";
 import { Lesson } from "@/lib/types/lesson";
 import { OptionType } from "@/lib/types/option";
 import { Topic } from "@/lib/types/topic";
+import { useLocale } from "next-intl";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -30,6 +31,7 @@ export default function AdminGrammar() {
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
 
   const [exerciseTypes, setExerciseTypes] = useState([]);
+  const locale = useLocale()
   const breadcrumbs = [
     { label: "Home", href: "/admin/home" },
     { label: "Exercises writing", href: "/admin/exercises/writing" },
@@ -181,7 +183,7 @@ export default function AdminGrammar() {
       toast.error("Please select a file to import");
       return;
     }
-    console.log("Check");
+  
 
     try {
       exerciseService.importByFile(file);
@@ -220,7 +222,7 @@ export default function AdminGrammar() {
           page={page}
           onPageChange={onPageChange}
           service={exerciseService}
-          linkBase="/admin/exercises"
+          linkBase={"/"+locale+"/admin/data/sound"}
           breadcrumbs={breadcrumbs}
           modalFields={modalFields}
           onHandleFile={onHandleFile}
