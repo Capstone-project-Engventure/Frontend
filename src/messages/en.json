@@ -71,7 +71,8 @@
     "next": "Next",
     "page": "Page",
     "actions": "Actions",
-    "confirmDelete": "Are you sure you want to delete this item?"
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "apiError": "An error occurred while fetching data from the server. Please try again later."
   },
   "StudentWritingPractice": {
     "title": "Writing Practice",
@@ -124,5 +125,59 @@
     "try_again": "Try again!",
     "listen_normal": "Normal",
     "listen_slow": "Slow"
+  },
+  "Admin": {
+    "Exercises": {
+      "breadcrumbs": {
+        "home": "Home",
+        "writingExercises": "Exercises Writing",
+        "grammarExercises": "Exercises Grammar"
+      },
+      "topic": "Topic",
+      "lesson": "Lesson",
+      "fields": {
+        "name": "Name",
+        "question": "Question",
+        "options": "Options",
+        "level": "Level",
+        "answer": "Answer",
+        "description": "Description",
+        "skill": "Skill",
+        "audio": "Audio",
+        "questionType": "Question Type",
+        "audioFile": "Audio File",
+        "lesson": "Lesson",
+        "topic": "Topic"
+      },
+      "skills": {
+        "writing": "Writing",
+        "grammar": "Grammar",
+        "listening": "Listening",
+        "pronunciation": "Pronunciation",
+        "vocabulary": "Vocabulary"
+      },
+      "placeholders": {
+        "lesson": "Select a lesson",
+        "topic": "Select a topic"
+      }
+    },
+    "Lessons": {
+      "breadcrumbs": {
+        "home": "Home",
+        "lesson": "Lessons"
+      },
+      "fields": {
+        "title": "Title",
+        "level": "Level",
+        "topic": "Topic",
+        "description": "Description"
+      },
+      "messages": {
+        "success": "Updated successfully",
+        "fetchTopicFail": "Failed to fetch topics",
+        "importOk": "File imported successfully",
+        "importFail": "Import failed"
+      }
+    }
   }
 }

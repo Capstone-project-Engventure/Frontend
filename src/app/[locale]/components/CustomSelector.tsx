@@ -10,22 +10,30 @@ interface ObjectSelectProps {
   objects: OptionType[];
   onChange: (value: OptionType | null) => void;
   value?: OptionType | null;
+  placeholder?: string;
 }
 
-const CustomSelector = ({ objects, onChange, value }: ObjectSelectProps) => {
+const CustomSelector = ({
+  objects,
+  onChange,
+  value,
+  placeholder,
+}: ObjectSelectProps) => {
   return (
     <Select
       options={objects}
       value={value}
       onChange={onChange}
       isSearchable
-      placeholder="Tìm kiếm chủ đề..."
+      placeholder={placeholder || "Tìm kiếm chủ đề..."}
       maxMenuHeight={200} //
       menuPlacement="auto"
+      menuPosition="absolute"
+      isClearable={true}
       styles={{
         menuList: (base) => ({
           ...base,
-          maxHeight: "300px", 
+          maxHeight: "300px",
         }),
       }}
     />

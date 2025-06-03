@@ -1,6 +1,6 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
-import CustomSelector from "@/app/[locale]/components/TopicSelector";
+import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
 import { Topic } from "@/lib/types/topic";

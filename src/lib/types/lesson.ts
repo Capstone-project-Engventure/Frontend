@@ -4,5 +4,6 @@ export type Lesson = {
   level: string;
   description: string;
   topic?: number | null;
+  topic_id?:string;
   exercises: []
 };

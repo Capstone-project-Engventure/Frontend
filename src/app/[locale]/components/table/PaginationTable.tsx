@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import {
   HiPlus,
   HiPencil,
@@ -21,10 +21,6 @@ import { toast } from "react-toastify";
 import ImportModal from "../ImportModal";
 import { ExportFile } from "@/lib/export-json";
 import AudioPlayer from "../AudioPlayer";
-import CustomSelector from "../TopicSelector";
-import { OptionProps } from "react-select";
-import TopicService from "@/lib/services/topic.service";
-import LessonService from "@/lib/services/lesson.service";
 import { useTranslations } from "next-intl";
 import { FetchArgs, ServiceResponse } from "@/lib/types/api";
 
@@ -68,12 +64,11 @@ interface PaginationTableProps {
   hasImport?: boolean;
   fetchArgs?: FetchArgs;
   filterArgs?: any;
+  filterComponents?: React.ReactNode;
   fetchFunction?: (args: FetchArgs) => Promise<ServiceResponse>;
   onAdd?: (data: any, config: any) => void;
   onUpdate?: (id: string, data: any, config: any) => void;
   onHandleFile?: (file: File) => void;
-  hasTopicSelector?: boolean;
-  hasLessonSelector?: boolean;
   hasBreadcrumb?: boolean;
   hasCustomFetch?: boolean;
 }
@@ -97,17 +92,22 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   fetchFunction,
   filterArgs,
   // fetchArgs,
+  filterComponents,
   onHandleFile,
   onAdd,
   onUpdate,
-  hasTopicSelector = false,
-  hasLessonSelector = false,
   hasBreadcrumb = true,
   hasCustomFetch = false,
 }) => {
-  const [objects, setObjects] = useState([]);
+  const [objects, setObjects] = useState<any[]>([]);
+  const [isMounted] = useState({ current: true });
+  useEffect(
+    () => () => {
+      isMounted.current = false;
+    },
+    []
+  );
   const [totalPages, setTotalPages] = useState(1);
-
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
@@ -123,22 +123,13 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   const [sortKey, setSortKey] = useState<string>(""); // e.g., "name"
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const [topics, setTopics] = useState<OptionProps[]>([]);
-
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-
   const t = useTranslations("PaginationTable");
-  const topicService = new TopicService();
-  const lessonService = new LessonService();
 
   const handleFetchData = async () => {
+    if (!service && !fetchFunction) return;
     try {
       if (hasCustomFetch) {
-        if (
-          customObjects &&
-          Array.isArray(customObjects) &&
-          customObjects.length > 0
-        ) {
+        if (customObjects && Array.isArray(customObjects)) {
           setObjects(customObjects);
           setTotalPages(customTotalPages || 1);
           return;
@@ -164,19 +155,20 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       const res = fetchFunction
         ? await fetchFunction(fetchArgs)
         : await service.getAll(fetchArgs);
-      // const res = await service.getAll({
-      //   page: page,
-      //   pageSize: 10,
-      //   keyword: keyword,
-      // });
-
-      if (res.success && Array.isArray(res.data)) {
-        // Handling sorting:
+      console.log("Response: ", res);
+      
+      if (!res.success || !Array.isArray(res.data)) {
+        toast.error(res.message || t("apiError"));
+        return;
+      }
+      if (isMounted.current) {
         setObjects(res.data);
         setTotalPages(res.total_page);
+        if (page > res.total_page) onPageChange(res.total_page || 1);
       }
     } catch (err) {
       console.log("Error: ", err);
+      toast.error(t("networkError"));
     }
   };
 
@@ -226,7 +218,6 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
     if (selectedItems.length === 0) return;
     setIsLoading(true);
     try {
-      // Assuming service has a deleteMultiple method
       console.log("Deleting items: ", selectedItems);
 
       const response = await service.deleteMultiple(selectedItems);
@@ -298,76 +289,27 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
     handleFetchData();
   }, [page, keyword, customObjects]);
 
-  useEffect(() => {
-    // Reset selected items when page changes
-    const handleSorting = () => {
-      const sortedData = [...objects].sort((a, b) => {
-        const aVal = a[sortKey];
-        const bVal = b[sortKey];
-
-        if (typeof aVal === "string" && typeof bVal === "string") {
-          return sortOrder === "asc"
-            ? (aVal as string).localeCompare(bVal as string)
-            : (bVal as string).localeCompare(aVal as string);
-        }
-
-        if (typeof aVal === "number" && typeof bVal === "number") {
-          return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
-        }
-
-        if (aVal instanceof Date && bVal instanceof Date) {
-          return sortOrder === "asc"
-            ? (aVal as Date).getTime() - (bVal as Date).getTime()
-            : (bVal as Date).getTime() - (aVal as Date).getTime();
-        }
-
-        return 0;
-      });
-      if (sortedData.length > 0) {
-        setObjects(sortedData);
-      }
-    };
-    handleSorting();
-  }, [sortKey, sortOrder]);
-
-  useEffect(() => {
-    const fetchTopics = async () => {
-      try {
-        const res = await topicService.getAll();
-        if (res.success && Array.isArray(res.data)) {
-          setTopics(
-            res.data.map((t: any) => ({
-              value: t.id,
-              label: t.title,
-            }))
-          );
-        } else {
-          setTopics([]);
-          toast.error("Error fetching topics");
-        }
-      } catch (error) {
-        console.error("Error fetching topics: ", error);
-      }
-    };
-    fetchTopics();
-  }, []);
-
-  // if (!objects || objects.length === 0) {
-  //   return (
-  //     <div className="flex items-center justify-center h-screen">
-  //       <h1 className="text-2xl font-bold">Không có dữ liệu</h1>
-  //     </div>
-  //   );
-  // }
-
-  function handleSort(key: any) {
-    if (sortKey === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortOrder("asc");
-    }
+  function handleSort(key: string) {
+    if (!key) return;
+    setSortKey((prev) => (prev === key ? prev : key));
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
   }
+
+  const sortedObjects = useMemo(() => {
+    if (!sortKey) return objects;
+    return [...objects].sort((a, b) => {
+      const aVal = a?.[sortKey];
+      const bVal = b?.[sortKey];
+      if (aVal == null || bVal == null) return 0;
+      if (typeof aVal === "string")
+        return sortOrder === "asc"
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      if (typeof aVal === "number")
+        return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
+      return 0;
+    });
+  }, [objects, sortKey, sortOrder]);
 
   return (
     <>
@@ -393,23 +335,12 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         <div className="mt-8">
           <div className="flex justify-between mb-4 px-2">
             <div className="flex flex-col gap-2 w-1/3">
-              {/* <input
-                type="text"
-                placeholder="Search vocabulary..."
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              /> */}
               <SearchInput keyword={keyword} onChange={setKeyword} />
-              <div className="flex flex-row gap-2">
-                {hasTopicSelector ? (
-                  <CustomSelector
-                    topics={topics}
-                    value={selectedTopic}
-                    onChange={setSelectedTopic}
-                  />
-                ) : (
-                  <></>
-                )}
-              </div>
+              {filterComponents && (
+                <div className="mb-4 flex flex-wrap gap-4 items-center">
+                  {filterComponents}
+                </div>
+              )}
             </div>
             <div className="flex flex-row gap-2 items-center">
               <button
@@ -466,7 +397,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                       checked={selectedItems.length === objects.length}
                     />
                   </th>
-                  {fields.map((f: any) => (
+                  {(fields as Field[]).map((f) => (
                     <th
                       key={f.key}
                       className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase"
@@ -486,8 +417,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800">
-                {objects.length > 0 ? (
-                  objects.map((item) => (
+                {sortedObjects.length > 0 ? (
+                  sortedObjects.map((item) => (
                     <tr
                       key={item.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition"
@@ -499,7 +430,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                           onChange={() => handleCheckboxChange(item.id)}
                         />
                       </td>
-                      {fields.map((f) => (
+                      {(fields as Field[]).map((f) => (
                         <td
                           key={f.key}
                           className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300"
@@ -526,7 +457,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             <span>{item[f.key]?.[f.nestKey]}</span>
                           ) : f.type === "mcq" &&
                             item[f.key] &&
-                            Array(item[f.key]) ? (
+                            Array.isArray(item[f.key]) ? (
                             <ul className="list-disc list-inside">
                               {item[f.key].map(
                                 (opt: { key: string; option: string }) => (
@@ -537,6 +468,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                                 )
                               )}
                             </ul>
+                          ) : typeof item[f.key] === "object" && item[f.key] ? (
+                            <span>{item[f.key]}</span>
                           ) : (
                             <span>{item[f.key]}</span>
                           )}
@@ -628,10 +561,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                       />
                     );
                   }
-                  if (
-                    field.type === "mcq" &&
-                    formData.type !== "3aded9b5-2f14-4814-bf39-707d5bffcb76"
-                  ) {
+                  if (field.type === "mcq") {
                     return null;
                   }
                   return (
