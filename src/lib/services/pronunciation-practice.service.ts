@@ -15,23 +15,20 @@ class PronunciationPracticeService extends BaseService<Lesson> {
   constructor() {
     super("pronunciation-exercises");
   }
-  // async function getLessonsByTopic(){
-  //   const res = await api.get<ApiResponse<Lesson[]>>(
-  //     `${this.endpoint}`
-  //   );
-  //   if (res.data.success) {
-  //     return res.data.data;
-  //   } else {
-  //     throw new Error(res.data.data);
-  //   }
-  // }
 
   importByFile(file: File) {
     const formData = new FormData();
     console.log("it came here");
 
     formData.append("file", file);
-    return api.post("/lessons/import-file", formData, {
+    return api.post("/pronunciation-exercises/import-file", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+  checkPronunciation(data) {
+    return api.post("/pronunciation-exercises/check-pronunciation", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

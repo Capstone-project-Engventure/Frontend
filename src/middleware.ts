@@ -4,6 +4,7 @@ import createIntlMiddleware from "next-intl/middleware";
 // import { parseAuthCookie, verifyJwt } from './lib/utils/jwt';
 import { decodeJwt, jwtVerify, importSPKI } from "jose";
 import { PUBLIC_KEY_PEM } from "@/lib/key/publicKey";
+import Cookies from "js-cookie";
 
 const intlMiddleware = createIntlMiddleware({
   locales: ["en", "vi"],
@@ -12,65 +13,46 @@ const intlMiddleware = createIntlMiddleware({
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("access_token")?.value;
-  const publicKey = await importSPKI(PUBLIC_KEY_PEM, "RS256");
-  const intlResponse = intlMiddleware(request);
-
-  if (intlResponse.redirected) {
-    return intlResponse;
-  }
-
   const pathname = request.nextUrl.pathname;
   const locale = pathname.split("/")[1];
   const isValidLocale = ["en", "vi"].includes(locale);
   const resolvedLocale = isValidLocale ? locale : "en";
+  const isLocaleRoot = pathname === `/${resolvedLocale}` || pathname === `/${resolvedLocale}/` || pathname === "/";
 
   let role = "anonymous";
   let isValidToken = false;
 
+  // Validate token if present
   if (token) {
     try {
-      // const { payload } = await jwtVerify(token, new TextEncoder().encode(SECRET_KEY));
-      const decoded = decodeJwt(token);
-      const now = Math.floor(Date.now() / 1000);
-
-      if (decoded.exp && decoded.exp < now) {
-        // throw new Error("Token expired");
-        return;
-      }
+      const publicKey = await importSPKI(PUBLIC_KEY_PEM, "RS256");
       const { payload } = await jwtVerify(token, publicKey);
-      const currentTimestamp = Math.floor(Date.now() / 1000); // In seconds
-
       isValidToken = true;
       role = payload.scope?.includes("admin") ? "admin" : "student";
     } catch (error) {
       console.error("JWT verification failed:", error);
-      const response = NextResponse.redirect(
-        new URL(`/${resolvedLocale}/`, request.url)
-      );
-      request.cookies.delete("access_token");
-      return response;
-      // return NextResponse.redirect(new URL('/', request.url));
     }
   }
 
-  if ((pathname === "/" || pathname === `/${resolvedLocale}`) && isValidToken) {
-    if (role === "admin") {
-      return NextResponse.redirect(
-        new URL(`/${resolvedLocale}/admin/home`, request.url)
-      );
-    } else if (role === "student") {
-      return NextResponse.redirect(
-        new URL(`/${resolvedLocale}/student/my-course`, request.url)
-      );
-    } else {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  } 
-  if (pathname === "/") {
-    return NextResponse.redirect(new URL("/", request.url));
+  // Redirect based on locale
+  const intlResponse = intlMiddleware(request);
+  if (intlResponse.redirected) {
+    return intlResponse;
   }
-  // If the user is not authenticated and trying to access a protected route
 
+  // Authenticated user landing on root → redirect to role-specific dashboard
+  if (isLocaleRoot && isValidToken) {
+    const destination =
+      role === "admin"
+        ? `/${resolvedLocale}/admin/home`
+        : `/${resolvedLocale}/student/my-course`;
+
+    if (pathname !== destination) {
+      return NextResponse.redirect(new URL(destination, request.url));
+    }
+  }
+
+  // If trying to access a protected route and unauthenticated → redirect to home
   const isProtectedRoute =
     pathname.startsWith(`/${resolvedLocale}/admin`) ||
     pathname.startsWith(`/${resolvedLocale}/student`);
@@ -85,6 +67,31 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/", "/(en|vi)/:path*"],
 };
+
+function checkAuthStatus(req: NextRequest): string | null {
+  try {
+    const cookie = req.cookies.get("access_token")?.value;
+    return JSON.parse(cookie || "false");
+  } catch {
+    return null;
+  }
+}
+
+function validateJwtToken(token: string) {
+  try {
+    const decoded = decodeJwt(token);
+    const now = Math.floor(Date.now() / 1000);
+    if (decoded.exp && decoded.exp < now) {
+      console.log("expired: ", decoded.exp, now);
+      Cookies.remove("access_token");
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("JWT verification failed:", error);
+    return false;
+  }
+}
 
 // 1. Specify protected and public routes
 const protectedRoutes = ["/dashboard"];

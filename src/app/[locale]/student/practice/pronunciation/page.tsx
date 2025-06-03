@@ -59,7 +59,7 @@ const PronunciationPracticePage = () => {
           </div>
 
           <Link
-            href={`/${locale}/student/practice/pronunciation/${encodeURIComponent(sound.symbol)}`}
+            href={`/${locale}/student/practice/pronunciation/${encodeURIComponent(sound.id)}`}
             className="text-white bg-teal-600 font-medium border border-gray-300 px-4 py-2 rounded hover:bg-teal-400 hover:text-white transition text-center w-full"
           >
             {t("goToExercise")}

@@ -148,7 +148,7 @@ export default function WritingExercise() {
       toast.error("Please select a file to import");
       return;
     }
-    console.log("Check");
+    
 
     try {
       exerciseService.importByFile(file);

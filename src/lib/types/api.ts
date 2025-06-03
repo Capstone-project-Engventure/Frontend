@@ -1,4 +1,11 @@
-export interface PaginatedResponse {
+export interface FetchArgs {
+  page: number;
+  pageSize: number;
+  keyword?: string;
+  [key: string]: any;
+}
+
+export interface ServiceResponse<> {
   links: {
     previous: string | null;
     next: string | null;
