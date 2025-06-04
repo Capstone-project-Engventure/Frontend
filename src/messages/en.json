@@ -42,6 +42,8 @@
     "data": "Data Management",
     "vocabulary": "Vocabulary",
     "phonetics": "Phonetics",
+    "allExercises":"All exercises",
+    "reading":"Reading",
     "grammar": "Grammar",
     "listening": "Listening",
     "writing": "Writing",
@@ -147,7 +149,8 @@
         "questionType": "Question Type",
         "audioFile": "Audio File",
         "lesson": "Lesson",
-        "topic": "Topic"
+        "topic": "Topic",
+        "type":"Type"
       },
       "skills": {
         "writing": "Writing",
@@ -177,6 +180,59 @@
         "fetchTopicFail": "Failed to fetch topics",
         "importOk": "File imported successfully",
         "importFail": "Import failed"
+      },
+      "Detail": {
+        "breadcrumbs": {
+          "home": "Home",
+          "manageLessons": "Lesson Management",
+          "lessonDetail": "Lesson Detail"
+        },
+        "fields": {
+          "name": "Name",
+          "question": "Question",
+          "systemAnswer": "System Answer",
+          "questionType": "Question Type",
+          "level": "Level",
+          "description": "Description",
+          "skill": "Skill"
+        },
+        "exercise": {
+          "title": "Title",
+          "question": "Question",
+          "description": "Description",
+          "type": "Type"
+        },
+        "buttons": {
+          "addExistingExercise": "Add Existing Exercises",
+          "filter": "Filter",
+          "addSelected": "Add Selected",
+          "cancel": "Cancel",
+          "save": "Save",
+          "select": "Select"
+        },
+        "modal": {
+          "title": "Add Exercises",
+          "exerciseTypePlaceholder": "Exercise Type",
+          "skillPlaceholder": "Skill"
+        },
+        "table": {
+          "title": "Title",
+          "type": "Type",
+          "skill": "Skill",
+          "level": "Level"
+        },
+        "messages": {
+          "loading": "Loading data…",
+          "fetchExerciseTypesFail": "Failed to fetch exercise types",
+          "networkError": "Network error",
+          "noLessonId": "No lesson ID provided",
+          "fetchLessonFail": "Fetch lessons failed",
+          "fetchExercisesFail": "Failed to fetch exercises",
+          "fetchAvailableExercisesErr": "Error fetching available exercises",
+          "addExercisesError": "Error adding exercises to lesson",
+          "addExercisesSuccess": "{count} exercises have been added to the lesson",
+          "addExercisesPartialFail": "{fail}/{total} exercises could not be added to the lesson"
+        }
       }
     }
   }

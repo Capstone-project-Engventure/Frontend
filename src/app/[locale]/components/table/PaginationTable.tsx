@@ -65,6 +65,7 @@ interface PaginationTableProps {
   fetchArgs?: FetchArgs;
   filterArgs?: any;
   filterComponents?: React.ReactNode;
+  customActions?: React.ReactNode;
   fetchFunction?: (args: FetchArgs) => Promise<ServiceResponse>;
   onAdd?: (data: any, config: any) => void;
   onUpdate?: (id: string, data: any, config: any) => void;
@@ -93,6 +94,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   filterArgs,
   // fetchArgs,
   filterComponents,
+  customActions,
   onHandleFile,
   onAdd,
   onUpdate,
@@ -343,6 +345,11 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
               )}
             </div>
             <div className="flex flex-row gap-2 items-center">
+              {customActions ? (
+                customActions
+              ) : (
+                <></>
+              )}
               <button
                 onClick={handleAdd}
                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"

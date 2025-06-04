@@ -46,6 +46,9 @@
     "data": "Quản lý dữ liệu",
     "vocabulary": "Từ vựng",
     "phonetics": "Ngữ âm",
+    "allExercises": "Tất cả bài tập",
+    "exercises": "Bài tập",
+    "reading": "Đọc",
     "grammar": "Ngữ pháp",
     "listening": "Nghe",
     "writing": "Viết",
@@ -150,7 +153,8 @@
         "questionType": "Loại câu hỏi",
         "audioFile": "Tệp âm thanh",
         "lesson": "Bài học",
-        "topic": "Chủ đề"
+        "topic": "Chủ đề",
+        "type": "Loại bài tập"
       },
       "skills": {
         "writing": "Viết",
@@ -188,6 +192,59 @@
         "fetchTopicFail": "Lấy danh sách chủ đề thất bại",
         "importOk": "Import file thành công",
         "importFail": "Import file thất bại"
+      },
+      "Detail": {
+        "breadcrumbs": {
+          "home": "Trang chủ",
+          "manageLessons": "Quản lý bài học",
+          "lessonDetail": "Chi tiết bài học"
+        },
+        "fields": {
+          "name": "Tên",
+          "question": "Câu hỏi",
+          "systemAnswer": "Đáp án hệ thống",
+          "questionType": "Loại câu hỏi",
+          "level": "Trình độ",
+          "description": "Mô tả",
+          "skill": "Kỹ năng"
+        },
+        "exercise": {
+          "title": "Tiêu đề",
+          "question": "Câu hỏi",
+          "description": "Mô tả",
+          "type": "Loại"
+        },
+        "buttons": {
+          "addExistingExercise": "Thêm bài tập có sẵn",
+          "filter": "Lọc",
+          "addSelected": "Thêm đã chọn",
+          "cancel": "Hủy",
+          "save": "Lưu",
+          "select": "Chọn"
+        },
+        "modal": {
+          "title": "Thêm bài tập",
+          "exerciseTypePlaceholder": "Loại bài tập",
+          "skillPlaceholder": "Kỹ năng"
+        },
+        "table": {
+          "title": "Câu hỏi",
+          "type": "Loại",
+          "skill": "Kỹ năng",
+          "level": "Trình độ"
+        },
+        "messages": {
+          "loading": "Đang tải dữ liệu…",
+          "fetchExerciseTypesFail": "Không thể lấy danh sách loại bài tập",
+          "networkError": "Lỗi mạng",
+          "noLessonId": "Không có ID bài học",
+          "fetchLessonFail": "Lấy bài học thất bại",
+          "fetchExercisesFail": "Không thể lấy danh sách bài tập",
+          "fetchAvailableExercisesErr": "Lỗi khi lấy bài tập có sẵn",
+          "addExercisesError": "Lỗi khi thêm bài tập vào bài học",
+          "addExercisesSuccess": "Đã thêm {count} bài tập vào bài học",
+          "addExercisesPartialFail": "{fail}/{total} bài tập không thể thêm vào bài học"
+        }
       }
     }
   }
