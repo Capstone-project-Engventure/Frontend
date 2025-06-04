@@ -77,13 +77,22 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
       href: `${basePath}/${role === "admin" ? "topics" : "favorite-course"}`,
     },
     {
-      label: t(role === "admin" ? "data" : "practice"),
+      label: t(role === "admin" ? "exercises" : "practice"),
       icon: TbNotes,
       children: [
+        ...(role === "admin"
+          ? [
+              {
+                label: t("allExercises"),
+                href: `${basePath}/exercises`,
+                icon: MdLibraryBooks,
+              },
+            ]
+          : []),
         {
-          label: t("vocabulary"),
+          label: t("reading"),
           href: `${basePath}/${
-            role === "admin" ? "exercises/vocabulary" : "practice/vocabulary"
+            role === "admin" ? "exercises/reading" : "practice/reading"
           }`,
           icon: MdLibraryBooks,
         },

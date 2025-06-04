@@ -11,6 +11,7 @@ interface ObjectSelectProps {
   onChange: (value: OptionType | null) => void;
   value?: OptionType | null;
   placeholder?: string;
+  multiple?: boolean;
 }
 
 const CustomSelector = ({
@@ -18,6 +19,7 @@ const CustomSelector = ({
   onChange,
   value,
   placeholder,
+  multiple=false
 }: ObjectSelectProps) => {
   return (
     <Select
@@ -30,6 +32,7 @@ const CustomSelector = ({
       menuPlacement="auto"
       menuPosition="absolute"
       isClearable={true}
+      isMulti={multiple}
       styles={{
         menuList: (base) => ({
           ...base,

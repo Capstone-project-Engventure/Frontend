@@ -111,7 +111,7 @@ export abstract class BaseService<T> {
   }
 
   public async update(
-    id: number,
+    id: string | number,
     data: Partial<T>,
     config: any
   ): Promise<ApiResponse<T>> {

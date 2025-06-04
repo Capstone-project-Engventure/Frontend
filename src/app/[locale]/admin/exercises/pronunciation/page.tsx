@@ -23,9 +23,9 @@ const PronunciationPage: React.FC = () => {
   ]
   const fields = [
     { key: "symbol", label: "Symbol" },
-    { key: "word", label: "Word" },
-    { key: "sound_pronounce", label: "Sound pronounce" },
-    { key: "word_pronounce", label: "Word pronounce" },
+    { key: "word", label: "Word", type:"text" },
+    { key: "sound_pronounce", label: "Sound pronounce", type:"textarea" },
+    { key: "word_pronounce", label: "Word pronounce", type:"textarea" },
     { key: "sound_audio", label: "Audio", type: "audio" },
     { key: "word_audio", label: "Audio", type: "audio" },
     { key: "description", label: "Description" },
