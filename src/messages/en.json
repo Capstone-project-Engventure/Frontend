@@ -35,6 +35,7 @@
     "BreadcrumbHome": "Home"
   },
   "Sidebar": {
+    "exercises": "Exercises",
     "dashboard": "Dashboard",
     "courses": "Courses",
     "lessons": "Lessons",
