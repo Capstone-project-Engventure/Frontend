@@ -48,51 +48,45 @@ export default function AdminGrammar() {
     },
   ];
 
-  const fields = useMemo(
-    () => [
-      { key: "name", label: t("fields.name") },
-      { key: "question", label: t("fields.question") },
-      { key: "options", label: t("fields.options"), type: "mcq" },
-      { key: "level", label: t("fields.level") },
-      { key: "system_answer", label: t("fields.answer") },
-      { key: "description", label: t("fields.description") },
-    ],
-    [t]
-  );
+  const fields = useMemo(() => [
+    { key: "name", label: t("fields.name") },
+    { key: "question", label: t("fields.question") },
+    { key: "options", label: t("fields.options"), type: "mcq" },
+    { key: "level", label: t("fields.level") },
+    { key: "system_answer", label: t("fields.answer") },
+    { key: "description", label: t("fields.description") },
+  ], [t]);
 
-  const modalFields = useMemo(
-    () => [
-      { key: "name", label: t("fields.name"), type: "text" },
-      { key: "question", label: t("fields.question"), type: "text" },
-      {
-        key: "lesson",
-        label: t("fields.lesson"),
-        type: "select",
-        options: lessons || [],
-      },
-      {
-        key: "type",
-        label: t("fields.questionType"),
-        type: "select",
-        options: exerciseTypes || [],
-      },
-      {
-        key: "level",
-        label: t("fields.level"),
-        type: "select",
-        options: LevelOptions,
-      },
-      { key: "description", label: t("fields.description"), type: "textarea" },
-      {
-        key: "skill",
-        label: t("fields.skill"),
-        type: "select",
-        options: SkillOptions,
-      },
-      // { key: "generated_by", type: "hidden", default: "system" },
-    ],
-    [t, lessons, exerciseTypes]
-  );
+  const modalFields = useMemo(() => [
+    { key: "name", label: t("fields.name"), type: "text" },
+    { key: "question", label: t("fields.question"), type: "text" },
+    {
+      key: "lesson",
+      label: t("fields.lesson"),
+      type: "select",
+      options: lessons || [],
+    },
+    {
+      key: "type",
+      label: t("fields.questionType"),
+      type: "select",
+      options: exerciseTypes || [],
+    },
+    {
+      key: "level",
+      label: t("fields.level"),
+      type: "select",
+      options: LevelOptions,
+    },
+    { key: "description", label: t("fields.description"), type: "textarea" },
+    {
+      key: "skill",
+      label: t("fields.skill"),
+      type: "select",
+      options: SkillOptions,
+    },
+    // { key: "generated_by", type: "hidden", default: "system" },
+  ], [t, lessons, exerciseTypes]);
 
   const onPageChange = (page: number) => {
     setPage(page);
@@ -187,7 +181,6 @@ export default function AdminGrammar() {
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
-
       <PaginationTable
         filterComponents={filterComponents}
         customObjects={exercises}

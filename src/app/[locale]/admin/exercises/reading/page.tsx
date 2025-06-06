@@ -1,14 +1,12 @@
 "use client";
+
 import ExerciseService from "@/lib/services/exercise.service";
 import { Exercise } from "@/lib/types/exercise";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-
-
 const ReadingExercises = () => {
-
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const exerciseService = new ExerciseService();
   const pathname = usePathname()

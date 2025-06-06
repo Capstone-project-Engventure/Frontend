@@ -6,14 +6,14 @@ import { BaseService } from "./base.service";
 const api = useApi();
 
 class ExerciseService extends BaseService<Exercise> {
-  constructor() { 
+  constructor() {
     super("exercises");
   }
 
   importByFile(file: File) {
     const formData = new FormData();
     console.log("it came here");
-    
+
     formData.append("file", file);
     return api.post("exercises/import-file", formData, {
       headers: {
@@ -25,7 +25,6 @@ class ExerciseService extends BaseService<Exercise> {
   submitExercise(exerciseId: string, content: string) {
     return api.post(`exercises/${exerciseId}/submit`, { content });
   }
-  
-
 }
+
 export default ExerciseService;
