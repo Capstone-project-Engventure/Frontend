@@ -174,7 +174,12 @@
         "title": "Title",
         "level": "Level",
         "topic": "Topic",
-        "description": "Description"
+        "description": "Description",
+        "types":"Type",
+        "type":{
+          "lesson": "Lesson",
+          "practice": "Practice"
+        }
       },
       "messages": {
         "success": "Updated successfully",

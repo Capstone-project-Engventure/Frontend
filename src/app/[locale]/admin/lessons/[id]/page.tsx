@@ -7,6 +7,7 @@ import { SkillOptions } from "@/lib/constants/skill";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
 import ExerciseService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
+import { Exercise } from "@/lib/types/exercise";
 import { Lesson } from "@/lib/types/lesson";
 import { OptionType } from "@/lib/types/option";
 import { useLocale } from "next-intl";
@@ -21,7 +22,7 @@ export default function AdminLessonDetail() {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [exerciseTypes, setExerciseTypes] = useState<OptionType[]>([]);
   const [filteredExercises, setFilteredExercises] = useState<any[]>([]);
-  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [filters, setFilters] = useState({ type: "", skill: "" });
 
@@ -50,10 +51,13 @@ export default function AdminLessonDetail() {
       { key: "question", label: t("fields.question"), type: "text" },
       { key: "system_answer", label: t("fields.systemAnswer"), type: "text" },
       {
-        key: "type",
+        key: "type.name",
         label: t("fields.questionType"),
-        type: "select",
-        options: exerciseTypes,
+        isNested: true,
+        type: "object",
+        nestKey: "name",
+        // type: "select",
+        // options: exerciseTypes,
       },
       {
         key: "level",
@@ -127,7 +131,6 @@ export default function AdminLessonDetail() {
   /* filter exercises not already linked  */
   const fetchFilteredExercises = async () => {
     if (!lesson) {
-      alert("No lesson");
       return;
     }
     try {
@@ -136,28 +139,28 @@ export default function AdminLessonDetail() {
         toast.error(t("messages.fetchExercisesFail"));
         return;
       }
+      console.log("Filtered Skill:", filters.skill);
+      console.log("Filtered Type:", filters.type);
+
       const inLessonIds = lesson.exercises.map((e) => e.id);
       const filtered = res.data.filter((ex: any) => {
         const notInLesson = !inLessonIds.includes(ex.id);
-        const matchType = filters.type ? ex.type === filters.type : true;
-        const matchSkill = filters.skill ? ex.skill === filters.skill : true;
+        const matchType = filters.type ? ex.type === filters.type?.value : true;
+        const matchSkill = filters.skill
+          ? ex.skill === filters.skill?.value
+          : true;
 
         const shouldInclude = notInLesson && matchType && matchSkill;
-
-        console.log("Exercise:", ex);
-        console.log(" - notInLesson:", notInLesson);
-        console.log(" - matchType:", matchType);
-        console.log(" - matchSkill:", matchSkill);
-        console.log(" - included:", shouldInclude);
         return shouldInclude;
       });
       console.log("Filtered Exercises:", filtered);
-      
+
       setFilteredExercises(filtered);
     } catch {
       toast.error(t("messages.fetchExercisesFail"));
     }
   };
+
   useEffect(() => {
     fetchFilteredExercises();
   }, [filters]);
@@ -165,10 +168,12 @@ export default function AdminLessonDetail() {
   /* attach selected exercises */
   const handleAttachExercisesToLesson = async () => {
     if (!selectedExercises.length || !id) return;
+    console.log("Attaching exercises:", selectedExercises);
+
     try {
-      const requests = selectedExercises.map((exId) =>
-        exerciseService.update(
-          exId,
+      const requests = selectedExercises.map((exercise: Exercise) =>
+        exerciseService.partialUpdate(
+          exercise?.id,
           { lesson: id },
           { config: { headers: { "Accept-Language": locale } } }
         )
@@ -198,6 +203,19 @@ export default function AdminLessonDetail() {
     }
   };
 
+  const onHandleFile = async (file: File) => {
+    if (!file) {
+      toast.error("Please select a file to import");
+      return;
+    }
+
+    try {
+      exerciseService.importByFile(file);
+    } catch (error) {
+      toast.error("Error importing file");
+    }
+  };
+
   /* ─────────────── loading state ─────────────── */
   if (isLoading) {
     return (
@@ -216,6 +234,7 @@ export default function AdminLessonDetail() {
         modalFields={modalField}
         service={exerciseService}
         breadcrumbs={breadcrumbs}
+        onHandleFile={onHandleFile}
         hasCustomFetch
         /* add-existing button (responsive) */
         customActions={
@@ -266,6 +285,7 @@ export default function AdminLessonDetail() {
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="p-2"></th>
+                      <th className="p-2">{t("table.name")}</th>
                       <th className="p-2">{t("table.question")}</th>
                       <th className="p-2">{t("table.type")}</th>
                       <th className="p-2">{t("table.skill")}</th>
@@ -290,6 +310,7 @@ export default function AdminLessonDetail() {
                             }}
                           />
                         </td>
+                        <td className="p-2">{ex?.name}</td>
                         <td className="p-2">{ex?.question}</td>
                         <td className="p-2">{ex?.type?.name}</td>
                         <td className="p-2">{ex?.skill}</td>
