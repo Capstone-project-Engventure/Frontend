@@ -185,7 +185,12 @@
         "title": "Tiêu đề",
         "level": "Trình độ",
         "topic": "Chủ đề",
-        "description": "Mô tả"
+        "description": "Mô tả",
+        "types": "Kiểu lớp học",
+        "type": {
+          "lesson": "Bài học",
+          "practice": "Luyện tập"
+        }
       },
       "messages": {
         "success": "Cập nhật thành công",

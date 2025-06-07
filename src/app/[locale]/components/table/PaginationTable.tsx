@@ -109,6 +109,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
     },
     []
   );
+
   const [totalPages, setTotalPages] = useState(1);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -158,15 +159,19 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         ? await fetchFunction(fetchArgs)
         : await service.getAll(fetchArgs);
       console.log("Response: ", res);
-      
+
       if (!res.success || !Array.isArray(res.data)) {
         toast.error(res.message || t("apiError"));
         return;
       }
       if (isMounted.current) {
+        console.log("Setting objects: ", res.data);
+
         setObjects(res.data);
         setTotalPages(res.total_page);
         if (page > res.total_page) onPageChange(res.total_page || 1);
+      } else {
+        console.warn("Component is unmounted, skipping state update.");
       }
     } catch (err) {
       console.log("Error: ", err);
@@ -243,41 +248,54 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
     setIsLoading(true);
     console.log("Check formData: ", formData);
 
-    const form = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (key === "options") {
-        form.append("options", JSON.stringify(value));
-      } else if (value instanceof File) {
-        form.append(key, value);
-      } else if (typeof value === "string" && value.startsWith("http")) {
-        // Already uploaded file, skip
-      } else if (value !== null && value !== undefined && value !== "") {
-        form.append(key, value);
-      }
-    });
+    let dataToSend = { ...formData };
+
+    const isMultiPart = config?.headers?.["Content-Type"]?.includes(
+      "multipart/form-data"
+    );
+    if (isMultiPart) {
+      const form = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "options") {
+          form.append("options", JSON.stringify(value));
+        } else if (value instanceof File) {
+          form.append(key, value);
+        } else if (typeof value === "string" && value.startsWith("http")) {
+          // If the value is a URL, append it directly
+          form.append(key, value);
+        } else if (value !== null && value !== undefined && value !== "") {
+          form.append(key, value);
+        } else {
+          form.append(key, value);
+        }
+      });
+      dataToSend = form;
+    }
+
+    console.log("Check formData after : ", dataToSend);
 
     try {
       let response;
       if (formData.id) {
         response = onUpdate
-          ? await onUpdate(formData.id, form, config)
-          : await service.update(formData.id, form, config);
+          ? await onUpdate(formData.id, dataToSend, config)
+          : await service.update(formData.id, dataToSend, config);
       } else {
         response = onAdd
-          ? await onAdd(form, config)
-          : service.create(form, config);
+          ? await onAdd(dataToSend, config)
+          : await service.create(dataToSend, config);
       }
       if (response.success) {
         setIsModalOpen(false);
-        onSuccess?.();
+        handleFetchData();
+        await onSuccess?.();
       } else {
-        alert("Failed to save item");
+        toast.error("Failed to save item");
       }
     } catch (error) {
-      alert("Error saving item");
+      toast.error("Error saving item");
     } finally {
       setIsLoading(false);
-      handleFetchData();
     }
   };
 
@@ -289,13 +307,18 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
   useEffect(() => {
     handleFetchData();
-  }, [page, keyword, customObjects]);
+  }, [isMounted.current, page, keyword, customObjects]);
 
   function handleSort(key: string) {
     if (!key) return;
     setSortKey((prev) => (prev === key ? prev : key));
     setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
   }
+
+  // Method to take nest field
+  const getValueByPath = (obj: any, path: string) => {
+  return path.split(".").reduce((acc, key) => acc?.[key], obj);
+};
 
   const sortedObjects = useMemo(() => {
     if (!sortKey) return objects;
@@ -345,11 +368,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
               )}
             </div>
             <div className="flex flex-row gap-2 items-center">
-              {customActions ? (
-                customActions
-              ) : (
-                <></>
-              )}
+              {customActions ? customActions : <></>}
               <button
                 onClick={handleAdd}
                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
@@ -476,7 +495,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                               )}
                             </ul>
                           ) : typeof item[f.key] === "object" && item[f.key] ? (
-                            <span>{item[f.key]}</span>
+                            <span>{getValueByPath(item, f.key)}</span>
                           ) : (
                             <span>{item[f.key]}</span>
                           )}
@@ -640,13 +659,6 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                         </>
                       ) : field.type === "image" || field.type === "audio" ? (
                         <div className="mb-4">
-                          {/* <label
-                            htmlFor={`file_input_${field.key}`}
-                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                          >
-                            Upload file
-                          </label> */}
-
                           <input
                             type="file"
                             accept={

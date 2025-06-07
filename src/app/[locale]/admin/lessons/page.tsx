@@ -43,6 +43,7 @@ export default function AdminLesson() {
         isNest: true,
         nestKey: "title",
       },
+      { key: "type", label: t("fields.types") },
       { key: "description", label: t("fields.description") },
     ],
     [t]
@@ -62,6 +63,15 @@ export default function AdminLesson() {
         label: t("fields.topic"),
         type: "select",
         options: topicOptions,
+      },
+      {
+        key: "type",
+        label: t("fields.types"),
+        type: "select",
+        options: [
+          { value: "lesson", label: t("fields.type.lesson") },
+          { value: "practice", label: t("fields.type.practice") },
+        ],
       },
       { key: "description", label: t("fields.description"), type: "textarea" },
     ],

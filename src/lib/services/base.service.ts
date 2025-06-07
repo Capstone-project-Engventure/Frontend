@@ -135,6 +135,31 @@ export abstract class BaseService<T> {
     }
   }
 
+  public async partialUpdate(
+    id: string | number,
+    data: Partial<T>,
+    config: any
+  ): Promise<ApiResponse<T>> {
+    try {
+      const res = await api.patch(`${this.endpoint}/${id}`, data, config);
+      if (res.status === 200) {
+        return {
+          success: true,
+          data: res.data as T,
+        };
+      }
+      return {
+        success: false,
+        data: "Unexpected status code: " + res.status,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error.message,
+      };
+    }
+  }
+
   public async delete(id: number): Promise<ApiResponse<null>> {
     try {
       const res = await api.delete(`${this.endpoint}/${id}`);
