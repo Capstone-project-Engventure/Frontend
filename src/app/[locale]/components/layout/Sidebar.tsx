@@ -92,7 +92,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
         {
           label: t("reading"),
           href: `${basePath}/${
-            role === "admin" ? "exercises/reading" : "practice/reading"
+            role === "admin" ? "exercises/reading-lessons" : "practice/reading"
           }`,
           icon: MdLibraryBooks,
         },
