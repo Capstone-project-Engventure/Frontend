@@ -41,6 +41,7 @@
   "Sidebar": {
     "dashboard": "Thống kê",
     "courses": "Danh sách khóa học",
+    "learningCorner": "Góc học tập",
     "lessons": "Danh sách buổi học",
     "topics": "Danh sách chủ đề",
     "data": "Quản lý dữ liệu",
@@ -93,6 +94,22 @@
     "submissionSuccessful": "Nộp bài thành công",
     "submissionFailed": "Nộp bài viết thất bại",
     "content_placeholder": "Nhập hoặc dán (Ctrl + V) nội dung bài viết của bạn tại đây"
+  },
+  "ReadingPractice": {
+    "breadcrumbs": {
+      "home": "Nhà",
+      "readingPractice": "Luyện tập đọc hiểu"
+    },
+    "filter": {
+      "topic": "Chủ đề",
+      "level": "Cấp độ",
+      "allTopics": "Tất cả chủ đề",
+      "allLevels": "Tất cả cấp độ",
+      "reset": "Đặt lại bộ lọc",
+      "activeFilters": "Bộ lọc đang áp dụng:",
+      "noResults": "Không tìm thấy bài học nào phù hợp với bộ lọc.",
+      "clearFilters": "Xóa bộ lọc"
+    }
   },
   "PronunciationPractice": {
     "title": "Luyện phát âm",

@@ -5,4 +5,3 @@ export type ExerciseType = {
     description: string;
     // options: Record<string, string> | string[] | null;
 };
-  

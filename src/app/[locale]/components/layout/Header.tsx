@@ -48,9 +48,9 @@ export default function Header() {
   const userStr = Cookies.get("user") || null;
   const oauthService = new OauthService();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [user, setUser]= useState();
+  const [user, setUser] = useState();
   useEffect(() => {
-    async function getUserInfo (){
+    async function getUserInfo() {
       if (accessToken) {
         try {
           const userInfo = await oauthService.getUserInfo();
@@ -61,7 +61,7 @@ export default function Header() {
         }
       }
     }
-   
+
     getUserInfo();
 
     // if (userStr) {
@@ -78,8 +78,8 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="h-16 bg-white shadow-xl flex flex-row items-center px-6 justify-between">
-      <div className="text-lg font-semibold flex flex-row justify-center space-x-8">
+    <header className="py-2 px-6 bg-white shadow-xl flex flex-row items-center justify-end">
+      {/* <div className="text-lg font-semibold flex flex-row justify-center space-x-8">
         {navItems.map((item) => (
           <Popover key={item.href} className="relative">
             {({ open }) => (
@@ -113,7 +113,7 @@ export default function Header() {
             )}
           </Popover>
         ))}
-      </div>
+      </div> */}
       <div className="flex flex-row items-center">
         <div
           className="flex flex-row gap-2 items-center mr-4"

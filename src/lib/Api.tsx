@@ -44,11 +44,11 @@ export const useApi = () => {
               secure: process.env.NEXT_PUBLIC_PRODUCTION === "production",
               sameSite: "Lax" as const,
             };
-            Cookies.set("access_token",access_token, {
+            Cookies.set("access_token", access_token, {
               ...cookieOptions,
               expires: dayjs().add(1, 'hour').toDate(),
             })
-            Cookies.set("refresh_token",refresh_token, {
+            Cookies.set("refresh_token", refresh_token, {
               ...cookieOptions,
               expires: dayjs().add(7, 'day').toDate(),
             })
