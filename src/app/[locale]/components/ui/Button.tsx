@@ -20,6 +20,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
+        style={{ "cursor": "pointer" }}
         ref={ref}
         className={clsx(baseClasses, variants[variant], className)}
         disabled={disabled || loading}

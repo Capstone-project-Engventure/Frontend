@@ -1,13 +1,29 @@
-export type Exercise = {
-    id: string;
-    name: string;
-    question: string;
-    description: string;
-    options: Record<string, string> | string[] | null;
-    audio_file: string;
-    system_answer: string;
-    image: string | null;
-    lesson?: string;
-    skill?:string;
+export type ExerciseOption = {
+    key: string;
+    option: string;
 };
-  
+
+export type ExerciseType = {
+    id: number;
+    name: string;
+    description: string;
+};
+
+export type Exercise = {
+    id: number;
+    name: string;
+    question?: string | null;
+    system_answer: string;
+    type_id: number;
+    type?: ExerciseType;
+    level: string;
+    skill: string;
+    image: string | null;
+    lesson: string | null;
+    generated_by: string;
+    description: string;
+    audio_file?: string | null;
+    audio_file_url?: string | null;
+    options: ExerciseOption[];
+    explanation?: string | null;
+};

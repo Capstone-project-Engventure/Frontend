@@ -37,6 +37,7 @@
   "Sidebar": {
     "exercises": "Exercises",
     "dashboard": "Dashboard",
+    "learningCorner": "Learning Corner",
     "courses": "Courses",
     "lessons": "Lessons",
     "topics": "Topics",
@@ -76,6 +77,12 @@
     "actions": "Actions",
     "confirmDelete": "Are you sure you want to delete this item?",
     "apiError": "An error occurred while fetching data from the server. Please try again later."
+  },
+  "ReadingPractice": {
+    "breadcrumbs": {
+      "home": "Home",
+      "readingPractice": "Reading Practice"
+    }
   },
   "StudentWritingPractice": {
     "title": "Writing Practice",

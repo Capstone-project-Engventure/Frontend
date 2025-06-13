@@ -14,25 +14,27 @@ import { useAuth } from "@/lib/context/AuthContext";
 import { useRouter } from "next/navigation";
 import OAuthService from "@/lib/services/oauth.service";
 import { toast } from "react-toastify";
+import { useLocale, useTranslations } from "next-intl";
 export default function ProfilePopOVer() {
   const router = useRouter();
   const oauthService = new OAuthService();
   // const { reset } = useAuth();
+  const locale = useLocale();
   const items = [
     {
       label: "Thông tin cá nhân",
       icon: HiUserCircle,
-      href: "/student/user-profile",
+      href: `/${locale}/student/user-profile`,
     },
     {
       label: "Cài đặt",
       icon: HiUserCircle,
-      href: "/settings",
+      href: `/${locale}/settings`,
     },
     {
       label: "Đóng góp ý kiến",
       icon: HiUserCircle,
-      href: "/settings",
+      href: `/${locale}/settings`,
     },
     // {
     //   label: "Đăng xuất",
@@ -43,6 +45,7 @@ export default function ProfilePopOVer() {
   const [isShowProfile, setIsShowProfile] = useState(false);
   const handleLogout = async () => {
     await oauthService.logout();
+    localStorage.removeItem("user");
     router.push("/");
     toast.info("Đăng xuất thành công");
   };
@@ -51,7 +54,7 @@ export default function ProfilePopOVer() {
   };
   return (
     <div>
-      <Popover className="relative text-black">
+      <Popover className="relative text-black items-center">
         <PopoverButton>
           <div
             className="flex flex-row gap-2 items-center"

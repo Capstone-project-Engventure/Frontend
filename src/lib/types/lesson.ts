@@ -1,9 +1,22 @@
+import type { Reading } from './reading';
+
+export type Topic = {
+  id: string;
+  title: string;
+  description: string;
+  category?: string;
+  order?: number | null;
+};
+
 export type Lesson = {
   id: number;
   title: string;
   level: string;
   description: string;
-  topic?: number | null;
-  topic_id?:string;
-  exercises: []
+  type: string;
+  topic?: Topic | null;
+  course_id?: number | null;
+  topic_id?: string | null;
+  readings: Reading[];
+  image?: string;
 };

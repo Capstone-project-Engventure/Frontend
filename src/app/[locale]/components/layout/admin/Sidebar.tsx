@@ -132,7 +132,7 @@ export default function Sidebar() {
                 </div>
               );
             })}
-            <p className="font-bold">Góc học tập</p>
+            <p className="font-bold">Learning corner</p>
             {learnNavItems.map((item, index) => {
               const Icon = item.icon;
 
