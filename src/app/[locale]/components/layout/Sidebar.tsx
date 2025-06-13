@@ -252,7 +252,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
               );
             })}
             <p className={`font-bold ${toggleSidebar ? "" : "hidden"}`}>
-              Góc học tập
+              Learning corner
             </p>
             {learnNavItems.map((item, index) => {
               const Icon = item.icon;

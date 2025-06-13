@@ -1,5 +1,5 @@
 export type User = {
   email: string;
   roles: Array<{ name: string }>;
-  streak: number;
+  streak: number | null;
 };
