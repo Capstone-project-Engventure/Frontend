@@ -241,5 +241,23 @@
         }
       }
     }
+  },
+   "Common": {
+    "home": "Home",
+    "phonetics": "Phonetics",
+    "name": "Name",
+    "question": "Question",
+    "level": "Level",
+    "answer": "Answer",
+    "audio": "Audio",
+    "description": "Description",
+    "import_file": "Import File",
+    "create_successful": "Created successfully",
+    "create_unsuccessful": "Creation failed",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }

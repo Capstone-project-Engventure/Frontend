@@ -252,5 +252,23 @@
         }
       }
     }
+  },
+  "Common": {
+    "home": "Trang chủ",
+    "phonetics": "Âm vị",
+    "name": "Tên",
+    "question": "Câu hỏi",
+    "level": "Cấp độ",
+    "answer": "Câu trả lời",
+    "audio": "Âm thanh",
+    "description": "Mô tả",
+    "import_file": "Nhập tệp",
+    "create_successful": "Tạo thành công",
+    "create_unsuccessful": "Tạo không thành công",
+    "add": "Thêm",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "save": "Lưu",
+    "cancel": "Huỷ"
   }
 }
