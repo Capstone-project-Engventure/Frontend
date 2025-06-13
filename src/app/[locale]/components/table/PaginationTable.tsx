@@ -72,6 +72,8 @@ interface PaginationTableProps {
   onHandleFile?: (file: File) => void;
   hasBreadcrumb?: boolean;
   hasCustomFetch?: boolean;
+  onEdit?: (item: any) => void;
+  onCreate?: () => void;
 }
 
 const PaginationTable: React.FC<PaginationTableProps> = ({
@@ -100,6 +102,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   onUpdate,
   hasBreadcrumb = true,
   hasCustomFetch = false,
+  onEdit,
+  onCreate,
 }) => {
   const [objects, setObjects] = useState<any[]>([]);
   const [isMounted] = useState({ current: true });
@@ -133,6 +137,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       if (hasCustomFetch) {
         if (customObjects && Array.isArray(customObjects)) {
           setObjects(customObjects);
+          console.log(objects);
+
           setTotalPages(customTotalPages || 1);
           return;
         } else {
@@ -158,7 +164,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         ? await fetchFunction(fetchArgs)
         : await service.getAll(fetchArgs);
       console.log("Response: ", res);
-      
+
       if (!res.success || !Array.isArray(res.data)) {
         toast.error(res.message || t("apiError"));
         return;
@@ -175,13 +181,22 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   };
 
   const handleAdd = () => {
-    setFormData({});
-    setIsModalOpen(true);
+    if (onCreate) {
+      onCreate();
+    } else {
+      setFormData({});
+      setIsModalOpen(true);
+    }
   };
 
   const handleEdit = (item: any) => {
-    setFormData(item);
-    setIsModalOpen(true);
+    if (onEdit) {
+      // the override func is priority
+      onEdit(item?.id);
+    } else {
+      setFormData(item);
+      setIsModalOpen(true);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -260,12 +275,10 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       let response;
       if (formData.id) {
         response = onUpdate
-          ? await onUpdate(formData.id, form, config)
+          ? onUpdate(formData.id, form, config)
           : await service.update(formData.id, form, config);
       } else {
-        response = onAdd
-          ? await onAdd(form, config)
-          : service.create(form, config);
+        response = onAdd ? onAdd(form, config) : service.create(form, config);
       }
       if (response.success) {
         setIsModalOpen(false);
@@ -345,11 +358,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
               )}
             </div>
             <div className="flex flex-row gap-2 items-center">
-              {customActions ? (
-                customActions
-              ) : (
-                <></>
-              )}
+              {customActions ? customActions : <></>}
               <button
                 onClick={handleAdd}
                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
@@ -469,7 +478,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                               {item[f.key].map(
                                 (opt: { key: string; option: string }) => (
                                   <li key={opt.key}>
-                                    <strong>{opt.key.toUpperCase()}:</strong>{" "}
+                                    <strong>{opt?.key?.toUpperCase()}:</strong>{" "}
                                     {opt.option}
                                   </li>
                                 )

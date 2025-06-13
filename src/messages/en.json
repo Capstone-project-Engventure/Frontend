@@ -57,7 +57,8 @@
     "myCourses": "My Courses",
     "myLessons": "Lessons",
     "favoriteLessons": "Favorite Lessons",
-    "practice": "Practice"
+    "practice": "Practice",
+    "exercises": "Exercises"
   },
   "PaginationTable": {
     "add": "Add new",
@@ -141,7 +142,8 @@
       "breadcrumbs": {
         "home": "Home",
         "writingExercises": "Exercises Writing",
-        "grammarExercises": "Exercises Grammar"
+        "grammarExercises": "Exercises Grammar",
+        "readingExercises": "Exercises Reading"
       },
       "topic": "Topic",
       "lesson": "Lesson",
