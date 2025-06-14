@@ -1,10 +1,12 @@
 import useReadingStore from "@/lib/store/readingStore";
 
-export const resetAllStores = () => {
-    const { setLessons, setHasFetched } = useReadingStore.getState();
-    setLessons([]);
-    setHasFetched(false);
+const resetAllStores = () => {
+    ["ReadingPractice-storage", "current_lesson"].forEach(localStorage.removeItem);
 
-    localStorage.removeItem("ReadingPractice-storage");
-    localStorage.removeItem("current_lesson");
+    useReadingStore.setState({
+        lessons: [],
+        hasFetched: false,
+    });
 };
+
+export default resetAllStores;

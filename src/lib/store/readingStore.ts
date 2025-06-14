@@ -1,13 +1,14 @@
-// src/lib/stores/readingStore.ts
+import { Lesson } from "@/lib/types/lesson";
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Lesson } from "@/lib/types/lesson";
 
 interface ReadingState {
     lessons: Lesson[];
-    setLessons: (data: Lesson[]) => void;
     hasFetched: boolean;
+    hasHydrated: boolean;
+    setLessons: (data: Lesson[]) => void;
     setHasFetched: (value: boolean) => void;
+    setHasHydrated: (value: boolean) => void;
 }
 
 const useReadingStore = create<ReadingState>()(
@@ -15,15 +16,20 @@ const useReadingStore = create<ReadingState>()(
         (set) => ({
             lessons: [],
             hasFetched: false,
+            hasHydrated: false,
             setLessons: (data) => set({ lessons: data }),
             setHasFetched: (value) => set({ hasFetched: value }),
+            setHasHydrated: (value) => set({ hasHydrated: value }),
         }),
         {
-            name: 'ReadingPractice-storage', // tên key trong localStorage
+            name: 'ReadingPractice-storage',
             partialize: (state) => ({
                 lessons: state.lessons,
                 hasFetched: state.hasFetched,
             }),
+            onRehydrateStorage: () => (state) => {
+                state?.setHasHydrated(true);
+            }
         }
     )
 );

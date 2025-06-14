@@ -58,19 +58,17 @@ const LessonCard = ({ lesson }: LessonCardProps) => {
             </div>
             <div className="flex-1 p-4 flex flex-col justify-between">
                 <div className="mb-3">
-                    <h4 className="text-sm text-gray-600 mb-1">Lesson Name:</h4>
+                    <h4 className="text-sm text-gray-600 mb-1">Tên bài học:</h4>
                     <h3 className="font-bold text-lg text-gray-800 leading-tight">{lesson.title}</h3>
                 </div>
                 <div className="mb-3">
-                    <h4 className="text-sm text-gray-600 mb-1">Topic:</h4>
+                    <h4 className="text-sm text-gray-600 mb-1">Chủ đề:</h4>
                     <p className="font-semibold text-gray-700">{lesson.topic?.title || 'No Topic'}</p>
                 </div>
                 <div className="mt-auto flex justify-end">
                     <h4 className="text-sm text-gray-600 mb-1">
-                        Status:
-                        <div
-                            className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${status.color} ${status.bgColor}`}
-                        >
+                        Trạng thái:
+                        <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${status.color} ${status.bgColor}`}>
                             {status.text}
                         </div>
                     </h4>

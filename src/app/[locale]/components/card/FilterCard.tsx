@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "../ui/Button";
 
 interface FilterCardProps {
     topics: string[];
@@ -19,7 +18,6 @@ const FilterCard: React.FC<FilterCardProps> = ({
     selectedLevel,
     onTopicChange,
     onLevelChange,
-    onReset,
 }) => {
     const t = useTranslations("ReadingPractice");
 
@@ -65,11 +63,6 @@ const FilterCard: React.FC<FilterCardProps> = ({
                         </select>
                     </div>
                 </div>
-
-                {/* Reset Button */}
-                <Button onClick={onReset}>
-                    {t("filter.reset") || "Reset Filters"}
-                </Button>
             </div>
 
             {/* Active Filters Display */}
@@ -80,22 +73,22 @@ const FilterCard: React.FC<FilterCardProps> = ({
                             {t("filter.activeFilters") || "Active filters:"}
                         </span>
                         {selectedTopic && (
-                            <span className="inline-flex items-center px-3 py-1 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 rounded-full text-sm">
-                                Topic: {selectedTopic}
+                            <span className="items-center px-3 py-1 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 rounded-full text-sm">
+                                <strong>Chủ đề:</strong> {selectedTopic}
                                 <button
                                     onClick={() => onTopicChange("")}
-                                    className="ml-2 hover:text-amber-600 dark:hover:text-amber-300"
+                                    className="cursor-pointer ml-2 hover:text-red-600 dark:hover:text-amber-300"
                                 >
                                     ×
                                 </button>
                             </span>
                         )}
                         {selectedLevel && (
-                            <span className="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
-                                Level: {selectedLevel}
+                            <span className="items-center px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+                                <strong>Cấp độ:</strong> {selectedLevel}
                                 <button
                                     onClick={() => onLevelChange("")}
-                                    className="ml-2 hover:text-blue-600 dark:hover:text-blue-300"
+                                    className="cursor-pointer ml-2 hover:text-red-600 dark:hover:text-blue-300"
                                 >
                                     ×
                                 </button>
