@@ -99,7 +99,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
         {
           label: t("grammar"),
           href: `${basePath}/${
-            role === "admin" ? "exercises/grammar" : "practice/grammar"
+            role === "admin" ? "exercises/grammar-lessons" : "practice/grammar"
           }`,
           icon: GiSpellBook,
         },

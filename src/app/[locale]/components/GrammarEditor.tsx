@@ -1,23 +1,20 @@
 "use client";
 
+import { Grammar } from "@/lib/types/Grammar";
 import { Exercise, Option, Reading } from "@/lib/types/Reading";
 import React, { useEffect, useState } from "react";
 
 type Props = {
-  initialData?: Reading;
-  onSubmit: (data: Reading) => void;
+  initialData?: Grammar;
+  onSubmit: (data: Exercise) => void; // chỉ truyền 1 obj
   header: string;
 };
 
-const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
 
   useEffect(() => {
     if (initialData) {
-      setTitle(initialData.title || "");
-      setContent(initialData.content || "");
       setExercises(initialData.exercises || []);
     }
   }, [initialData]);
@@ -48,7 +45,7 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
     type: undefined,
     type_id: undefined,
     level: 'A1',
-    skill: 'reading',
+    skill: 'grammar',
     image: null,
     lesson: null,
     generated_by: 'admin',
@@ -83,13 +80,9 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
   };
 
   const handleSubmit = () => {
-    const readingData: Reading = {
-      id: initialData?.id!,
-      title,
-      content,
-      exercises,
-    };
-    onSubmit(readingData);
+    exercises.forEach(ex => ex.lesson = 14)
+    const grammarData: Exercise[] = exercises;
+    onSubmit(grammarData[0]);
   };
 
 	const handleCorrectAnswerChange = (qIndex: number, correctIndex: number) => {
@@ -105,21 +98,6 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
       </h2>
 
       <div className="space-y-4">
-        <label className="block font-semibold">Title:</label>
-        <input
-          type="text"
-          className="w-full border rounded px-3 py-2"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <label className="block font-semibold">Passage:</label>
-        <textarea
-          className="w-full border rounded px-3 py-2 min-h-[150px]"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-
         <div className="space-y-6">
           {exercises.map((q, qIndex) => (
             <div key={qIndex} className="border p-4 rounded-lg bg-gray-50">
@@ -195,4 +173,4 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
   );
 };
 
-export default ReadingEditor;
+export default GrammarEditor;
