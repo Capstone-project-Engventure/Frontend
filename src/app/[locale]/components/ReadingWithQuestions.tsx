@@ -152,7 +152,6 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
                                             : 'No explanation provided for this question.'}
                                     </p>
                                 </div>
-
                             </div>
                         );
                     })}

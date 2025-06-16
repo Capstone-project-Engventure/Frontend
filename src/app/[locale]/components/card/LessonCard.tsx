@@ -1,40 +1,44 @@
+// src\app\[locale]\components\card\LessonCard.tsx
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
 import { Lesson } from '@/lib/types/lesson';
+import { useLocale } from 'next-intl';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { FC, useCallback, useMemo } from 'react';
 
 interface LessonCardProps {
-    lesson: Lesson;
+    lesson: Lesson & {
+        completed?: boolean;
+        inProgress?: boolean;
+        readings?: any[]
+    };
 }
 
-const LessonCard = ({ lesson }: LessonCardProps) => {
+const LessonCard: FC<LessonCardProps> = ({ lesson }) => {
     const locale = useLocale();
     const router = useRouter();
 
-    const getStatus = () => {
-        if ((lesson as any).completed) {
+    const status = useMemo(() => {
+        if (lesson.completed) {
             return { text: 'Đã hoàn thành', color: 'text-green-600', bgColor: 'bg-green-50' };
-        } else if ((lesson as any).inProgress) {
-            return { text: 'Đang học', color: 'text-blue-600', bgColor: 'bg-blue-50' };
-        } else {
-            return { text: 'Chưa bắt đầu', color: 'text-gray-600', bgColor: 'bg-gray-50' };
         }
-    };
+        if (lesson.inProgress) {
+            return { text: 'Đang học', color: 'text-blue-600', bgColor: 'bg-blue-50' };
+        }
+        return { text: 'Chưa bắt đầu', color: 'text-gray-600', bgColor: 'bg-gray-50' };
+    }, [lesson.completed, lesson.inProgress]);
 
-    const handleClick = () => {
-        localStorage.setItem(
-            'current_lesson',
-            JSON.stringify({
-                title: lesson.title,
-                description: lesson.description,
-            })
-        );
-
+    const handleClick = useCallback(() => {
+        const lessonData = {
+            title: lesson.title,
+            description: lesson.description,
+            readings: lesson.readings || [],
+            id: lesson.id,
+        }
+        localStorage.setItem('current_lesson', JSON.stringify(lessonData));
         router.push(`/${locale}/student/practice/reading/${lesson.id}`);
-    };
-
-    const status = getStatus();
+    }, [lesson, locale, router]);
 
     return (
         <div
@@ -43,7 +47,13 @@ const LessonCard = ({ lesson }: LessonCardProps) => {
         >
             <div className="w-32 flex-shrink-0 bg-gray-100 flex items-center justify-center">
                 {lesson.image ? (
-                    <img src={lesson.image} alt={lesson.title} className="w-full h-full object-cover" />
+                    <Image
+                        src={lesson.image}
+                        alt={lesson.title}
+                        width={128}
+                        height={128}
+                        className="object-cover w-full h-full"
+                    />
                 ) : (
                     <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
                         <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -56,22 +66,23 @@ const LessonCard = ({ lesson }: LessonCardProps) => {
                     </div>
                 )}
             </div>
+
             <div className="flex-1 p-4 flex flex-col justify-between">
-                <div className="mb-3">
-                    <h4 className="text-sm text-gray-600 mb-1">Tên bài học:</h4>
-                    <h3 className="font-bold text-lg text-gray-800 leading-tight">{lesson.title}</h3>
+                <div>
+                    <div className="mb-3">
+                        <h4 className="text-sm text-gray-600 mb-1">Tên bài học:</h4>
+                        <h3 className="font-bold text-lg text-gray-800 leading-tight">{lesson.title}</h3>
+                    </div>
+                    <div className="mb-3">
+                        <h4 className="text-sm text-gray-600 mb-1">Chủ đề:</h4>
+                        <p className="font-semibold text-gray-700">{lesson.topic?.title || 'No Topic'}</p>
+                    </div>
                 </div>
-                <div className="mb-3">
-                    <h4 className="text-sm text-gray-600 mb-1">Chủ đề:</h4>
-                    <p className="font-semibold text-gray-700">{lesson.topic?.title || 'No Topic'}</p>
-                </div>
+
                 <div className="mt-auto flex justify-end">
-                    <h4 className="text-sm text-gray-600 mb-1">
-                        Trạng thái:
-                        <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${status.color} ${status.bgColor}`}>
-                            {status.text}
-                        </div>
-                    </h4>
+                    <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${status.color} ${status.bgColor}`}>
+                        {status.text}
+                    </div>
                 </div>
             </div>
         </div>

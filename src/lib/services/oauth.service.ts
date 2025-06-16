@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import { useApi } from "../Api";
 import { User } from "../types/user";
 import { saveTokenCookies } from "../utils/jwt";
-import { resetAllStores } from "@/lib/resetStores";
+import resetAllStores from "@/lib/resetStores";
 
 type LoginResponse = {
   access_token: string;
