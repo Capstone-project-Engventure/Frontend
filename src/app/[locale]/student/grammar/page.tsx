@@ -5,33 +5,32 @@ import ExerciseService from "@/lib/services/exercise.service";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
 import { Exercise } from "@/lib/types/exercise";
 import { ExerciseType } from "@/lib/types/exercise-type";
+import { LevelEnum } from "@/lib/constants/level";
 
-type Level = "beginner" | "intermediate" | "advanced";
 
-export default function Grammar() {
+export default function GrammarPracticePage() {
   const exerciseService = new ExerciseService();
   const exerciseTypeService = new ExerciseTypeService();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [exerciseTypes, setExerciseTypes] = useState<ExerciseType[]>([]);
   const [selectedType, setSelectedType] = useState<string>("");
-  const [selectedLevel, setSelectedLevel] = useState<Level>("beginner");
+  const [selectedLevel, setSelectedLevel] = useState<LevelEnum>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const levels: Level[] = ["beginner", "intermediate", "advanced"];
 
   useEffect(() => {
-    const fetchExerciseTypes = async () => {
-      try {
-        const res = await exerciseTypeService.getAllExerciseTypes();
-        if (res.success && Array.isArray(res.data)) {
-          setExerciseTypes(res.data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch exercise types:", err);
-      }
-    };
+    // const fetchExerciseTypes = async () => {
+    //   try {
+    //     const res = await exerciseTypeService.getAll();
+    //     if (res.success && Array.isArray(res.data)) {
+    //       setExerciseTypes(res.data);
+    //     }
+    //   } catch (err) {
+    //     console.error("Failed to fetch exercise types:", err);
+    //   }
+    // };
 
-    fetchExerciseTypes();
+    // fetchExerciseTypes();
   }, []);
 
   useEffect(() => {
@@ -41,7 +40,7 @@ export default function Grammar() {
         const typeFilter = selectedType ? `type:${selectedType}` : "";
         const levelFilter = `level:${selectedLevel}`;
         const keyword = [typeFilter, levelFilter].filter(Boolean).join(" ");
-        const res = await exerciseService.getAllExercises(1, 10, keyword);
+        const res = await exerciseService.getAll();
         if (res.success) {
           setExercises(Array.isArray(res.data) ? res.data : []);
         }

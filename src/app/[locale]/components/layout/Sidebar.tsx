@@ -110,15 +110,15 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
           }`,
           icon: MdOutlineVolumeUp,
         },
-        {
-          label: t("pronunciation"),
-          href: `${basePath}/${
-            role === "admin"
-              ? "exercises/pronunciation"
-              : "practice/pronunciation"
-          }`,
-          icon: MdOutlineRecordVoiceOver,
-        },
+        // {
+        //   label: t("pronunciation"),
+        //   href: `${basePath}/${
+        //     role === "admin"
+        //       ? "exercises/pronunciation"
+        //       : "practice/pronunciation"
+        //   }`,
+        //   icon: MdOutlineRecordVoiceOver,
+        // },
         {
           label: t("writing"),
           href: `${basePath}/${
@@ -126,6 +126,15 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
           }`,
           icon: MdEditNote,
         },
+        {
+          label: t("speaking"),
+          href: `${basePath}/${
+            role === "admin"
+              ? "exercises/speaking"
+              : "practice/speaking"
+          }`,
+          icon: MdOutlineRecordVoiceOver,
+        }
       ],
     },
     ...(role === "admin"

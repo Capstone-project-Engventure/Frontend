@@ -35,6 +35,15 @@ class LessonService extends BaseService<Lesson> {
       },
     });
   }
+
+  async getAllSpeakingLessons(
+    params?: { page?: number; pageSize?: number }
+  ) {
+    const response = await api.get("/lessons", {
+      params: { type: "practice_speaking", ...params },
+    });
+    return response;
+  }
 }
 
 export default LessonService;

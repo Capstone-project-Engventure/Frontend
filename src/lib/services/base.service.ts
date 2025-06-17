@@ -69,7 +69,7 @@ export abstract class BaseService<T> {
     }
   }
 
-  public async getById(id: string): Promise<ApiResponse<T>> {
+  public async getById(id: string|number): Promise<ApiResponse<T>> {
     const res = await api.get(`${this.endpoint}/${id}`);
     if (res.status === 200) {
       return {
@@ -117,6 +117,31 @@ export abstract class BaseService<T> {
   ): Promise<ApiResponse<T>> {
     try {
       const res = await api.put(`${this.endpoint}/${id}`, data, config);
+      if (res.status === 200) {
+        return {
+          success: true,
+          data: res.data as T,
+        };
+      }
+      return {
+        success: false,
+        data: "Unexpected status code: " + res.status,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error.message,
+      };
+    }
+  }
+
+  public async partialUpdate(
+    id: string | number,
+    data: Partial<T>,
+    config: any
+  ): Promise<ApiResponse<T>> {
+    try {
+      const res = await api.patch(`${this.endpoint}/${id}`, data, config);
       if (res.status === 200) {
         return {
           success: true,
