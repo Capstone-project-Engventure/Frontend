@@ -183,8 +183,8 @@
         "level": "Level",
         "topic": "Topic",
         "description": "Description",
-        "types": "Type",
-        "type": {
+        "types":"Type",
+        "type":{
           "lesson": "Lesson",
           "practice": "Practice"
         }
