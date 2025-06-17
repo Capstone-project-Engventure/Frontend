@@ -69,7 +69,7 @@ export abstract class BaseService<T> {
     }
   }
 
-  public async getById(id: string): Promise<ApiResponse<T>> {
+  public async getById(id: string|number): Promise<ApiResponse<T>> {
     const res = await api.get(`${this.endpoint}/${id}`);
     if (res.status === 200) {
       return {

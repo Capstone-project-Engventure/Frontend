@@ -44,12 +44,13 @@
     "data": "Data Management",
     "vocabulary": "Vocabulary",
     "phonetics": "Phonetics",
-    "allExercises":"All exercises",
-    "reading":"Reading",
+    "allExercises": "All exercises",
+    "reading": "Reading",
     "grammar": "Grammar",
     "listening": "Listening",
     "writing": "Writing",
     "pronunciation": "Pronunciation",
+    "speaking": "Speaking",
     "generate": "Generate",
     "types": "Exercise Types",
     "flashcard": "Flashcard",
@@ -158,7 +159,7 @@
         "audioFile": "Audio File",
         "lesson": "Lesson",
         "topic": "Topic",
-        "type":"Type"
+        "type": "Type"
       },
       "skills": {
         "writing": "Writing",
@@ -182,8 +183,8 @@
         "level": "Level",
         "topic": "Topic",
         "description": "Description",
-        "types":"Type",
-        "type":{
+        "types": "Type",
+        "type": {
           "lesson": "Lesson",
           "practice": "Practice"
         }
@@ -249,7 +250,18 @@
       }
     }
   },
-   "Common": {
+  "Common": {
+    "breadcrumbs": {
+      "home": "Home",
+      "exercises": "Exercises",
+      "lessons": "Lessons",
+      "topics": "Topics",
+      "vocabulary": "Vocabulary",
+      "phonetics": "Phonetics",
+      "generateExercise": "Generate Exercise",
+      "review": "Review",
+      "speaking": "Speaking"
+    },
     "home": "Home",
     "phonetics": "Phonetics",
     "name": "Name",
@@ -266,5 +278,94 @@
     "delete": "Delete",
     "save": "Save",
     "cancel": "Cancel"
+  },
+  "GenerateExercise": {
+    "heading": "Create English Exercises",
+    "numberOfQuestions": "Number of questions",
+    "selectSkill": "Select Skill",
+    "selectLevel": "Select Level",
+    "selectTopic": "Select Topic",
+    "selectType": "Select Type",
+    "selectMode": "Select Model",
+    "selectPrompt": "Select Prompt",
+    "promptLabel": "Prompt",
+    "useRag": "Use RAG",
+    "presetPrompt": {
+      "default": "Default prompt for generating a custom exercise.",
+      "presentSimple": "Generate a multiple choice question about present simple tense.",
+      "vocabularyTravel": "Create a vocabulary exercise for travel topic.",
+      "readingB1": "Generate a reading comprehension question for level B1."
+    },
+    "creating": "Creating...",
+    "createExercise": "Generate",
+    "exportJson": "Export JSON",
+    "table": {
+      "number": "#",
+      "question": "Question",
+      "level": "Level",
+      "skill": "Skill"
+    },
+    "skills": {
+      "grammar": "Grammar",
+      "vocabulary": "Vocabulary",
+      "reading": "Reading",
+      "listening": "Listening",
+      "writing": "Writing",
+      "pronunciation": "Pronunciation"
+    }
+  },
+  "Review": {
+    "review": {
+      "level": "How would you rate your English level?",
+      "goals": "What is your learning goal?",
+      "reasons": "Why are you learning English?",
+      "frequency": "How often do you study English?",
+      "strengths": "Which skill are you strongest at?",
+      "weaknesses": "Which skill do you find most challenging?",
+      "selectPlaceholder": "Select...",
+      "back": "Back",
+      "next": "Next",
+      "finish": "Finish",
+      "loading": "Generating...",
+      "result": "Review Result",
+      "edit": "Edit Information",
+      "error": "An error occurred, please try again",
+      "resultTemplate": "Based on your information:\n- Level: {level}\n- Goals: {goals}\n- Reasons: {reasons}\n- Frequency: {frequency}\n- Strengths: {strengths}\n- Weaknesses: {weaknesses}"
+    },
+    "level": {
+      "beginner": "Beginner",
+      "limited": "Limited",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "goals": {
+      "basic_comm": "Basic Communication",
+      "exam_cert": "IELTS/TOEFL Certification",
+      "career": "Career Development",
+      "travel": "Travel"
+    },
+    "reason": {
+      "entertainment": "Entertainment",
+      "travel": "Travel Preparation",
+      "career_support": "Career Support",
+      "study_support": "Academic Support",
+      "certification": "Certification",
+      "social": "Social Communication",
+      "migration": "Migration",
+      "networking": "Networking"
+    },
+    "frequency": {
+      "once": "Once a week",
+      "twice_thrice": "2-3 times a week",
+      "four_five": "4-5 times a week",
+      "daily": "Daily"
+    },
+    "skills": {
+      "listening": "Listening",
+      "speaking": "Speaking",
+      "reading": "Reading",
+      "writing": "Writing"
+    },
+    "title": "English Level Assessment"
   }
 }

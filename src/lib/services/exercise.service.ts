@@ -25,6 +25,16 @@ class ExerciseService extends BaseService<Exercise> {
   submitExercise(exerciseId: string, content: string) {
     return api.post(`exercises/${exerciseId}/submit`, { content });
   }
+
+  async checkPronunciation({ audio, exercise }) {
+    const formData = new FormData();
+    formData.append("audio", audio);
+    formData.append("exercise", exercise);
+
+    return api.post("/exercises/check-pronunciation", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  }
 }
 
 export default ExerciseService;
