@@ -1,3 +1,4 @@
+// src\app\[locale]\student\practice\reading\[id]\page.tsx
 'use client';
 
 import { useLocale } from 'next-intl';

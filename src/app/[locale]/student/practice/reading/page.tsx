@@ -27,7 +27,7 @@ type PageMap = Record<string, number>;
 
 const ReadingPractice: React.FC = () => {
   const locale = useLocale();
-  const t = useTranslations("ReadingPractice");
+  const t = useTranslations("LessonPractice");
 
   const { lessons, setLessons, hasFetched, setHasFetched, hasHydrated } = useReadingStore();
   const [currentPages, setCurrentPages] = useState<PageMap>({});

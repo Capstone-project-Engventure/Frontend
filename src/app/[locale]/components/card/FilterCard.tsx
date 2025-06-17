@@ -19,7 +19,7 @@ const FilterCard: React.FC<FilterCardProps> = ({
     onTopicChange,
     onLevelChange,
 }) => {
-    const t = useTranslations("ReadingPractice");
+    const t = useTranslations("LessonPractice");
 
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
@@ -35,7 +35,7 @@ const FilterCard: React.FC<FilterCardProps> = ({
                             onChange={(e) => onTopicChange(e.target.value)}
                             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-amber-500 focus:border-transparent min-w-[200px]"
                         >
-                            <option value="">{t("filter.allTopics") || "All Topics"}</option>
+                            <option value="">{t("filter.allTopic") || "All Topic"}</option>
                             {topics.map((topic) => (
                                 <option key={topic} value={topic}>
                                     {topic}
@@ -54,7 +54,7 @@ const FilterCard: React.FC<FilterCardProps> = ({
                             onChange={(e) => onLevelChange(e.target.value)}
                             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-amber-500 focus:border-transparent min-w-[200px]"
                         >
-                            <option value="">{t("filter.allLevels") || "All Levels"}</option>
+                            <option value="">{t("filter.allLevel") || "All Level"}</option>
                             {levels.map((level) => (
                                 <option key={level} value={level}>
                                     {level}

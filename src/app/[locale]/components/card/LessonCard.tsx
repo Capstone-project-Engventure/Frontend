@@ -4,7 +4,7 @@
 import { Lesson } from '@/lib/types/lesson';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { FC, useCallback, useMemo } from 'react';
 
 interface LessonCardProps {
@@ -12,12 +12,14 @@ interface LessonCardProps {
         completed?: boolean;
         inProgress?: boolean;
         readings?: any[]
+        exercises?: any[];
     };
 }
 
 const LessonCard: FC<LessonCardProps> = ({ lesson }) => {
     const locale = useLocale();
     const router = useRouter();
+    const pathname = usePathname();
 
     const status = useMemo(() => {
         if (lesson.completed) {
@@ -30,15 +32,36 @@ const LessonCard: FC<LessonCardProps> = ({ lesson }) => {
     }, [lesson.completed, lesson.inProgress]);
 
     const handleClick = useCallback(() => {
-        const lessonData = {
+        const pathParts = pathname.split('/');
+        const practiceType = pathParts[pathParts.length - 1];
+
+        const commonData = {
             title: lesson.title,
             description: lesson.description,
-            readings: lesson.readings || [],
             id: lesson.id,
+        };
+
+        let lessonData;
+
+        if (practiceType === 'reading') {
+            lessonData = {
+                ...commonData,
+                readings: lesson.readings || [],
+            };
+        } else if (practiceType === 'grammar') {
+            lessonData = {
+                ...commonData,
+                exercises: lesson.exercises || [],
+            };
+        } else {
+            console.warn('Unknown practice type:', practiceType);
+            return;
         }
+
         localStorage.setItem('current_lesson', JSON.stringify(lessonData));
-        router.push(`/${locale}/student/practice/reading/${lesson.id}`);
+        router.push(`/${locale}/student/practice/${practiceType}/${lesson.id}`);
     }, [lesson, locale, router]);
+
 
     return (
         <div

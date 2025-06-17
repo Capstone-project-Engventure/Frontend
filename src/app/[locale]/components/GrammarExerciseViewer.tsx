@@ -1,102 +1,110 @@
-// src\app\[locale]\components\ReadingWithQuestions.tsx
 'use client';
 
 import { Button } from '@/app/[locale]/components/ui/Button';
-import type { Reading } from '@/lib/types/reading';
+import type { Exercise } from '@/lib/types/exercise'; // Giả định bạn đã có kiểu Exercise
 import { useEffect, useState } from 'react';
 
-const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [answers, setAnswers] = useState<{ [questionId: number]: string }>({});
+interface GrammarExerciseViewerProps {
+    exercises: Exercise[];
+    // lessonTitle: string; // Loại bỏ prop này
+    // lessonDescription: string; // Loại bỏ prop này
+}
+
+const GrammarExerciseViewer = ({ exercises }: GrammarExerciseViewerProps) => {
+    const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+    const [answers, setAnswers] = useState<{ [exerciseId: number]: string }>({});
     const [selectedOptionKey, setSelectedOptionKey] = useState<string>('');
     const [isCompleted, setIsCompleted] = useState(false);
     const [results, setResults] = useState<{ correct: number; total: number; score: number }>({ correct: 0, total: 0, score: 0 });
 
-    const currentQuestion = exercises[currentQuestionIndex];
-    const isFirstQuestion = currentQuestionIndex === 0;
-    const isLastQuestion = currentQuestionIndex === exercises.length - 1;
+    const currentExercise = exercises[currentExerciseIndex];
+    const isFirstExercise = currentExerciseIndex === 0;
+    const isLastExercise = currentExerciseIndex === exercises.length - 1;
 
     const handleOptionChange = (key: string) => {
         setSelectedOptionKey(key);
     };
 
     const handleNext = () => {
-        if (!isLastQuestion) {
+        if (!isLastExercise) {
+            // Lưu đáp án hiện tại trước khi chuyển sang câu tiếp theo
             if (selectedOptionKey) {
-                setAnswers(prev => ({ ...prev, [currentQuestion.id]: selectedOptionKey }));
+                setAnswers(prev => ({ ...prev, [currentExercise.id]: selectedOptionKey }));
             }
-            setCurrentQuestionIndex(prev => prev + 1);
+            setCurrentExerciseIndex(prev => prev + 1);
         }
     };
 
     const handlePrevious = () => {
-        if (!isFirstQuestion) {
+        if (!isFirstExercise) {
+            // Lưu đáp án hiện tại trước khi quay lại câu trước
             if (selectedOptionKey) {
-                setAnswers(prev => ({ ...prev, [currentQuestion.id]: selectedOptionKey }));
+                setAnswers(prev => ({ ...prev, [currentExercise.id]: selectedOptionKey }));
             }
-            setCurrentQuestionIndex(prev => prev - 1);
+            setCurrentExerciseIndex(prev => prev - 1);
         }
     };
 
     const handleSubmit = () => {
-        if (selectedOptionKey) {
-            const finalAnswers = { ...answers, [currentQuestion.id]: selectedOptionKey };
+        // Lưu đáp án cuối cùng trước khi submit
+        const finalAnswers = selectedOptionKey
+            ? { ...answers, [currentExercise.id]: selectedOptionKey }
+            : answers;
 
-            // Tính điểm
-            let correctCount = 0;
-            exercises.forEach(exercise => {
-                if (finalAnswers[exercise.id] === exercise.system_answer) {
-                    correctCount++;
-                }
-            });
+        let correctCount = 0;
+        exercises.forEach(exercise => {
+            if (finalAnswers[exercise.id] === exercise.system_answer) {
+                correctCount++;
+            }
+        });
 
-            const totalQuestions = exercises.length;
-            const scorePercent = Math.round((correctCount / totalQuestions) * 100);
+        const totalQuestions = exercises.length;
+        const scorePercent = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
-            setResults({
-                correct: correctCount,
-                total: totalQuestions,
-                score: scorePercent
-            });
+        setResults({
+            correct: correctCount,
+            total: totalQuestions,
+            score: scorePercent
+        });
 
-            setAnswers(finalAnswers);
-            setIsCompleted(true);
-        } else {
-            alert('Please select an answer before submitting.');
-        }
+        setAnswers(finalAnswers); // Cập nhật state answers một lần cuối
+        setIsCompleted(true);
     };
 
     const handleRestart = () => {
         setIsCompleted(false);
-        setCurrentQuestionIndex(0);
+        setCurrentExerciseIndex(0);
         setAnswers({});
         setSelectedOptionKey('');
         setResults({ correct: 0, total: 0, score: 0 });
     };
 
+    // Khi chuyển câu hỏi hoặc quay lại, load đáp án đã chọn nếu có
     useEffect(() => {
         if (!isCompleted) {
-            setSelectedOptionKey(answers[currentQuestion?.id] || '');
+            setSelectedOptionKey(answers[currentExercise?.id] || '');
         }
-    }, [currentQuestionIndex, answers, currentQuestion?.id, isCompleted]);
+    }, [currentExerciseIndex, answers, currentExercise?.id, isCompleted]);
+
+    if (!currentExercise) {
+        return <div className="text-center p-6 text-gray-600">Không có bài tập nào.</div>;
+    }
 
     if (isCompleted) {
         return (
             <div className="max-w-7xl mx-auto p-8 bg-white shadow-xl rounded-2xl mt-4 space-y-4">
-                <h1 className="text-2xl font-bold text-center text-gray-800">{title}</h1>
-
-                {/* Reading content */}
-                <div className="text-gray-700 text-justify leading-relaxed whitespace-pre-line border-l-4 border-blue-500 pl-4">
-                    {content}
-                </div>
+                {/* <h1 className="text-2xl font-bold text-center text-gray-800">{lessonTitle}</h1> Loại bỏ */}
+                {/* <p className="text-gray-700 text-center leading-relaxed whitespace-pre-line border-l-4 border-blue-500 pl-4"> Loại bỏ
+                    {lessonDescription}
+                </p> */}
 
                 {/* Results Header */}
                 <div className="text-center bg-gray-50 p-6 rounded-lg">
                     <div className="text-4xl mb-4">🚀</div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Test completed!</h2>
-                    <p className="text-lg text-gray-600 mb-2">Correct answers: {results.correct}/{results.total}.</p>
-                    <p className="text-lg text-gray-600 mb-4">Your score is {results.score}%.</p>
-                    <p className="text-gray-600">Check your answers below:</p>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Bài tập đã hoàn thành!</h2>
+                    <p className="text-lg text-gray-600 mb-2">Số câu đúng: {results.correct}/{results.total}.</p>
+                    <p className="text-lg text-gray-600 mb-4">Điểm của bạn là {results.score}%.</p>
+                    <p className="text-gray-600">Kiểm tra lại đáp án của bạn bên dưới:</p>
                 </div>
 
                 {/* Detailed Results */}
@@ -104,8 +112,6 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
                     {exercises.map((exercise, index) => {
                         const userAnswer = answers[exercise.id];
                         const isCorrect = userAnswer === exercise.system_answer;
-                        // const correctOption = exercise.options.find(opt => opt.key === exercise.system_answer);
-                        // const userSelectedOption = exercise.options.find(opt => opt.key === userAnswer);
 
                         return (
                             <div key={exercise.id} className="border rounded-lg p-6">
@@ -149,8 +155,8 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
                                     }`}>
                                     <p className="text-sm italic">
                                         {exercise.explanation
-                                            ? <> <strong>Explanation:</strong> {exercise.explanation} </>
-                                            : 'No explanation provided for this question.'}
+                                            ? <> <strong>Giải thích:</strong> {exercise.explanation} </>
+                                            : 'Không có giải thích cho câu hỏi này.'}
                                     </p>
                                 </div>
                             </div>
@@ -161,7 +167,7 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
                 {/* Restart Button */}
                 <div className="flex justify-center pt-6">
                     <Button variant="default" onClick={handleRestart}>
-                        Take Test Again
+                        Làm lại bài tập
                     </Button>
                 </div>
             </div>
@@ -170,22 +176,20 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
 
     return (
         <div className="max-w-7xl mx-auto p-8 bg-white shadow-xl rounded-2xl mt-4 space-y-4">
-            <h1 className="text-2xl font-bold text-center text-gray-800">{title}</h1>
-
-            {/* Reading content */}
-            <div className="text-gray-700 text-justify leading-relaxed whitespace-pre-line border-l-4 border-blue-500 pl-4">
-                {content}
-            </div>
+            {/* <h1 className="text-2xl font-bold text-center text-gray-800">{lessonTitle}</h1> Loại bỏ */}
+            {/* <p className="text-gray-700 text-center leading-relaxed whitespace-pre-line border-l-4 border-blue-500 pl-4"> Loại bỏ
+                {lessonDescription}
+            </p> */}
 
             {/* Progress indicator */}
             <div className="flex justify-center items-center space-x-2 py-4">
                 <span className="text-sm text-gray-600">
-                    Question {currentQuestionIndex + 1} of {exercises.length}
+                    Câu hỏi {currentExerciseIndex + 1} / {exercises.length}
                 </span>
                 <div className="w-64 bg-gray-200 rounded-full h-2">
                     <div
                         className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${((currentQuestionIndex + 1) / exercises.length) * 100}%` }}
+                        style={{ width: `${((currentExerciseIndex + 1) / exercises.length) * 100}%` }}
                     />
                 </div>
             </div>
@@ -194,19 +198,19 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
             <div className="p-6 border rounded-lg bg-gray-50">
                 <div className="flex items-start mb-4">
                     <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                        <span className="text-white text-sm font-bold">{currentQuestionIndex + 1}</span>
+                        <span className="text-white text-sm font-bold">{currentExerciseIndex + 1}</span>
                     </div>
                     <div>
-                        <p className="font-semibold text-gray-800 text-lg leading-8">{currentQuestion.question}</p>
+                        <p className="font-semibold text-gray-800 text-lg leading-8">{currentExercise.question}</p>
                     </div>
                 </div>
 
                 <ul className="space-y-3 mx-2">
-                    {currentQuestion.options.map((opt) => (
+                    {currentExercise.options.map((opt) => (
                         <li key={opt.key} className="flex items-center space-x-3">
                             <input
                                 type="radio"
-                                name={`question-${currentQuestion.id}`}
+                                name={`exercise-${currentExercise.id}`}
                                 id={`opt-${opt.key}`}
                                 value={opt.key}
                                 onChange={() => handleOptionChange(opt.key)}
@@ -230,22 +234,22 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
 
             {/* Navigation buttons */}
             <div className="flex justify-center items-center pt-4 gap-2">
-                {!isFirstQuestion && (
+                {!isFirstExercise && (
                     <Button variant="outline" onClick={handlePrevious}>
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
-                        Previous
+                        Trước
                     </Button>
                 )}
 
-                {isLastQuestion ? (
+                {isLastExercise ? (
                     <Button variant="default" onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
-                        Submit Answers
+                        Nộp bài
                     </Button>
                 ) : (
                     <Button variant="default" onClick={handleNext}>
-                        Next
+                        Tiếp theo
                         <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -256,4 +260,4 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
     );
 };
 
-export default ReadingWithQuestions;
+export default GrammarExerciseViewer;

@@ -1,4 +1,5 @@
 import type { Reading } from './reading';
+import type { Exercise } from './exercise';
 
 export type Topic = {
   id: string;
@@ -19,4 +20,5 @@ export type Lesson = {
   topic_id?: string | null;
   readings: Reading[];
   image?: string;
+  exercises?: Exercise[];
 };
