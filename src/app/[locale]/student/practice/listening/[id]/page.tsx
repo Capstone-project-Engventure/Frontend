@@ -3,9 +3,10 @@
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import GrammarExerciseViewer from '@/app/[locale]/components/GrammarExerciseViewer';
+
+import AudioWithQuestions from '@/app/[locale]/components/AudioWithQuestions';
 import { Button } from '@/app/[locale]/components/ui/Button';
-import grammarPracticeService from '@/lib/services/student/grammar-practice.service';
+import listeningPracticeService from '@/lib/services/student/listening-practice.service';
 import { Lesson } from '@/lib/types/lesson';
 
 interface PageProps {
@@ -22,7 +23,7 @@ interface LessonData {
     id: number;
 }
 
-export default function GrammarPracticePage({ params }: PageProps) {
+export default function ListeningPracticePage({ params }: PageProps) {
     const router = useRouter();
     const locale = useLocale();
 
@@ -49,9 +50,9 @@ export default function GrammarPracticePage({ params }: PageProps) {
             }
 
             console.log("Fetching grammar data from API...");
-            const result = await grammarPracticeService.getById(Number(params.id));
-            if (result.success && result.dataGrammar) {
-                const fetchedLesson: Lesson = result.dataGrammar;
+            const result = await listeningPracticeService.getById(Number(params.id));
+            if (result.success && result.dataListening) {
+                const fetchedLesson: Lesson = result.dataListening;
                 const exercises = fetchedLesson.exercises || [];
 
                 const lessonToSet: LessonData = {
@@ -77,7 +78,7 @@ export default function GrammarPracticePage({ params }: PageProps) {
         <div className="min-h-screen bg-gray-100 p-6 rounded-2xl">
             <Button
                 variant="destructive"
-                onClick={() => router.push(`/${locale}/student/practice/grammar`)}
+                onClick={() => router.push(`/${locale}/student/practice/listening`)}
             >
                 <svg
                     className="w-4 h-3 text-white mr-2"
@@ -97,7 +98,6 @@ export default function GrammarPracticePage({ params }: PageProps) {
             </Button>
 
             <div className="max-w-6xl mx-auto mt-6">
-                {/* Phần tiêu đề và mô tả của bài học ngữ pháp vẫn được giữ lại */}
                 {lessonData && (
                     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                         <h1 className="text-2xl font-bold text-gray-800 mb-2">{lessonData.title}</h1>
@@ -113,11 +113,7 @@ export default function GrammarPracticePage({ params }: PageProps) {
                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-500"></div>
                     </div>
                 ) : lessonData?.exercises && lessonData.exercises.length > 0 ? (
-                    <GrammarExerciseViewer
-                        exercises={lessonData.exercises}
-                    // lessonTitle={lessonData.title}
-                    // lessonDescription={lessonData.description}
-                    />
+                    <AudioWithQuestions exercises={lessonData.exercises} />
                 ) : (
                     <div className="p-6 text-red-600 text-center">
                         Không tìm thấy dữ liệu bài tập ngữ pháp hoặc không có bài tập nào.

@@ -1,4 +1,4 @@
-import { useApi } from "../Api";
+import { useApi } from "../../Api";
 
 class GrammarPracticeService {
     private api;
@@ -17,7 +17,7 @@ class GrammarPracticeService {
                 data: response.data,
             };
         } catch (error: any) {
-            console.error("Failed to fetch reading practices:", error);
+            console.error("Failed to fetch getAllGrammarPractices: ", error);
             return { success: false, data: null };
         }
     }

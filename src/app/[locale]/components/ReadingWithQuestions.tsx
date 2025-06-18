@@ -1,4 +1,3 @@
-// src\app\[locale]\components\ReadingWithQuestions.tsx
 'use client';
 
 import { Button } from '@/app/[locale]/components/ui/Button';
@@ -216,8 +215,8 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
                             <label
                                 htmlFor={`opt-${opt.key}`}
                                 className={`flex items-center cursor-pointer space-x-2 p-2 rounded-lg transition-colors ${selectedOptionKey === opt.key
-                                    ? 'bg-blue-100 text-blue-800'
-                                    : 'hover:bg-gray-100'
+                                    ? 'bg-blue-200 text-blue-800'
+                                    : 'hover:bg-gray-200'
                                     }`}
                             >
                                 <span className="font-bold text-gray-600">{opt.key}.</span>

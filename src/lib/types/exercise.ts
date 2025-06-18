@@ -22,7 +22,7 @@ export type Exercise = {
     lesson: string | null;
     generated_by: string;
     description: string;
-    audio_file?: string | null;
+    audio_file?: string;
     audio_file_url?: string | null;
     options: ExerciseOption[];
     explanation?: string | null;

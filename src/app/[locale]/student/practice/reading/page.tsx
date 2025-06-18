@@ -4,13 +4,13 @@ import Breadcrumb from "@/app/[locale]/components/breadcumb";
 import FilterCard from "@/app/[locale]/components/card/FilterCard";
 import LessonCard from "@/app/[locale]/components/card/LessonCard";
 import PaginationCard from "@/app/[locale]/components/card/PaginationCard";
-import readingPracticeService from "@/lib/services/reading-practice.service";
+import readingPracticeService from "@/lib/services/student/reading-practice.service";
 import useReadingStore from "@/lib/store/readingStore";
 import { Lesson } from "@/lib/types/lesson";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useEffect, useMemo, useState } from "react";
 
-// Constants
+
 const ITEMS_PER_PAGE = 6;
 
 const LEVEL_ORDER = [
@@ -33,7 +33,6 @@ const ReadingPractice: React.FC = () => {
   const [currentPages, setCurrentPages] = useState<PageMap>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Filter states
   const [selectedTopic, setSelectedTopic] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
 
@@ -43,22 +42,22 @@ const ReadingPractice: React.FC = () => {
   ];
 
   useEffect(() => {
-    if (!hasHydrated) return;
+    if (!hasHydrated || hasFetched) return;
 
     const fetchLessons = async () => {
-      if (!hasFetched || lessons.length === 0) {
-        setIsLoading(true);
-        const result = await readingPracticeService.getAllReadingPractices();
-        if (result.success && result.data) {
-          setLessons(result.data);
-          setHasFetched(true);
-        }
-        setIsLoading(false);
+      setIsLoading(true);
+      const result = await readingPracticeService.getAllReadingPractices();
+      if (result.success && result.data) {
+        setLessons(result.data);
+      } else {
+        setLessons([]);
       }
+      setHasFetched(true);
+      setIsLoading(false);
     };
 
     fetchLessons();
-  }, [hasHydrated, hasFetched, lessons, setHasFetched, setLessons]);
+  }, [hasHydrated, hasFetched, setHasFetched, setLessons]);
 
   // Get unique topics and levels from lessons
   const { uniqueTopics, uniqueLevels } = useMemo(() => {
@@ -66,7 +65,6 @@ const ReadingPractice: React.FC = () => {
     const levels = new Set<string>();
 
     lessons.forEach(lesson => {
-      // Handle topic - use title property from Topic object
       const topicTitle = lesson.topic?.title;
 
       if (topicTitle && topicTitle !== "No Topic") {
@@ -94,7 +92,6 @@ const ReadingPractice: React.FC = () => {
   // Filter lessons based on selected topic and level
   const filteredLessons = useMemo(() => {
     return lessons.filter(lesson => {
-      // Handle topic comparison using title property
       const topicMatch = !selectedTopic || lesson.topic?.title === selectedTopic;
       const levelMatch = !selectedLevel || lesson.level === selectedLevel;
       return topicMatch && levelMatch;

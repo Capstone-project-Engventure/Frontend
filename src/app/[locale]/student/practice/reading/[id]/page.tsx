@@ -1,4 +1,3 @@
-// src\app\[locale]\student\practice\reading\[id]\page.tsx
 'use client';
 
 import { useLocale } from 'next-intl';
@@ -7,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import ReadingWithQuestions from '@/app/[locale]/components/ReadingWithQuestions';
 import { Button } from '@/app/[locale]/components/ui/Button';
-import readingPracticeService from '@/lib/services/reading-practice.service';
+import readingPracticeService from '@/lib/services/student/reading-practice.service';
 
 interface PageProps {
     params: {
@@ -37,8 +36,6 @@ export default function ReadingPracticePage({ params }: PageProps) {
     useEffect(() => {
         const initializeData = async () => {
             setLoading(true);
-
-            // Thử lấy dữ liệu từ localStorage trước
             const stored = localStorage.getItem("current_lesson");
             let lessonData: LessonData | null = null;
 
@@ -48,19 +45,16 @@ export default function ReadingPracticePage({ params }: PageProps) {
                     setTitle(lessonData?.title || '');
                     setDescription(lessonData?.description || '');
 
-                    // Nếu có readings trong localStorage và readings không rỗng
                     if (lessonData?.readings && lessonData.readings.length > 0) {
                         setAllReadings(lessonData.readings);
-                        setExerciseData(lessonData.readings[0]); // Hiển thị reading đầu tiên
-                        setLoading(false);
-                        return; // Không cần fetch API nữa
+                        setExerciseData(lessonData.readings[0]);
+                        return;
                     }
                 } catch (e) {
                     console.error("Failed to parse lesson data from localStorage:", e);
                 }
             }
 
-            // Nếu không có dữ liệu trong localStorage hoặc readings rỗng, fetch từ API
             console.log("Fetching data from API...");
             const result = await readingPracticeService.getById(Number(params.id));
             if (result.success && result.dataReading) {
@@ -71,7 +65,6 @@ export default function ReadingPracticePage({ params }: PageProps) {
                     setExerciseData(readings[0]);
                 }
 
-                // Cập nhật localStorage với dữ liệu mới
                 if (lessonData) {
                     const updatedLessonData = {
                         ...lessonData,

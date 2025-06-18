@@ -1,4 +1,3 @@
-// src\app\[locale]\components\card\LessonCard.tsx
 'use client';
 
 import { Lesson } from '@/lib/types/lesson';
@@ -53,7 +52,13 @@ const LessonCard: FC<LessonCardProps> = ({ lesson }) => {
                 ...commonData,
                 exercises: lesson.exercises || [],
             };
-        } else {
+        } else if (practiceType === 'listening') {
+            lessonData = {
+                ...commonData,
+                exercises: lesson.exercises || [],
+            };
+        }
+        else {
             console.warn('Unknown practice type:', practiceType);
             return;
         }

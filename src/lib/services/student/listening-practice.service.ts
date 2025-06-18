@@ -1,23 +1,23 @@
-import { useApi } from "../Api";
+import { useApi } from "../../Api";
 
-class ReadingPracticeService {
+class ListeningPracticeService {
     private api;
 
     constructor() {
         this.api = useApi();
     }
 
-    async getAllReadingPractices() {
+    async getAllListeningPractices() {
         try {
             const response = await this.api.get("/lessons", {
-                params: { type: "reading_practice" },
+                params: { type: "listening_practice" },
             });
             return {
                 success: true,
                 data: response.data,
             };
         } catch (error: any) {
-            console.error("Failed to fetch reading practices:", error);
+            console.error("Failed to fetch getAllListeningPractices: ", error);
             return { success: false, data: null };
         }
     }
@@ -27,9 +27,9 @@ class ReadingPracticeService {
             const response = await this.api.get(`/lessons/${id}`);
             return {
                 success: true,
-                dataReading: response.data.readings,
+                dataListening: response.data,
             };
-            
+
         } catch (error: any) {
             console.error("Error fetching reading detail:", error);
             return { success: false, data: null };
@@ -37,5 +37,5 @@ class ReadingPracticeService {
     }
 }
 
-const readingPracticeService = new ReadingPracticeService();
-export default readingPracticeService;
+const listeningPracticeService = new ListeningPracticeService();
+export default listeningPracticeService;

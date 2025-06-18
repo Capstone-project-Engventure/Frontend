@@ -3,14 +3,15 @@
 import { Button } from '@/app/[locale]/components/ui/Button';
 import type { Exercise } from '@/lib/types/exercise';
 import { useEffect, useState } from 'react';
+import MediaThemeTailwindAudio from 'player.style/tailwind-audio/react';
 
-interface GrammarExerciseViewerProps {
+interface AudioWithQuestionsProps {
     exercises: Exercise[];
     // lessonTitle: string;
     // lessonDescription: string;
 }
 
-const GrammarExerciseViewer = ({ exercises }: GrammarExerciseViewerProps) => {
+const AudioWithQuestions = ({ exercises }: AudioWithQuestionsProps) => {
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
     const [answers, setAnswers] = useState<{ [exerciseId: number]: string }>({});
     const [selectedOptionKey, setSelectedOptionKey] = useState<string>('');
@@ -44,9 +45,7 @@ const GrammarExerciseViewer = ({ exercises }: GrammarExerciseViewerProps) => {
     };
 
     const handleSubmit = () => {
-        const finalAnswers = selectedOptionKey
-            ? { ...answers, [currentExercise.id]: selectedOptionKey }
-            : answers;
+        const finalAnswers = selectedOptionKey ? { ...answers, [currentExercise.id]: selectedOptionKey } : answers;
 
         let correctCount = 0;
         exercises.forEach(exercise => {
@@ -172,9 +171,9 @@ const GrammarExerciseViewer = ({ exercises }: GrammarExerciseViewerProps) => {
 
     return (
         <div className="max-w-7xl mx-auto p-8 bg-white shadow-xl rounded-2xl mt-4 space-y-4">
-            {/* <h1 className="text-2xl font-bold text-center text-gray-800">{lessonTitle}</h1> */}
-            {/* <p className="text-gray-700 text-center leading-relaxed whitespace-pre-line border-l-4 border-blue-500 pl-4">
-                {lessonDescription}
+            {/* <h1 className="text-2xl font-bold text-center text-gray-800">{currentExercise.name}</h1>
+            <p className="text-gray-700 text-center leading-relaxed whitespace-pre-line border-l-4 border-blue-500 pl-4">
+                {currentExercise.description}
             </p> */}
 
             {/* Progress indicator */}
@@ -192,7 +191,19 @@ const GrammarExerciseViewer = ({ exercises }: GrammarExerciseViewerProps) => {
 
             {/* Current question block */}
             <div className="p-6 border rounded-lg bg-gray-50">
-                <div className="flex items-start mb-4">
+                <div className="justify-start">
+                    <MediaThemeTailwindAudio style={{ width: "50%", }}>
+                        <audio
+                            slot="media"
+                            src={currentExercise.audio_file}
+                            playsInline
+                            crossOrigin="anonymous"
+                            controls
+                            className="w-full"
+                        />
+                    </MediaThemeTailwindAudio>
+                </div>
+                <div className="flex items-start my-4">
                     <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                         <span className="text-white text-sm font-bold">{currentExerciseIndex + 1}</span>
                     </div>
@@ -228,6 +239,7 @@ const GrammarExerciseViewer = ({ exercises }: GrammarExerciseViewerProps) => {
                 </ul>
             </div>
 
+
             {/* Navigation buttons */}
             <div className="flex justify-center items-center pt-4 gap-2">
                 {!isFirstExercise && (
@@ -256,4 +268,4 @@ const GrammarExerciseViewer = ({ exercises }: GrammarExerciseViewerProps) => {
     );
 };
 
-export default GrammarExerciseViewer;
+export default AudioWithQuestions;
