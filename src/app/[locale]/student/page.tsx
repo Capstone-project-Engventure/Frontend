@@ -1,21 +1,21 @@
 "use client";
 import React, { useState } from 'react';
 import { 
-  LuCalendar as Calendar,
-  LuArmchair as BarChart3, // Sử dụng LuBarChart thay cho LuBarChart2
-  LuClock as Clock,
-  LuTrophy as Trophy,
-  LuBook as Book,
-  LuTarget as Target,
-  LuTrendingUp as TrendingUp,
-  LuCircle as CheckCircle,
-  LuStar as Star,
-  LuAward as Award,
-  LuActivity as Activity,
-  LuUsers as Users,
-  LuBookOpen as BookOpen,
-  LuCircle as PlayCircle
-} from 'react-icons/lu';
+  Calendar,
+  BarChart3,
+  Clock,
+  Trophy,
+  Book,
+  Target,
+  TrendingUp,
+  CheckCircle,
+  Star,
+  Award,
+  Activity,
+  Users,
+  BookOpen,
+  PlayCircle
+} from 'lucide-react';
 // Mock data
 const mockStudentData = {
   user: {

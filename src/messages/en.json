@@ -142,7 +142,8 @@
       "breadcrumbs": {
         "home": "Home",
         "writingExercises": "Exercises Writing",
-        "grammarExercises": "Exercises Grammar"
+        "grammarExercises": "Exercises Grammar",
+        "readingExercises": "Exercises Reading"
       },
       "topic": "Topic",
       "lesson": "Lesson",

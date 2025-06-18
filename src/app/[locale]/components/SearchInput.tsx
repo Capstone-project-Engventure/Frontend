@@ -15,7 +15,7 @@ export function SearchInput({
   placeholder = "",
 }: SearchInputProps) {
   return (
-    <div className="flex flex-row relative w-full">
+    <div className="flex flex-row relative">
       <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
       <input
         type="text"

@@ -1,12 +1,16 @@
-import React, { useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { promptStore } from '@/stores/promptStore';
-import PaginationTable from '@/components/PaginationTable';
-
 'use client';
+import React, { useEffect } from 'react';
+// import { observer } from 'mobx-react-lite';
+import { usePromptStore } from '@/lib/store/promptStore';
+import PaginationTable from '@/app/[locale]/components/table/PaginationTable';
+import AdvancedDataTable from '../../components/table/AdvancedDataTable';
 
 
-const PromptManagementPage: React.FC = observer(() => {
+
+
+const PromptManagementPage: React.FC = (() => {
+    const promptStore = usePromptStore();
+
     useEffect(() => {
         promptStore.fetchPrompts();
     }, []);
@@ -14,26 +18,29 @@ const PromptManagementPage: React.FC = observer(() => {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4">Prompt Management</h1>
-            <PaginationTable
-                data={promptStore.prompts}
-                total={promptStore.total}
-                loading={promptStore.loading}
+            {/* <PaginationTable
+                
+            /> */}
+            <AdvancedDataTable
+                fields={promptStore.fields}
+                service={promptStore.service}
                 page={promptStore.page}
-                pageSize={promptStore.pageSize}
                 onPageChange={promptStore.setPage}
-                onPageSizeChange={promptStore.setPageSize}
-                columns={[
-                    { title: 'ID', dataIndex: 'id', key: 'id' },
-                    { title: 'Prompt', dataIndex: 'text', key: 'text' },
-                    { title: 'Actions', key: 'actions', render: (record: any) => (
-                        <button
-                            className="text-red-500"
-                            onClick={() => promptStore.deletePrompt(record.id)}
-                        >
-                            Delete
-                        </button>
-                    )},
-                ]}
+                keyField="id"
+                customObjects={promptStore.customObjects}
+                customTotalPages={promptStore.customTotalPages}
+                modalFields={promptStore.modalFields}
+                modalTitle="Edit Prompt"
+                linkBase="/admin/prompts"
+                breadcrumbs={promptStore.breadcrumbs}
+                hasImport={promptStore.hasImport}
+                hasCustomFetch={promptStore.hasCustomFetch}
+                onAdd={promptStore.addPrompt}
+                onUpdate={promptStore.updatePrompt}
+                onDelete={promptStore.deletePrompt}
+                onEdit={promptStore.editPrompt}
+                // onCreate={promptStore.createPrompt}
+                onSuccess={promptStore.onSuccess}
             />
         </div>
     );

@@ -28,10 +28,8 @@ export interface Exercise {
   audio_file_url?: string;
 }
 
-export interface Reading {
-  id: number;
+export interface Grammar {
+  id?: number;
   lesson?: number,
-  title: string;
-  content: string;
   exercises: Exercise[];
 }

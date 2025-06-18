@@ -29,3 +29,4 @@ export type Exercise = {
     created_at?: string; 
     updated_at?: string;
 };
+  
