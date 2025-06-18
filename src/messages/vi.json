@@ -54,6 +54,7 @@
     "listening": "Nghe",
     "writing": "Viết",
     "pronunciation": "Phát âm",
+    "speaking": "Nói",
     "generate": "Tạo dữ liệu",
     "types": "Kiểu bài học",
     "flashcard": "Flashcard",
@@ -204,7 +205,12 @@
         "title": "Tiêu đề",
         "level": "Trình độ",
         "topic": "Chủ đề",
-        "description": "Mô tả"
+        "description": "Mô tả",
+        "types": "Kiểu lớp học",
+        "type": {
+          "lesson": "Bài học",
+          "practice": "Luyện tập"
+        }
       },
       "messages": {
         "success": "Cập nhật thành công",
@@ -265,6 +271,125 @@
           "addExercisesPartialFail": "{fail}/{total} bài tập không thể thêm vào bài học"
         }
       }
+    }
+  },
+  "Common": {
+    "home": "Trang chủ",
+    "breadcrumbs": {
+      "home": "Trang chủ",
+      "exercises": "Bài tập",
+      "lessons": "Bài học",
+      "topics": "Chủ đề",
+      "vocabulary": "Từ vựng",
+      "phonetics": "Âm vị",
+      "generateExercise": "Tạo bài tập",
+      "review": "Đánh giá",
+      "speaking": "Nói"
+    },
+    "phonetics": "Âm vị",
+    "name": "Tên",
+    "question": "Câu hỏi",
+    "level": "Cấp độ",
+    "answer": "Câu trả lời",
+    "audio": "Âm thanh",
+    "description": "Mô tả",
+    "import_file": "Nhập tệp",
+    "create_successful": "Tạo thành công",
+    "create_unsuccessful": "Tạo không thành công",
+    "add": "Thêm",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "save": "Lưu",
+    "cancel": "Huỷ"
+  },
+  "GenerateExercise": {
+    "heading": "Tạo bài tập tiếng Anh",
+    "numberOfQuestions": "Số câu hỏi",
+    "selectSkill": "Chọn kỹ năng",
+    "selectLevel": "Chọn trình độ",
+    "selectTopic": "Chọn chủ đề",
+    "selectType": "Chọn loại",
+    "selectMode": "Chọn chế độ",
+    "selectPrompt": "Chọn Prompt",
+    "promptLabel": "Nội dung Prompt",
+    "useRag": "Sử dụng RAG",
+    "presetPrompt": {
+      "default": "Prompt mặc định để tạo bài tập tùy chỉnh.",
+      "presentSimple": "Tạo câu hỏi trắc nghiệm về thì hiện tại đơn.",
+      "vocabularyTravel": "Tạo bài tập từ vựng về chủ đề du lịch.",
+      "readingB1": "Tạo câu hỏi đọc hiểu cho cấp độ B1."
+    },
+    "creating": "Đang tạo...",
+    "createExercise": "Tạo bài tập",
+    "exportJson": "Xuất JSON",
+    "table": {
+      "number": "#",
+      "question": "Câu hỏi",
+      "level": "Trình độ",
+      "skill": "Kỹ năng"
+    },
+    "skills": {
+      "grammar": "Ngữ pháp",
+      "vocabulary": "Từ vựng",
+      "reading": "Đọc",
+      "listening": "Nghe",
+      "writing": "Viết",
+      "pronunciation": "Phát âm",
+      "speaking": "Nói"
+    }
+  },
+  "Review": {
+    "title": "Đánh giá trình độ tiếng Anh",
+    "review": {
+      "level": "Bạn tự đánh giá trình độ",
+      "goals": "Mục tiêu học",
+      "reasons": "Tại sao bạn học tiếng Anh?",
+      "frequency": "Tần suất học",
+      "strengths": "Điểm mạnh",
+      "weaknesses": "Điểm yếu",
+      "selectPlaceholder": "Chọn...",
+      "back": "Quay lại",
+      "next": "Tiếp theo",
+      "finish": "Hoàn thành",
+      "loading": "Đang tạo...",
+      "result": "Kết quả review",
+      "edit": "Chỉnh sửa thông tin",
+      "error": "Có lỗi xảy ra, vui lòng thử lại",
+      "resultTemplate": "Dựa trên thông tin của bạn:\n- Trình độ: {level}\n- Mục tiêu: {goals}\n- Lý do: {reasons}\n- Tần suất: {frequency}\n- Điểm mạnh: {strengths}\n- Điểm yếu: {weaknesses}"
+    },
+    "level": {
+      "beginner": "Mới học",
+      "limited": "Biết ít",
+      "intermediate": "Trung bình",
+      "advanced": "Chuyên sâu"
+    },
+    "goals": {
+      "basic_comm": "Giao tiếp cơ bản",
+      "exam_cert": "Chứng chỉ IELTS/TOEFL",
+      "career": "Phát triển công việc",
+      "travel": "Du lịch"
+    },
+    "reason": {
+      "entertainment": "Giải trí",
+      "travel": "Chuẩn bị du lịch",
+      "career_support": "Hỗ trợ việc làm",
+      "study_support": "Hỗ trợ học tập",
+      "certification": "Chứng chỉ",
+      "social": "Giao tiếp xã hội",
+      "migration": "Di cư",
+      "networking": "Mở rộng mạng lưới"
+    },
+    "frequency": {
+      "once": "1 lần/tuần",
+      "twice_thrice": "2-3 lần/tuần",
+      "four_five": "4-5 lần/tuần",
+      "daily": "Hàng ngày"
+    },
+    "skills": {
+      "listening": "Nghe",
+      "speaking": "Nói",
+      "reading": "Đọc",
+      "writing": "Viết"
     }
   }
 }

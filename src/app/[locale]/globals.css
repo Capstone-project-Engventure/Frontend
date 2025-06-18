@@ -1,15 +1,7 @@
 @import "tailwindcss";
 @layer theme, base, components, utilities;
-/* @import "./theme.css" layer(theme);
-@import "./preflight.css" layer(base);
-@import "./utilities.css" layer(utilities); */
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-/* Tailwind v4 has changed */
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
-
+/* Light theme (default) */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -23,6 +15,74 @@
   --success: #10b981;
   --success-light: #34d399;
   --success-dark: #059669;
+  
+  /* Typography Scale - Professional font sizes */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  
+  /* Line Heights for better readability */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+}
+
+/* Dark theme - Higher specificity to override system preferences */
+.dark,
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --primary: #d97706;
+  --primary-light: #f59e0b;
+  --primary-dark: #b45309;
+  --secondary: #3b82f6;
+  --secondary-light: #60a5fa;
+  --secondary-dark: #1e40af;
+  
+  --success: #10b981;
+  --success-light: #34d399;
+  --success-dark: #047857;
+}
+
+/* Light theme explicit - Higher specificity to override system preferences */
+.light,
+html.light {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #f59e0b;
+  --primary-light: #fcd34d;
+  --primary-dark: #d97706;
+  --secondary: #3b82f6;
+  --secondary-light: #60a5fa;
+  --secondary-dark: #1d4ed8;
+  
+  --success: #10b981;
+  --success-light: #34d399;
+  --success-dark: #059669;
+}
+
+/* System preference fallback - ONLY when no explicit theme class is set */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark) {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --primary: #d97706;
+    --primary-light: #f59e0b;
+    --primary-dark: #b45309;
+    --secondary: #3b82f6;
+    --secondary-light: #60a5fa;
+    --secondary-dark: #1e40af;
+    
+    --success: #10b981;
+    --success-light: #34d399;
+    --success-dark: #047857;
+  }
 }
 
 @theme inline {
@@ -34,55 +94,286 @@
   --color-secondary: var(--secondary);
   --color-secondary-light: var(--secondary-light);
   --color-secondary-dark: var(--secondary-dark);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  
+  /* Use Geist fonts if available, fallback to system fonts */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --primary: #d97706;
-    --secondary: #1d4ed8;
-  }
-}
-
+/* Base Styles */
 body {
   background: var(--background);
-  color: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Typography Styles - Responsive to theme */
+.typography-heading-1 {
+  @apply text-3xl font-bold leading-tight tracking-tight;
+  color: var(--foreground);
+}
+
+.typography-heading-2 {
+  @apply text-2xl font-bold leading-snug tracking-tight;
+  color: var(--foreground);
+}
+
+.typography-heading-3 {
+  @apply text-xl font-semibold leading-snug;
+  color: var(--foreground);
+}
+
+.typography-body-large {
+  @apply text-lg leading-relaxed;
+  color: var(--foreground);
+  opacity: 0.9;
+}
+
+.typography-body {
+  @apply text-base leading-relaxed;
+  color: var(--foreground);
+  opacity: 0.9;
+}
+
+.typography-body-small {
+  @apply text-sm leading-normal;
+  color: var(--foreground);
+  opacity: 0.8;
+}
+
+.typography-caption {
+  @apply text-xs leading-normal font-medium;
+  color: var(--foreground);
+  opacity: 0.7;
+}
+
+/* Button Styles */
 .btn-success {
   background-color: var(--success);
   color: white;
   border: 1px solid var(--success-dark);
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm;
 }
+
 .btn-success:hover {
   background-color: var(--success-dark);
+  @apply shadow-md;
 }
 
-/* h1 {
-  @apply text-3xl font-bold text-gray-800;
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: 1px solid var(--primary-dark);
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm;
 }
 
-h2 {
-  @apply text-2xl font-semibold text-gray-700;
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  @apply shadow-md;
 }
 
-h3 {
-  @apply text-xl font-medium text-gray-600;
-}
-p {
-  @apply text-base text-gray-500;
-}
-a {
-  @apply text-blue-600 hover:text-blue-800;
-} */
-.heading{
-  @apply text-3xl font-bold text-gray-800;
+.btn-secondary {
+  background-color: var(--secondary);
+  color: white;
+  border: 1px solid var(--secondary-dark);
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm;
 }
 
+.btn-secondary:hover {
+  background-color: var(--secondary-dark);
+  @apply shadow-md;
+}
+
+/* Card Components - Theme responsive */
 .card {
-  @apply flex justify-between items-center p-5 bg-white rounded-xl shadow-md
+  @apply rounded-xl shadow-lg border overflow-hidden transition-all duration-300 hover:shadow-xl;
+  background: var(--background);
+  border-color: theme('colors.gray.200');
+}
+
+.dark .card {
+  border-color: theme('colors.gray.700');
+}
+
+.card-header {
+  @apply px-6 py-4 border-b;
+  background: linear-gradient(to right, 
+    theme('colors.blue.50'), 
+    theme('colors.indigo.50')
+  );
+  border-color: theme('colors.gray.100');
+}
+
+.dark .card-header {
+  background: linear-gradient(to right, 
+    theme('colors.gray.800'), 
+    theme('colors.gray.700')
+  );
+  border-color: theme('colors.gray.600');
+}
+
+.card-body {
+  @apply px-6 py-4;
+}
+
+.card-footer {
+  @apply px-6 py-4 border-t;
+  background-color: theme('colors.gray.50');
+  border-color: theme('colors.gray.100');
+}
+
+.dark .card-footer {
+  background-color: theme('colors.gray.800');
+  border-color: theme('colors.gray.600');
+}
+
+/* Exercise Card Specific Styles */
+.exercise-card {
+  @apply rounded-2xl shadow-lg border overflow-hidden mb-8 hover:shadow-xl transition-all duration-300;
+  background: var(--background);
+  border-color: theme('colors.gray.200');
+}
+
+.dark .exercise-card {
+  border-color: theme('colors.gray.700');
+}
+
+.exercise-header {
+  @apply px-8 py-6 border-b;
+  background: linear-gradient(to right, 
+    theme('colors.blue.50'), 
+    theme('colors.indigo.50')
+  );
+  border-color: theme('colors.gray.100');
+}
+
+.dark .exercise-header {
+  background: linear-gradient(to right, 
+    theme('colors.gray.800'), 
+    theme('colors.gray.700')
+  );
+  border-color: theme('colors.gray.600');
+}
+
+.exercise-number {
+  @apply bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg shadow-md;
+}
+
+.exercise-type-badge {
+  @apply px-4 py-2 rounded-full border flex items-center space-x-2 font-medium text-sm;
+}
+
+.exercise-level-badge {
+  @apply bg-orange-100 text-orange-700 border-orange-200 px-3 py-1 rounded-full border text-sm font-medium;
+}
+
+.dark .exercise-level-badge {
+  @apply bg-orange-900 text-orange-300 border-orange-700;
+}
+
+.exercise-topic-badge {
+  @apply bg-gray-100 text-gray-700 border-gray-200 px-3 py-1 rounded-full border text-sm font-medium;
+}
+
+.dark .exercise-topic-badge {
+  @apply bg-gray-800 text-gray-300 border-gray-600;
+}
+
+/* Option Styles */
+.option-correct {
+  @apply border-green-400 bg-green-50 shadow-md ring-2 ring-green-200;
+}
+
+.dark .option-correct {
+  @apply border-green-500 bg-green-900 ring-green-700;
+}
+
+.option-default {
+  @apply border-gray-200 hover:border-gray-300 hover:shadow-sm;
+  background: var(--background);
+}
+
+.dark .option-default {
+  @apply border-gray-600 hover:border-gray-500;
+}
+
+.option-key-correct {
+  @apply bg-green-500 text-white;
+}
+
+.option-key-default {
+  @apply bg-gray-100 text-gray-600;
+}
+
+.dark .option-key-default {
+  @apply bg-gray-700 text-gray-300;
+}
+
+/* Form Elements */
+.form-checkbox {
+  @apply w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 transition-colors;
+}
+
+.dark .form-checkbox {
+  @apply border-gray-600 bg-gray-800;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.dark .form-input {
+  @apply border-gray-600 focus:border-blue-400 focus:ring-blue-800;
+}
+
+/* Utility Classes */
+.heading {
+  @apply text-3xl font-bold leading-tight tracking-tight;
+  color: var(--foreground);
+}
+
+.subheading {
+  @apply text-xl font-semibold leading-snug;
+  color: var(--foreground);
+  opacity: 0.9;
+}
+
+.text-muted {
+  color: var(--foreground);
+  opacity: 0.7;
+}
+
+.text-subtle {
+  color: var(--foreground);
+  opacity: 0.6;
+}
+
+/* Responsive Typography */
+@media (max-width: 640px) {
+  .typography-heading-1 {
+    @apply text-2xl;
+  }
+  
+  .typography-heading-2 {
+    @apply text-xl;
+  }
+  
+  .exercise-card {
+    @apply mx-4;
+  }
+  
+  .exercise-header {
+    @apply px-4 py-4;
+  }
+  
+  .card-body {
+    @apply px-4;
+  }
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 
+
 interface FilterCardProps {
     topics: string[];
     levels: string[];

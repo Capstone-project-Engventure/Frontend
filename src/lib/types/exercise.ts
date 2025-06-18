@@ -27,3 +27,4 @@ export type Exercise = {
     options: ExerciseOption[];
     explanation?: string | null;
 };
+  

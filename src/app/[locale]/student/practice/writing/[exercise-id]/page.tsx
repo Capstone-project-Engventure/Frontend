@@ -14,6 +14,14 @@ import {
   LuHeading2,
   LuList,
   LuListOrdered,
+  LuSend,
+  LuBookOpen,
+  LuClock,
+  LuCheck,
+  LuGraduationCap,
+  LuFileText,
+  LuSave,
+  LuEye,
 } from "react-icons/lu";
 import SubmissionService from "@/lib/services/submission.service";
 import { toast } from "react-toastify";
@@ -30,23 +38,27 @@ export default function StudentWritingPracticePage() {
       user = JSON.parse(storedUser);
     }
   }
+
   const t = useTranslations("StudentWritingPractice");
   const [exercise, setExercise] = useState<Exercise>(null);
   const [wordCount, setWordCount] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   const exerciseService = new ExerciseService();
   const submissionService = new SubmissionService();
+
   const editor = useEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder: t("placeholder_content") || "Start writing here...",
+        placeholder:
+          t("placeholder_content") ||
+          "Bắt đầu viết câu trả lời của bạn tại đây...",
       }),
     ],
-
     content: "\n\n\n",
-    // placeholder: t("placeholder_content"),
     onUpdate: ({ editor }) => {
       const text = editor?.getText();
       setWordCount(text.trim().split(/\s+/).filter(Boolean).length);
@@ -62,7 +74,6 @@ export default function StudentWritingPracticePage() {
     editor.on("focus", onFocus);
     editor.on("blur", onBlur);
 
-    // Cleanup
     return () => {
       editor.off("focus", onFocus);
       editor.off("blur", onBlur);
@@ -74,7 +85,6 @@ export default function StudentWritingPracticePage() {
       console.error("Exercise ID is required");
       return;
     }
-    console.log("Fetching exercise with ID:", exerciseId);
 
     exerciseService
       .getById(exerciseId)
@@ -91,157 +101,370 @@ export default function StudentWritingPracticePage() {
       });
   }, []);
 
-  const handleSubmit = () => {
-    if (!editor) return;
+  const handleSubmit = async () => {
+    if (!editor || isSubmitting) return;
+
+    setIsSubmitting(true);
     const content = editor?.getHTML();
-    // exerciseService.submitExercise("1", content).then((response) => {
-    //   console.log("Submission successful:", response);
-    //   // Optionally reset editor or show success message
-    //   editor.commands.clearContent();
-    //   setWordCount(0);
-    // }).catch((error) => {
-    //   console.error("Submission failed:", error);
-    // });
-    submissionService
-      .submitWritingExercise(exercise.id, user.id, content)
-      .then((response) => {
-        if (response.success) {
-          console.log("Submission successful:", response);
-          toast.info(t("submissionSuccessful"));
-        } else {
-          console.error("Submission failed:", error);
-          toast.error(t("submissionFailed"));
-        }
-      })
-      .catch((error) => {
-        console.error("Submission failed:", error);
-        toast.error(t("submissionFailed"));
-      });
+
+    try {
+      const response = await submissionService.submitWritingExercise(
+        exercise.id,
+        user.id,
+        content
+      );
+
+      if (response.success) {
+        toast.success(t("submissionSuccessful") || "Nộp bài thành công!");
+        setLastSaved(new Date());
+      } else {
+        toast.error(t("submissionFailed") || "Nộp bài thất bại!");
+      }
+    } catch (error) {
+      console.error("Submission failed:", error);
+      toast.error(t("submissionFailed") || "Nộp bài thất bại!");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (!exercise) return <p>Loading...</p>;
+  const handleSaveDraft = () => {
+    // Implement save draft functionality
+    setLastSaved(new Date());
+    toast.info("Đã lưu bản nháp");
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  if (!exercise) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg p-8 flex items-center space-x-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="text-gray-600 font-medium">Đang tải bài tập...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen">
-      <main className="flex-1 p-4">
-        <h1 className="text-2xl font-bold mb-2">{exercise.name}</h1>
-        <p className="text-gray-700 mb-4">{exercise.question}</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <LuBookOpen className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">
+                  Luyện tập viết
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Hoàn thành bài tập của bạn
+                </p>
+              </div>
+            </div>
 
-        <div
-          className={`p-2 mb-2 min-h-[6rem] rounded-md ${
-            isFocused ? "" : "border"
-          }`}
-        >
-          <EditorContent editor={editor} />
-        </div>
-
-        <div className="flex justify-between text-sm text-gray-500 mt-2">
-          <div>Words: {wordCount}</div>
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Submit
-          </button>
-        </div>
-        <div className="mt-4 text-sm text-gray-700 flex flex-wrap gap-2 items-center">
-          <button
-            onClick={() => editor?.chain().focus().toggleBold().run()}
-            disabled={!editor?.can().chain().focus().toggleBold().run()}
-            className={`p-1 rounded hover:bg-gray-200 ${
-              editor?.isActive("bold") ? "bg-blue-100 text-blue-600" : ""
-            }`}
-          >
-            <LuBold size={16} />
-          </button>
-
-          <button
-            onClick={() => editor?.chain().focus().toggleItalic().run()}
-            disabled={!editor?.can().chain().focus().toggleItalic().run()}
-            className={`p-1 rounded hover:bg-gray-200 ${
-              editor?.isActive("italic") ? "bg-blue-100 text-blue-600" : ""
-            }`}
-          >
-            <LuItalic size={16} />
-          </button>
-
-          <button
-            onClick={() => editor?.chain().focus().toggleStrike().run()}
-            disabled={!editor?.can().chain().focus().toggleStrike().run()}
-            className={`p-1 rounded hover:bg-gray-200 ${
-              editor?.isActive("strike") ? "bg-blue-100 text-blue-600" : ""
-            }`}
-          >
-            <LuStrikethrough size={16} />
-          </button>
-
-          <span className="text-gray-400">|</span>
-
-          <button
-            onClick={() =>
-              editor?.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-            className={`p-1 rounded hover:bg-gray-200 ${
-              editor?.isActive("heading", { level: 1 })
-                ? "bg-blue-100 text-blue-600"
-                : ""
-            }`}
-          >
-            <LuHeading1 size={16} />
-          </button>
-
-          <button
-            onClick={() =>
-              editor?.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-            className={`p-1 rounded hover:bg-gray-200 ${
-              editor?.isActive("heading", { level: 2 })
-                ? "bg-blue-100 text-blue-600"
-                : ""
-            }`}
-          >
-            <LuHeading2 size={16} />
-          </button>
-
-          <span className="text-gray-400">|</span>
-
-          <button
-            onClick={() => editor?.chain().focus().toggleBulletList().run()}
-            className={`p-1 rounded hover:bg-gray-200 ${
-              editor?.isActive("bulletList") ? "bg-blue-100 text-blue-600" : ""
-            }`}
-          >
-            <LuList size={16} />
-          </button>
-
-          <button
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-            className={`p-1 rounded hover:bg-gray-200 ${
-              editor?.isActive("orderedList") ? "bg-blue-100 text-blue-600" : ""
-            }`}
-          >
-            <LuListOrdered size={16} />
-          </button>
-
-          <span className="ml-2 text-xs text-gray-500">
-            {/* {t("instructions")} */}
-          </span>
-        </div>
-      </main>
-
-      {/* Sidebar */}
-      <aside className="w-72 border-l p-4 bg-gray-50">
-        <div className="mb-4">
-          <h2 className="font-semibold">Grammar Check</h2>
-          <div className="text-xs text-gray-500">
-            Check grammar box (coming soon)
+            <div className="flex items-center space-x-4">
+              {lastSaved && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <LuCheck className="h-4 w-4 mr-1 text-green-500" />
+                  Đã lưu lúc {formatTime(lastSaved)}
+                </div>
+              )}
+              <div className="bg-blue-50 px-3 py-1 rounded-full">
+                <span className="text-sm font-medium text-blue-700">
+                  {wordCount} từ
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-        <div>
-          <h2 className="font-semibold">Last Submission</h2>
-          <p className="text-sm text-gray-600">You wrote this last time...</p>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {/* Exercise Card */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                <h2 className="text-xl font-bold text-white mb-1">
+                  {exercise.name}
+                </h2>
+                <div className="flex items-center text-blue-100">
+                  <LuGraduationCap className="h-4 w-4 mr-2" />
+                  <span className="text-sm">Bài tập luyện viết</span>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                  <h3 className="font-semibold text-gray-800 mb-2 flex items-center">
+                    <LuFileText className="h-4 w-4 mr-2" />
+                    Đề bài:
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    {exercise.question}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Editor Card */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+              {/* Toolbar */}
+              <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
+                <div className="flex flex-wrap gap-1 items-center">
+                  <div className="flex items-center space-x-1 border-r border-gray-300 pr-3 mr-3">
+                    <button
+                      onClick={() => editor?.chain().focus().toggleBold().run()}
+                      disabled={
+                        !editor?.can().chain().focus().toggleBold().run()
+                      }
+                      className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+                        editor?.isActive("bold")
+                          ? "bg-blue-100 text-blue-600"
+                          : "text-gray-600"
+                      }`}
+                      title="Đậm"
+                    >
+                      <LuBold size={16} />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        editor?.chain().focus().toggleItalic().run()
+                      }
+                      disabled={
+                        !editor?.can().chain().focus().toggleItalic().run()
+                      }
+                      className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+                        editor?.isActive("italic")
+                          ? "bg-blue-100 text-blue-600"
+                          : "text-gray-600"
+                      }`}
+                      title="Nghiêng"
+                    >
+                      <LuItalic size={16} />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        editor?.chain().focus().toggleStrike().run()
+                      }
+                      disabled={
+                        !editor?.can().chain().focus().toggleStrike().run()
+                      }
+                      className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+                        editor?.isActive("strike")
+                          ? "bg-blue-100 text-blue-600"
+                          : "text-gray-600"
+                      }`}
+                      title="Gạch ngang"
+                    >
+                      <LuStrikethrough size={16} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center space-x-1 border-r border-gray-300 pr-3 mr-3">
+                    <button
+                      onClick={() =>
+                        editor
+                          ?.chain()
+                          .focus()
+                          .toggleHeading({ level: 1 })
+                          .run()
+                      }
+                      className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+                        editor?.isActive("heading", { level: 1 })
+                          ? "bg-blue-100 text-blue-600"
+                          : "text-gray-600"
+                      }`}
+                      title="Tiêu đề 1"
+                    >
+                      <LuHeading1 size={16} />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        editor
+                          ?.chain()
+                          .focus()
+                          .toggleHeading({ level: 2 })
+                          .run()
+                      }
+                      className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+                        editor?.isActive("heading", { level: 2 })
+                          ? "bg-blue-100 text-blue-600"
+                          : "text-gray-600"
+                      }`}
+                      title="Tiêu đề 2"
+                    >
+                      <LuHeading2 size={16} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+                    <button
+                      onClick={() =>
+                        editor?.chain().focus().toggleBulletList().run()
+                      }
+                      className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+                        editor?.isActive("bulletList")
+                          ? "bg-blue-100 text-blue-600"
+                          : "text-gray-600"
+                      }`}
+                      title="Danh sách có dấu đầu dòng"
+                    >
+                      <LuList size={16} />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        editor?.chain().focus().toggleOrderedList().run()
+                      }
+                      className={`p-2 rounded-md hover:bg-gray-200 transition-colors ${
+                        editor?.isActive("orderedList")
+                          ? "bg-blue-100 text-blue-600"
+                          : "text-gray-600"
+                      }`}
+                      title="Danh sách có số thứ tự"
+                    >
+                      <LuListOrdered size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Editor */}
+              <div className="p-6">
+                <div
+                  className={`min-h-96 rounded-lg border-2 transition-all duration-200 ${
+                    isFocused
+                      ? "border-blue-500 shadow-md ring-4 ring-blue-500/10"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="p-4">
+                    <EditorContent
+                      editor={editor}
+                      className="prose prose-sm max-w-none focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span className="flex items-center">
+                      <LuFileText className="h-4 w-4 mr-1" />
+                      {wordCount} từ
+                    </span>
+                    {lastSaved && (
+                      <span className="flex items-center text-green-600">
+                        <LuCheck className="h-4 w-4 mr-1" />
+                        Đã lưu
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={handleSaveDraft}
+                      className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <LuSave className="h-4 w-4 mr-2" />
+                      Lưu nháp
+                    </button>
+
+                    <button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || wordCount === 0}
+                      className="flex items-center px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
+                    >
+                      {isSubmitting ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      ) : (
+                        <LuSend className="h-4 w-4 mr-2" />
+                      )}
+                      {isSubmitting ? "Đang nộp..." : "Nộp bài"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Progress Card */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <h3 className="font-semibold text-gray-800 mb-4 flex items-center">
+                <LuClock className="h-5 w-5 mr-2 text-blue-600" />
+                Tiến độ
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Số từ đã viết</span>
+                  <span className="font-medium">{wordCount}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min((wordCount / 500) * 100, 100)}%`,
+                    }}
+                  ></div>
+                </div>
+                <p className="text-xs text-gray-500">Mục tiêu: 500 từ</p>
+              </div>
+            </div>
+
+            {/* Grammar Check Card */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <h3 className="font-semibold text-gray-800 mb-4 flex items-center">
+                <LuCheck className="h-5 w-5 mr-2 text-green-600" />
+                Kiểm tra ngữ pháp
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <LuEye className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 mb-3">
+                  Tính năng kiểm tra ngữ pháp tự động
+                </p>
+                <button className="text-xs bg-gray-200 text-gray-600 px-3 py-1 rounded-full cursor-not-allowed">
+                  Sắp ra mắt
+                </button>
+              </div>
+            </div>
+
+            {/* Last Submission Card */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <h3 className="font-semibold text-gray-800 mb-4 flex items-center">
+                <LuFileText className="h-5 w-5 mr-2 text-purple-600" />
+                Bài nộp trước đó
+              </h3>
+              <div className="bg-purple-50 rounded-lg p-4 text-center">
+                <p className="text-sm text-gray-600 mb-2">
+                  Chưa có bài nộp nào
+                </p>
+                <p className="text-xs text-gray-500">
+                  Bài nộp của bạn sẽ hiển thị ở đây
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </aside>
+      </div>
     </div>
   );
 }

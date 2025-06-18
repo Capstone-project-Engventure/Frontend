@@ -15,18 +15,20 @@ import { toast } from "react-toastify";
 const pronunciationService = new PronunciationPracticeService();
 const exerciseService = new ExerciseService();
 const soundService = new SoundService();
-async function fetchExerciseBySymbol(sound_id: string) {
+
+async function fetchExerciseBySymbol(sound_id: string, t: (key: string) => string) {
   const res = await exerciseService.getAll({ filters: { sound: sound_id } });
   if (!res.success) {
-    toast.error("Failed to fetch exercises");
+    toast.error(t("error.fetchExercises"));
     return null;
   }
   return res.data;
 }
-async function fetchSoundById(sound_id: string) {
+
+async function fetchSoundById(sound_id: string, t: (key: string) => string) {
   const res = await soundService.getById(sound_id);
   if (!res.success) {
-    toast.error("Failed to fetch exercises");
+    toast.error(t("error.fetchSound"));
     return null;
   }
   return res.data;
@@ -36,8 +38,9 @@ const PhoneticExercisePage = () => {
   const { id } = useParams();
   const locale = useLocale();
   const t = useTranslations("PhoneticDetail");
+  const tc = useTranslations("Common");
 
-  const [selectedSound, setSelectedSound] = useState<Sound>(null);
+  const [selectedSound, setSelectedSound] = useState<Sound | null>(null);
   const [exercises, setExercises] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,65 +50,42 @@ const PhoneticExercisePage = () => {
   const onPageChange = (newPage: number) => setPage(newPage);
 
   const customFetch = async ({ page, pageSize, keyword }: FetchArgs) => {
-    console.log("Check here");
-
     return await exerciseService.getAll({
       page,
       pageSize,
       keyword,
-      filters: { sound: selectedSound.symbol },
+      filters: { sound: selectedSound?.symbol },
     });
   };
+
   const breadcrumbs = [
-    { label: "Home", href: `/${locale}/admin/home` },
-    { label: "Phonetics", href: `/${locale}/admin/data/phonetics` },
+    { label: tc("breadcrumb.home"), href: `/${locale}/admin/home` },
+    { label: tc("breadcrumb.phonetics"), href: `/${locale}/admin/data/phonetics` },
     {
-      label: selectedSound?.symbol || "",
+      label: selectedSound?.symbol || "...",
       href: `/${locale}/admin/data/phonetics/${selectedSound?.symbol || ""}`,
     },
   ];
-  const onHandleFile = (file: File) => console.log("Import file", file);
 
-  const fields = [
-    { key: "name", label: "Name" },
-    { key: "question", label: "Question" },
-    // { key: "options", label: "Options" },
-    { key: "level", label: "Level" },
-    { key: "system_answer", label: "Answer" },
-    { key: "audio_file_url", label: "Audio", type: "audio" },
-    { key: "description", label: "Description" },
-  ];
-
-  const modalFields = [
-    { key: "name", label: "Name", type: "text" },
-    { key: "question", label: "Question", type: "text" },
-    { key: "system_answer", label: "Answer", type: "text" },
-    {
-      key: "level",
-      label: "Level",
-      type: "select",
-      options: LevelOptions,
-    },
-    { key: "description", label: "Description", type: "textarea" },
-    { key: "audio_file", label: "Audio file", type: "audio" },
-    // add other editable fields
-  ];
   useEffect(() => {
     if (!id) return;
     setLoading(true);
     setFilters({ sound: id });
 
-    Promise.all([fetchExerciseBySymbol(id), fetchSoundById(id)])
+    Promise.all([
+      fetchExerciseBySymbol(id, t),
+      fetchSoundById(id, t),
+    ])
       .then(([exerciseData, soundData]) => {
-        setExercises(exerciseData);
+        setExercises(exerciseData || []);
         setSelectedSound(soundData);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, t]);
 
   const createPronunciationPractice = async (formData: any, config: any) => {
-    formData.append("sound_id", selectedSound.id);
+    formData.append("sound_id", selectedSound?.id || "");
     const res = await pronunciationService.create(formData, config);
     if (res.success) {
       toast.info(t("create_successful"));
@@ -113,6 +93,34 @@ const PhoneticExercisePage = () => {
       toast.error(t("create_unsuccessful"));
     }
   };
+
+  const fields = [
+    { key: "name", label: t("fields.name") },
+    { key: "question", label: t("fields.question") },
+    { key: "level", label: t("fields.level") },
+    { key: "system_answer", label: t("fields.answer") },
+    { key: "audio_file_url", label: t("fields.audio"), type: "audio" },
+    { key: "description", label: t("fields.description") },
+  ];
+
+  const modalFields = [
+    { key: "name", label: t("modal.name"), type: "text" },
+    { key: "question", label: t("modal.question"), type: "text" },
+    { key: "system_answer", label: t("modal.answer"), type: "text" },
+    {
+      key: "level",
+      label: t("modal.level"),
+      type: "select",
+      options: LevelOptions,
+    },
+    { key: "description", label: t("modal.description"), type: "textarea" },
+    { key: "audio_file", label: t("modal.audioFile"), type: "audio" },
+  ];
+
+  if (error) {
+    return <div>{t("error.general")}: {error}</div>;
+  }
+
   return (
     <div>
       <h1 className="text-xl font-semibold mb-4">
@@ -122,7 +130,7 @@ const PhoneticExercisePage = () => {
       <PaginationTable
         customObjects={exercises}
         customTotalPages={1}
-        hasCustomFetch={true}
+        hasCustomFetch
         customFetch={customFetch}
         filterArgs={filters}
         fields={fields}
@@ -132,13 +140,9 @@ const PhoneticExercisePage = () => {
         service={pronunciationService}
         linkBase={`/${locale}/admin/data/sound`}
         modalFields={modalFields}
-        onHandleFile={onHandleFile}
+        onHandleFile={() => {}}
         hasBreadcrumb={false}
-        config={{
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }}
+        config={{ headers: { "Content-Type": "multipart/form-data" } }}
       />
     </div>
   );

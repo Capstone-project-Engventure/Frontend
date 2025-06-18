@@ -64,7 +64,7 @@ const ReadingWithQuestions = ({ title, content, exercises }: Reading) => {
             alert('Please select an answer before submitting.');
         }
     };
-
+  
     const handleRestart = () => {
         setIsCompleted(false);
         setCurrentQuestionIndex(0);
