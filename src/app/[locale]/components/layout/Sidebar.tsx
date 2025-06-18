@@ -92,14 +92,14 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
         {
           label: t("reading"),
           href: `${basePath}/${
-            role === "admin" ? "exercises/reading" : "practice/reading"
+            role === "admin" ? "exercises/reading-lessons" : "practice/reading"
           }`,
           icon: MdLibraryBooks,
         },
         {
           label: t("grammar"),
           href: `${basePath}/${
-            role === "admin" ? "exercises/grammar" : "practice/grammar"
+            role === "admin" ? "exercises/grammar-lessons" : "practice/grammar"
           }`,
           icon: GiSpellBook,
         },

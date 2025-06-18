@@ -72,6 +72,8 @@ interface PaginationTableProps {
   onHandleFile?: (file: File) => void;
   hasBreadcrumb?: boolean;
   hasCustomFetch?: boolean;
+  onEdit?: (item: any) => void;
+  onCreate?: () => void;
 }
 
 const PaginationTable: React.FC<PaginationTableProps> = ({
@@ -100,6 +102,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   onUpdate,
   hasBreadcrumb = true,
   hasCustomFetch = false,
+  onEdit,
+  onCreate,
 }) => {
   const [objects, setObjects] = useState<any[]>([]);
   const [isMounted] = useState({ current: true });
@@ -134,6 +138,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       if (hasCustomFetch) {
         if (customObjects && Array.isArray(customObjects)) {
           setObjects(customObjects);
+          console.log(objects);
+
           setTotalPages(customTotalPages || 1);
           return;
         } else {
@@ -160,6 +166,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         : await service.getAll(fetchArgs);
       console.log("Response: ", res);
 
+
       if (!res.success || !Array.isArray(res.data)) {
         toast.error(res.message || t("apiError"));
         return;
@@ -180,13 +187,22 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
   };
 
   const handleAdd = () => {
-    setFormData({});
-    setIsModalOpen(true);
+    if (onCreate) {
+      onCreate();
+    } else {
+      setFormData({});
+      setIsModalOpen(true);
+    }
   };
 
   const handleEdit = (item: any) => {
-    setFormData(item);
-    setIsModalOpen(true);
+    if (onEdit) {
+      // the override func is priority
+      onEdit(item?.id);
+    } else {
+      setFormData(item);
+      setIsModalOpen(true);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -317,8 +333,8 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
   // Method to take nest field
   const getValueByPath = (obj: any, path: string) => {
-  return path.split(".").reduce((acc, key) => acc?.[key], obj);
-};
+    return path.split(".").reduce((acc, key) => acc?.[key], obj);
+  };
 
   const sortedObjects = useMemo(() => {
     if (!sortKey) return objects;
@@ -488,7 +504,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                               {item[f.key].map(
                                 (opt: { key: string; option: string }) => (
                                   <li key={opt.key}>
-                                    <strong>{opt.key.toUpperCase()}:</strong>{" "}
+                                    <strong>{opt?.key?.toUpperCase()}:</strong>{" "}
                                     {opt.option}
                                   </li>
                                 )
