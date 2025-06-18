@@ -2,7 +2,7 @@ import { Lesson } from "@/lib/types/lesson";
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface ReadingState {
+interface GrammarState {
     lessons: Lesson[];
     hasFetched: boolean;
     hasHydrated: boolean;
@@ -11,7 +11,7 @@ interface ReadingState {
     setHasHydrated: (value: boolean) => void;
 }
 
-const useReadingStore = create<ReadingState>()(
+const useGrammarStore = create<GrammarState>()(
     persist(
         (set) => ({
             lessons: [],
@@ -22,7 +22,7 @@ const useReadingStore = create<ReadingState>()(
             setHasHydrated: (value) => set({ hasHydrated: value })
         }),
         {
-            name: 'ReadingPractice-storage',
+            name: 'GrammarPractice-storage',
             partialize: (state) => ({
                 lessons: state.lessons,
                 hasFetched: state.hasFetched,
@@ -34,4 +34,4 @@ const useReadingStore = create<ReadingState>()(
     )
 );
 
-export default useReadingStore;
+export default useGrammarStore;

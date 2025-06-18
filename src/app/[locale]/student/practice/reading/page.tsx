@@ -1,16 +1,16 @@
 "use client";
 
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import FilterCard from "@/app/[locale]/components/card/FilterCard";
 import LessonCard from "@/app/[locale]/components/card/LessonCard";
 import PaginationCard from "@/app/[locale]/components/card/PaginationCard";
-import FilterCard from "@/app/[locale]/components/card/FilterCard";
-import readingPracticeService from "@/lib/services/reading-practice.service";
+import readingPracticeService from "@/lib/services/student/reading-practice.service";
 import useReadingStore from "@/lib/store/readingStore";
 import { Lesson } from "@/lib/types/lesson";
 import { useLocale, useTranslations } from "next-intl";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
-// Constants
+
 const ITEMS_PER_PAGE = 6;
 
 const LEVEL_ORDER = [
@@ -27,13 +27,12 @@ type PageMap = Record<string, number>;
 
 const ReadingPractice: React.FC = () => {
   const locale = useLocale();
-  const t = useTranslations("ReadingPractice");
+  const t = useTranslations("LessonPractice");
 
-  const { lessons, setLessons, hasFetched, setHasFetched } = useReadingStore();
+  const { lessons, setLessons, hasFetched, setHasFetched, hasHydrated } = useReadingStore();
   const [currentPages, setCurrentPages] = useState<PageMap>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
-  // Filter states
+
   const [selectedTopic, setSelectedTopic] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
 
@@ -43,20 +42,22 @@ const ReadingPractice: React.FC = () => {
   ];
 
   useEffect(() => {
+    if (!hasHydrated || hasFetched) return;
+
     const fetchLessons = async () => {
-      if (!hasFetched || lessons.length === 0) {
-        setIsLoading(true);
-        const result = await readingPracticeService.getAllReadingPractices();
-        if (result.success && result.data) {
-          setLessons(result.data);
-          setHasFetched(true);
-        }
-        setIsLoading(false);
+      setIsLoading(true);
+      const result = await readingPracticeService.getAllReadingPractices();
+      if (result.success && result.data) {
+        setLessons(result.data);
+      } else {
+        setLessons([]);
       }
+      setHasFetched(true);
+      setIsLoading(false);
     };
 
     fetchLessons();
-  }, [hasFetched, lessons, setHasFetched, setLessons]);
+  }, [hasHydrated, hasFetched, setHasFetched, setLessons]);
 
   // Get unique topics and levels from lessons
   const { uniqueTopics, uniqueLevels } = useMemo(() => {
@@ -64,13 +65,12 @@ const ReadingPractice: React.FC = () => {
     const levels = new Set<string>();
 
     lessons.forEach(lesson => {
-      // Handle topic - use title property from Topic object
       const topicTitle = lesson.topic?.title;
-      
+
       if (topicTitle && topicTitle !== "No Topic") {
         topics.add(topicTitle);
       }
-      
+
       if (lesson.level) {
         levels.add(lesson.level);
       }
@@ -92,7 +92,6 @@ const ReadingPractice: React.FC = () => {
   // Filter lessons based on selected topic and level
   const filteredLessons = useMemo(() => {
     return lessons.filter(lesson => {
-      // Handle topic comparison using title property
       const topicMatch = !selectedTopic || lesson.topic?.title === selectedTopic;
       const levelMatch = !selectedLevel || lesson.level === selectedLevel;
       return topicMatch && levelMatch;
@@ -141,13 +140,8 @@ const ReadingPractice: React.FC = () => {
   };
 
   // Filter handlers
-  const handleTopicChange = (topic: string): void => {
-    setSelectedTopic(topic);
-  };
-
-  const handleLevelChange = (level: string): void => {
-    setSelectedLevel(level);
-  };
+  const handleTopicChange = (topic: string): void => { setSelectedTopic(topic) };
+  const handleLevelChange = (level: string): void => { setSelectedLevel(level) };
 
   const handleResetFilters = (): void => {
     setSelectedTopic("");
@@ -184,7 +178,7 @@ const ReadingPractice: React.FC = () => {
           </p>
           <button
             onClick={handleResetFilters}
-            className="mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md transition-colors duration-200"
+            className="cursor-pointer mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md transition-colors duration-200"
           >
             {t("filter.clearFilters") || "Clear Filters"}
           </button>

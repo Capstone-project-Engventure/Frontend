@@ -1,10 +1,13 @@
 import useReadingStore from "@/lib/store/readingStore";
+import useGrammarStore from "@/lib/store/grammarStore";
+import useListeningStore from "@/lib/store/listeningStore";
 
-export const resetAllStores = () => {
-    const { setLessons, setHasFetched } = useReadingStore.getState();
-    setLessons([]);
-    setHasFetched(false);
+const resetAllStores = () => {
+    useReadingStore.setState({ lessons: [], hasFetched: false });
+    useGrammarStore.setState({ lessons: [], hasFetched: false });
+    useListeningStore.setState({ lessons: [], hasFetched: false });
 
-    localStorage.removeItem("ReadingPractice-storage");
-    localStorage.removeItem("current_lesson");
+    localStorage.removeItem("current-lesson");
 };
+
+export default resetAllStores;

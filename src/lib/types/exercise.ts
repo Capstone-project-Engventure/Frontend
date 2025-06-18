@@ -1,9 +1,12 @@
-import { ExerciseType } from "./exercise-type";
-import { Reading } from "./reading";
-
 export type ExerciseOption = {
     key: string;
     option: string;
+};
+
+export type ExerciseType = {
+    id: number;
+    name: string;
+    description: string;
 };
 
 export type Exercise = {
@@ -13,20 +16,15 @@ export type Exercise = {
     system_answer: string;
     type_id: number;
     type?: ExerciseType;
-    reading?: Reading;
     level: string;
     skill: string;
     image: string | null;
-    lesson?: string | null;
-    topic?: string | null;
+    lesson: string | null;
     generated_by: string;
     description: string;
-    audio_file?: string | null;
+    audio_file?: string;
     audio_file_url?: string | null;
     options: ExerciseOption[];
     explanation?: string | null;
-    status?:"approved" | "pending" | "rejected";
-    created_at?: string; 
-    updated_at?: string;
 };
   
