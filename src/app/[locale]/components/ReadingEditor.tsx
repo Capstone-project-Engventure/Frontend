@@ -1,8 +1,9 @@
 "use client";
 
-import { Exercise, Option, Reading } from "@/lib/types/Reading";
+import { Reading } from "@/lib/types/reading";
 import React, { useEffect, useState } from "react";
-
+import { Exercise } from "@/lib/types/exercise";
+import { Option } from "@/lib/types/index";
 type Props = {
   initialData?: Reading;
   onSubmit: (data: Reading) => void;
@@ -39,35 +40,34 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
   };
 
   const addQuestion = () => {
-  const newExercise: Exercise = {
-    id: Date.now(),         // hoặc một cách sinh id tạm thời
-    name: '',               // giá trị mặc định
-    question: '',
-    options: [],
-    system_answer: '',
-    type: undefined,
-    type_id: undefined,
-    level: 'A1',
-    skill: 'reading',
-    image: null,
-    lesson: null,
-    generated_by: 'admin',
-    description: '',
-    explanation: '',
-    audio_file: null,
-    audio_file_url: '',
+    const newExercise: Exercise = {
+      id: Date.now(), // hoặc một cách sinh id tạm thời
+      name: "", // giá trị mặc định
+      question: "",
+      options: [],
+      system_answer: "",
+      type: undefined,
+      type_id: undefined,
+      level: "A1",
+      skill: "reading",
+      image: null,
+      lesson: null,
+      generated_by: "admin",
+      description: "",
+      explanation: "",
+      audio_file: null,
+      audio_file_url: "",
+    };
+
+    setExercises([...exercises, newExercise]);
   };
-
-  setExercises([...exercises, newExercise]);
-};
-
 
   const addOption = (qIndex: number) => {
     const newQuestions = [...exercises];
     const newOption: Option = {
       key: "",
-      option: ""
-    }
+      option: "",
+    };
     newQuestions[qIndex].options.push(newOption);
     setExercises(newQuestions);
   };
@@ -92,17 +92,16 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
     onSubmit(readingData);
   };
 
-	const handleCorrectAnswerChange = (qIndex: number, correctIndex: number) => {
-		const newQuestions = [...exercises];
-		newQuestions[qIndex].system_answer = newQuestions[qIndex].options[correctIndex].option;
-		setExercises(newQuestions);
-	};
+  const handleCorrectAnswerChange = (qIndex: number, correctIndex: number) => {
+    const newQuestions = [...exercises];
+    newQuestions[qIndex].system_answer =
+      newQuestions[qIndex].options[correctIndex].option;
+    setExercises(newQuestions);
+  };
 
   return (
     <div className="max-w-5xl mx-auto bg-white p-6 rounded-2xl shadow-lg space-y-6 mt-10">
-      <h2 className="text-2xl font-bold text-gray-800 text-center">
-        {header}
-      </h2>
+      <h2 className="text-2xl font-bold text-gray-800 text-center">{header}</h2>
 
       <div className="space-y-4">
         <label className="block font-semibold">Title:</label>
@@ -151,11 +150,11 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
                       }
                     />
                     <input
-											type="radio"
-											name={`correct-answer-${qIndex}`}
-											onChange={() => handleCorrectAnswerChange(qIndex, oIndex)}
-										/>
-										<span className="text-sm text-gray-600">Correct</span>
+                      type="radio"
+                      name={`correct-answer-${qIndex}`}
+                      onChange={() => handleCorrectAnswerChange(qIndex, oIndex)}
+                    />
+                    <span className="text-sm text-gray-600">Correct</span>
 
                     <button
                       onClick={() => removeOption(qIndex, oIndex)}

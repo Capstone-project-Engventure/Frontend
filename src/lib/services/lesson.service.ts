@@ -44,6 +44,24 @@ class LessonService extends BaseService<Lesson> {
     });
     return response;
   }
+
+  async getAllListeningLessons(
+    params?: { page?: number; pageSize?: number }
+  ) {
+    const response = await api.get("/lessons", {
+      params: { type: "listening_practice", ...params },
+    });
+    return response;
+  }
+
+  async getAllGrammarLessons(
+    params?: { page?: number; pageSize?: number }
+  ) {
+    const response = await api.get("/lessons", {
+      params: { type: "grammar_practice", ...params },
+    });
+    return response;
+  }
 }
 
 export default LessonService;

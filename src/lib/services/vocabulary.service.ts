@@ -41,11 +41,12 @@ class VocabularyService extends BaseService<Vocabulary> {
     const formData = new FormData();
  
     formData.append("file", file);
-    return api.post("/vocabularies/import-file", formData, {
+    const response = api.post("/vocabularies/import-file", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
+    return response;
   }
 
 }

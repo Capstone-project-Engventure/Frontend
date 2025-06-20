@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter, usePathname } from "next/navigation";
-import { Reading } from "@/lib/types/Reading";
+import { Reading } from "@/lib/types/reading";
 import { useParams } from "next/navigation";
 
 export default function AdminReading() {

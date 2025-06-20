@@ -16,3 +16,39 @@ export interface ServiceResponse<> {
   count: number;
   results: [];
 }
+
+
+
+ interface PaginatedResponse<T> {
+  results: T[];
+  page: number;
+  num_pages: number;
+  total_count: number;
+}
+
+interface GetAllResponse<T> {
+  success: true;
+  data: T[];
+  pagination?: {
+    current_page: number;
+    total_page: number;
+    total_count: number;
+  };
+}
+
+ interface GetSingleResponse<T> {
+  success: true;
+  data: T;
+}
+
+ interface ErrorResponse {
+  success: false;
+  error: string;
+  code?: string;
+}
+
+// Union types cho các operations cụ thể
+export type GetAllResult<T> = GetAllResponse<T> | ErrorResponse;
+export type GetSingleResult<T> = GetSingleResponse<T> | ErrorResponse;
+export type MutationResult<T> = GetSingleResponse<T> | ErrorResponse;
+export type DeleteResult = { success: true; data: null } | ErrorResponse;

@@ -135,8 +135,10 @@ export default function AdminReading() {
     if (lesson) filters.lesson = lesson.value;
     const res = await lessonService.getAll({ page, pageSize: 10, filters });
     if (res.success) {
-      setLesson(res.data);
-      setTotalPage(res.total_page);
+      setLessons(
+        res.data.map((v: any) => ({ value: v.id, label: v.title }))
+      );
+      setTotalPage(res.pagination?.total_page ?? 1);
     } else {
       toast.error("Failed to fetch lesson");
     }
@@ -205,7 +207,7 @@ export default function AdminReading() {
       <Breadcrumb items={breadcrumbs} />
       <PaginationTable
         filterComponents={filterComponents}
-        customObjects={lesson}
+        customObjects={[]}
         customTotalPages={totalPage}
         fields={fields}
         page={page}

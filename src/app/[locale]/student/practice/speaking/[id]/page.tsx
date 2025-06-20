@@ -13,7 +13,7 @@ import {
 } from "react-icons/lu";
 
 import { useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/app/[locale]/components/ui/Button";
 import ExerciseService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
@@ -154,11 +154,11 @@ const VAD_CONFIG = {
   maxRecordingTime: 30000, // Tối đa 30 giây
 };
 
-export default function SpeakingPracticeDetailPage({ params }: PageProps) {
+export default function SpeakingPracticeDetailPage() {
   const router = useRouter();
   const locale = useLocale();
 
-  const { id } = use(params);
+  const { id } = useParams();
   const exerciseService = new ExerciseService();
   const lessonService = new LessonService();
   const [exercises, setExercises] = useState<any | null>(null);
