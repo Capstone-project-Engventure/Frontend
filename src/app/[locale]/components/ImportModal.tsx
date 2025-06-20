@@ -8,10 +8,8 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { set } from "lodash";
 import Image from "next/image";
 import { Fragment, use, useRef, useState } from "react";
-import * as XLSX from "xlsx";
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -47,7 +45,7 @@ export default function ImportModal({
       setSelectedFile(selectedFile);
       await onHandleFile(selectedFile);
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message || "Failed to parse file.");
     } finally {
       setLoading(false);
@@ -56,7 +54,7 @@ export default function ImportModal({
     }
   };
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = async (e:any) => {
     const file = e.target.files[0];
     if (!file) return;
 

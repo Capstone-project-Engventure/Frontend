@@ -1,3 +1,4 @@
+import { Field } from '@/lib/types';
 import React from 'react';
 
 interface FormFieldProps {

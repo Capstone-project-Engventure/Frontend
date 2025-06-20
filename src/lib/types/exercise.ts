@@ -13,18 +13,22 @@ export type Exercise = {
     id: number;
     name: string;
     question?: string | null;
-    system_answer: string;
-    type_id: number;
+    system_answer?: string;
+    type_id?: number;
     type?: ExerciseType;
-    level: string;
-    skill: string;
-    image: string | null;
-    lesson: string | null;
-    generated_by: string;
-    description: string;
+    level?: string;
+    skill?: string;
+    image?: string | null;
+    lesson?: string | null;
+    generated_by?: string;
+    description?: string;
     audio_file?: string;
     audio_file_url?: string | null;
-    options: ExerciseOption[];
+    options: ExerciseOption[] | [];
     explanation?: string | null;
+    reading?: {
+        title: string;
+        content: string;
+    };
+    exercises ?: any[];
 };
-  

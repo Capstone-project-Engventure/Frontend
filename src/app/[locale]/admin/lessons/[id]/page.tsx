@@ -1,6 +1,6 @@
 "use client";
 import CustomSelector from "@/app/[locale]/components/CustomSelector";
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import Modal from "@/app/[locale]/components/ui/Modal";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
@@ -25,6 +25,7 @@ export default function AdminLessonDetail() {
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [filters, setFilters] = useState({ type: "", skill: "" });
+  const [page, setPage] = useState(1);
 
   /* ─────────────── services & i18n ─────────────── */
   const lessonService = new LessonService();
@@ -80,13 +81,13 @@ export default function AdminLessonDetail() {
     [t, exerciseTypes]
   );
 
-  /* modal field list (if you still need it in PaginationTable) */
+  /* modal field list (if you still need it in AdvancedDataTable) */
   const modalField = useMemo(
     () => [
-      { label: t("exercise.title"), value: "title" },
-      { label: t("exercise.question"), value: "question" },
-      { label: t("exercise.description"), value: "description" },
-      { label: t("exercise.type"), value: "type" },
+      { key: "title", label: t("exercise.title"), type: "text" },
+      { key: "question", label: t("exercise.question"), type: "text" },
+      { key: "description", label: t("exercise.description"), type: "textarea" },
+      { key: "type", label: t("exercise.type"), type: "text" },
     ],
     [t]
   );
@@ -119,7 +120,7 @@ export default function AdminLessonDetail() {
       }
       setIsLoading(true);
       try {
-        const res = await lessonService.getById(id);
+        const res = await lessonService.getById(Array.isArray(id) ? id[0] : id);
         if (res.success) setLesson(res.data);
         else toast.error(t("messages.fetchLessonFail"));
       } finally {
@@ -142,12 +143,12 @@ export default function AdminLessonDetail() {
       console.log("Filtered Skill:", filters.skill);
       console.log("Filtered Type:", filters.type);
 
-      const inLessonIds = lesson.exercises.map((e) => e.id);
+      const inLessonIds = lesson.exercises?.map((e) => e.id) ?? [];
       const filtered = res.data.filter((ex: any) => {
         const notInLesson = !inLessonIds.includes(ex.id);
-        const matchType = filters.type ? ex.type === filters.type?.value : true;
+        const matchType = filters.type ? ex.type === filters.type : true;
         const matchSkill = filters.skill
-          ? ex.skill === filters.skill?.value
+          ? ex.skill === filters.skill
           : true;
 
         const shouldInclude = notInLesson && matchType && matchSkill;
@@ -174,7 +175,7 @@ export default function AdminLessonDetail() {
       const requests = selectedExercises.map((exercise: Exercise) =>
         exerciseService.partialUpdate(
           exercise?.id,
-          { lesson: id },
+          { lesson: Array.isArray(id) ? id[0] : id },
           { config: { headers: { "Accept-Language": locale } } }
         )
       );
@@ -193,7 +194,7 @@ export default function AdminLessonDetail() {
         );
       }
       /* refresh lesson */
-      const updated = await lessonService.getById(id);
+      const updated = await lessonService.getById(Array.isArray(id) ? id[0] : id);
       if (updated.success) setLesson(updated.data);
       setShowExerciseModal(false);
       setSelectedExercises([]);
@@ -228,25 +229,25 @@ export default function AdminLessonDetail() {
   /* ─────────────── UI ─────────────── */
   return (
     <div className="relative mt-8 rounded-lg shadow-md">
-      <PaginationTable
+      <AdvancedDataTable
         customObjects={lesson?.exercises || []}
         fields={fields}
         modalFields={modalField}
         service={exerciseService}
         breadcrumbs={breadcrumbs}
-        onHandleFile={onHandleFile}
+        // onHandleFile={onHandleFile}
         hasCustomFetch
-        /* add-existing button (responsive) */
-        customActions={
-          <button
-            type="button"
-            onClick={() => setShowExerciseModal(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          >
-            {t("buttons.addExistingExercise")}
-          </button>
-        }
+        page={page}
+        onPageChange={setPage}
       />
+      {/* add-existing button (responsive) */}
+      <button
+        type="button"
+        onClick={() => setShowExerciseModal(true)}
+        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 mt-4"
+      >
+        {t("buttons.addExistingExercise")}
+      </button>
 
       {/* ───────── modal ───────── */}
       {showExerciseModal && (
@@ -257,7 +258,7 @@ export default function AdminLessonDetail() {
         >
           <div className="mt-4 min-h-[200px]">
             <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <CustomSelector
+              {/* <CustomSelector
                 value={filters.type}
                 objects={exerciseTypes}
                 onChange={(val) => setFilters((f) => ({ ...f, type: val }))}
@@ -270,7 +271,7 @@ export default function AdminLessonDetail() {
                 onChange={(val) => setFilters((f) => ({ ...f, skill: val }))}
                 placeholder={t("filters.skill")}
                 className="flex-1"
-              />
+              /> */}
               <button
                 onClick={fetchFilteredExercises}
                 className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700"
@@ -330,7 +331,7 @@ export default function AdminLessonDetail() {
               <button
                 className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
                 onClick={async () => {
-                  await handleAttachExercisesToLesson(selectedExercises);
+                  await handleAttachExercisesToLesson();
                   setSelectedExercises([]);
                   setFilters({ type: "", skill: "" });
                   setFilteredExercises([]);

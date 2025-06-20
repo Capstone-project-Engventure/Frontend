@@ -1,5 +1,5 @@
 "use client";
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import SoundService from "@/lib/services/sound.service";
 import { Sound } from "@/lib/types/sound";
 import { useLocale } from "next-intl";
@@ -61,7 +61,7 @@ const PronunciationPage: React.FC = () => {
   
   return (
     <div>
-      <PaginationTable
+      <AdvancedDataTable
         fields={fields}
         keyField="symbol"
         breadcrumbs={breadcrumbs}
@@ -70,7 +70,6 @@ const PronunciationPage: React.FC = () => {
         service={soundService}
         linkBase={"/"+ locale + "/admin/exercises/pronunciation/id"}
         modalFields={modalFields}
-        onHandleFile={onHandleFile}
       />
     </div>
   );

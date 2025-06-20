@@ -45,6 +45,7 @@ interface GetAllResponse<T> {
   success: false;
   error: string;
   code?: string;
+  message?: string;
 }
 
 // Union types cho các operations cụ thể

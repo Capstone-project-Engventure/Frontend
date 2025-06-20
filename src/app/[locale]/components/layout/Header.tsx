@@ -48,7 +48,7 @@ export default function Header() {
   const userStr = Cookies.get("user") || null;
   const oauthService = new OauthService();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState<User>();
   useEffect(() => {
     async function getUserInfo() {
       if (accessToken) {

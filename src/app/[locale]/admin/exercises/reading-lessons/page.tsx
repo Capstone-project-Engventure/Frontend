@@ -1,6 +1,6 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
@@ -135,8 +135,10 @@ export default function AdminReading() {
     if (lesson) filters.lesson = lesson.value;
     const res = await lessonService.getAll({ page, pageSize: 10, filters });
     if (res.success) {
-      setLesson(res.data);
-      setTotalPage(res.total_page);
+      setLessons(
+        res.data.map((v: any) => ({ value: v.id, label: v.title }))
+      );
+      setTotalPage(res?.pagination?.total_page ?? 1);
     } else {
       toast.error("Failed to fetch lesson");
     }
@@ -198,9 +200,9 @@ export default function AdminReading() {
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
-      <PaginationTable
-        filterComponents={filterComponents}
-        customObjects={lesson}
+      <AdvancedDataTable
+        // filterComponents={filterComponents}
+        // customObjects={[]}
         customTotalPages={totalPage}
         fields={fields}
         page={page}
@@ -209,8 +211,6 @@ export default function AdminReading() {
         linkBase={`/${locale}/admin/exercises/reading-lessons/readings`}
         breadcrumbs={breadcrumbs}
         modalFields={modalFields}
-        onHandleFile={onHandleFile}
-        hasBreadcrumb={false}
         hasCustomFetch={true}
         onEdit={onEdit}
       />

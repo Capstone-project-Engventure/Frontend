@@ -31,7 +31,7 @@ export default function ClassDetail({
 }) {
   const api = useApi();
   const { id: courseId } = use(params);
-  const [course, setCourse] = useState<Course|null>(null);
+  const [course, setCourse] = useState<Course | null>(null);
   useEffect(() => {
     const fetchCourse = async () => {
       console.log("Course ID:", courseId);
@@ -71,13 +71,12 @@ export default function ClassDetail({
         <h2 className="text-xl font-bold text-amber-600">{course.name}</h2>
         <div className="mt-2">
           <p>
-            <FaCalendarAlt className="inline mr-1" /> Khai giảng: {course.begin}
+            <FaCalendarAlt className="inline mr-1" />
+            Khai giảng: {course.begin.toLocaleDateString("vi-VN")}
           </p>
           <p>
-            <FaCalendarCheck className="inline mr-1" /> Kết thúc: {course.end}
-          </p>
-          <p>
-            <FaUser className="inline mr-1" /> Giáo viên: {course.teacher}
+            <FaCalendarCheck className="inline mr-1" />
+            Kết thúc: {course.end.toLocaleDateString("vi-VN")}
           </p>
         </div>
       </div>

@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import ExerciseService from "@/lib/services/exercise.service";
 import { Button } from "@/app/[locale]/components/ui/Button";
 import AudioPlayer from "@/app/[locale]/components/AudioPlayer"; // optional custom audio player
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import { Lesson } from "@/lib/types/lesson";
 import LessonService from "@/lib/services/lesson.service";
 import { toast } from "react-toastify";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
-import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import { LevelOptions } from "@/lib/constants/level";
 
 export default function LessonByGrammar({

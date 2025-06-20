@@ -1,6 +1,6 @@
 "use client";
 
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
 import { LevelOptions } from "@/lib/constants/level";
@@ -90,18 +90,18 @@ export default function AdminLesson() {
   const onSuccess = () => toast.success(t("messages.success"));
   const onPageChange = (p: number) => setPage(p);
 
-  const onHandleFile = async (file: File) => {
-    if (!file) return;
-    const res = await lessonService.importByFile(file);
-    res.success
-      ? toast.success(t("messages.importOk"))
-      : toast.error(t("messages.importFail"));
-  };
+  // const onHandleFile = async (file: File) => {
+  //   if (!file) return;
+  //   const res = await lessonService.importByFile(file);
+  //   res.success
+  //     ? toast.success(t("messages.importOk"))
+  //     : toast.error(t("messages.importFail"));
+  // };
 
   return (
     // Fix the component with ts
     <>
-      <PaginationTable
+      <AdvancedDataTable
         fields={fields}
         page={page}
         service={lessonService}
@@ -110,7 +110,6 @@ export default function AdminLesson() {
         linkBase={`/${locale}/admin/lessons`}
         breadcrumbs={breadcrumbs}
         modalFields={modalFields}
-        onHandleFile={onHandleFile}
       />
     </>
   );

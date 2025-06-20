@@ -5,7 +5,7 @@ import { FiSun, FiMoon, FiMonitor } from "react-icons/fi";
 import { motion, AnimatePresence } from "motion/react";
 
 const ThemeChanger = () => {
-  const { theme, setTheme, resolvedTheme, systemTheme } = useTheme();
+  const { theme = "light", setTheme, resolvedTheme = "light", systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

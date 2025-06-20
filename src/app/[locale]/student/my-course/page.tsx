@@ -25,15 +25,20 @@ export default function MyClass() {
       try {
         setIsLoading(true);
         const res = await courseService.getAll({});
-        if (!res.success) {
-          throw new Error(res.message || "Failed to fetch course list");
+        // if (!res.success) {
+        //   throw new Error(res.message || "Failed to fetch course list");
+        // }
+        if (!("data" in res)) {
+          // đây là ErrorResponse
+          toast.error(res?.message || "Lỗi khi lấy danh sách khóa học");
+          return;
         }
         if (!Array.isArray(res.data)) {
           toast.error(res.data);
           return;
         }
         setCourses(res.data);
-      } catch (err) {
+      } catch (err:any) {
         console.error(err);
         setError(err);
       } finally {
@@ -61,11 +66,15 @@ export default function MyClass() {
               <h3 className="text-2xl text-amber-600">{item.name}</h3>
               <div className="flex flex-row mt-2 text-base items-center">
                 <FaCalendarAlt />
-                <span className="text-base ml-2">Khai giảng: {item.begin.toLocaleDateString()}</span>
+                <span className="text-base ml-2">
+                  Khai giảng: {item.begin.toLocaleDateString()}
+                </span>
               </div>
               <div className="flex flex-row text-base items-center">
                 <FaCalendarCheck />
-                <span className="text-base ml-2">Kết thúc {item.end.toLocaleDateString()}</span>
+                <span className="text-base ml-2">
+                  Kết thúc {item.end.toLocaleDateString()}
+                </span>
               </div>
               <div className="flex flex-row text-base items-center">
                 <FaUser />

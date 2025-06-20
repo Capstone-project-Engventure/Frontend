@@ -118,7 +118,7 @@ const AudioWithQuestions = ({ exercises }: AudioWithQuestionsProps) => {
                                 </div>
 
                                 <div className="space-y-3 ml-11">
-                                    {exercise.options.map((option) => {
+                                    {(exercise.options ?? []).map((option:any) => {
                                         const isUserSelected = option.key === userAnswer;
                                         const isSystemCorrect = option.key === exercise.system_answer;
 
@@ -213,7 +213,7 @@ const AudioWithQuestions = ({ exercises }: AudioWithQuestionsProps) => {
                 </div>
 
                 <ul className="space-y-3 mx-2">
-                    {currentExercise.options.map((opt) => (
+                    {currentExercise && currentExercise.options && currentExercise.options.map((opt:any) => (
                         <li key={opt.key} className="flex items-center space-x-3">
                             <input
                                 type="radio"

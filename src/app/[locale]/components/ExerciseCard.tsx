@@ -101,9 +101,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               <span className="bg-orange-100 text-orange-700 border-orange-200 px-3 py-1 rounded-full border text-sm font-medium">
                 {data.level || "N/A"}
               </span>
-              <span className="bg-gray-100 text-gray-700 border-gray-200 px-3 py-1 rounded-full border text-sm font-medium">
-                {data.topic || "General"}
-              </span>
+              {/* <span className="bg-gray-100 text-gray-700 border-gray-200 px-3 py-1 rounded-full border text-sm font-medium">
+                {data?.topic || "General"}
+              </span> */}
             </div>
           </div>
           <div className="flex items-center space-x-4">
@@ -192,7 +192,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         {/* Options */}
         <div className="space-y-3 mb-8">
           {options && options.length > 0 ? (
-            options.map((opt) => {
+            options.map((opt: any) => {
               const isCorrect = opt.key === correctKey;
               return (
                 <div

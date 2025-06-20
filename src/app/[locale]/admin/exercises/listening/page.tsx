@@ -19,8 +19,8 @@ export default function AdminListening() {
   useEffect(() => {
     const fetchTopics = async () => {
       const res = await topicService.getAll();
-      if (Array.isArray(res.data)) {
-        setTopics(res?.data || []);
+      if ('success' in res && res.success && Array.isArray(res.data)) {
+        setTopics(res.data || []);
       } else {
         setTopics([]);
         toast.error("Error fetching topics");
@@ -33,7 +33,14 @@ export default function AdminListening() {
     setSelectedTopic(option?.value || null);
     lessonService
       .getAll({ page: 1, pageSize: 10, filters: { topic_id: option?.value } })
-      .then((res) => setLessons(res.data));
+      .then((res) => {
+        if ('success' in res && res.success && Array.isArray(res.data)) {
+          setLessons(res.data);
+        } else {
+          setLessons([]);
+          toast.error("Error fetching lessons");
+        }
+      });
   };
 
   const topicOptions = topics.map((t) => ({
