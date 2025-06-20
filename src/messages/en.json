@@ -380,5 +380,9 @@
       "writing": "Writing"
     },
     "title": "English Level Assessment"
-  }
+  },
+  "GrammarPractice": {
+    "title": "Grammar Practice",
+    "description": "Improve your grammar skills with these exercises."
+  } 
 }

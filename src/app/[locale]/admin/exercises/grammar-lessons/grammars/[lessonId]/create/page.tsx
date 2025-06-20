@@ -2,7 +2,6 @@
 
 import ReadingEditor from "@/app/[locale]/components/ReadingEditor";
 import GrammarService from "@/lib/services/exercise.service";
-import { Reading } from "@/lib/types/Reading";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
 import GrammarEditor from "@/app/[locale]/components/GrammarEditor";

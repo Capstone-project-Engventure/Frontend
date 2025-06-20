@@ -27,16 +27,16 @@ import { FetchArgs, ServiceResponse } from "@/lib/types/api";
 interface Field {
   key: string;
   label: string;
-  type?:
-    | "key"
-    | "text"
-    | "image"
-    | "select"
-    | "textarea"
-    | "audio"
-    | "number"
-    | "hidden"
-    | "mcq";
+  type?: string;
+    // | "key"
+    // | "text"
+    // | "image"
+    // | "select"
+    // | "textarea"
+    // | "audio"
+    // | "number"
+    // | "hidden"
+    // | "mcq";
   placeholder?: string;
   required?: boolean;
   options?: { value: string; label: string }[];

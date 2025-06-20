@@ -2,7 +2,7 @@
 
 import ReadingEditor from "@/app/[locale]/components/ReadingEditor";
 import ReadingService from "@/lib/services/reading.service";
-import { Reading } from "@/lib/types/Reading";
+import { Reading } from "@/lib/types/reading";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
 

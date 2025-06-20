@@ -391,5 +391,9 @@
       "reading": "Đọc",
       "writing": "Viết"
     }
+  },
+  "GrammarPractice": {
+    "title": "Luyện tập ngữ pháp",
+    "description": "Cải thiện kỹ năng ngữ pháp của bạn với những bài tập này."
   }
 }

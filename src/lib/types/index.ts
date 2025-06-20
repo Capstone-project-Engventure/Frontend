@@ -1,16 +1,16 @@
 export interface Field {
   key: string;
   label: string;
-  type?:
-    | "key"
-    | "text"
-    | "image"
-    | "select"
-    | "textarea"
-    | "audio"
-    | "number"
-    | "hidden"
-    | "mcq";
+  type?: string;
+    // | "key"
+    // | "text"
+    // | "image"
+    // | "select"
+    // | "textarea"
+    // | "audio"
+    // | "number"
+    // | "hidden"
+    // | "mcq";
   placeholder?: string;
   required?: boolean;
   options?: { value: string; label: string }[];
@@ -18,4 +18,10 @@ export interface Field {
   isNest?: boolean;
   default?: string | number;
   choices?: Array<string>;
+}
+
+
+export interface Option{
+  key?: string;
+  option: string;
 }

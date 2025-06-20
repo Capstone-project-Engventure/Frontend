@@ -4,6 +4,7 @@
 import React, { use, useEffect, useState } from "react";
 import { ExerciseCard } from "@/app/[locale]/components/ExerciseCard";
 import { useApi } from "@/lib/Api";
+import { useParams } from "next/navigation";
 
 type Exercise = {
   id: string;
@@ -19,13 +20,9 @@ type Lesson = {
   description: string;
   exercises: Exercise[];
 };
-export default function LessonPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function LessonPage() {
   const api = useApi();
-  const { id: lessonId } = use(params);
+  const { id: lessonId } = useParams();
   //   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [lesson, setLesson] = useState<Lesson | null>(null);
 

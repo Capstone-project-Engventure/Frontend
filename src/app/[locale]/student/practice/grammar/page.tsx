@@ -1,218 +1,249 @@
 "use client";
-
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
 import FilterCard from "@/app/[locale]/components/card/FilterCard";
 import LessonCard from "@/app/[locale]/components/card/LessonCard";
 import PaginationCard from "@/app/[locale]/components/card/PaginationCard";
-import grammarPracticeService from "@/lib/services/student/grammar-practice.service";
-import useGrammarStore from "@/lib/store/grammarStore";
+import LessonService from "@/lib/services/lesson.service";
+import TopicService from "@/lib/services/topic.service";
+import useReadingStore from "@/lib/store/readingStore";
+import useListenStore from "@/lib/store/useListeningStore";
 import { Lesson } from "@/lib/types/lesson";
+import { Topic } from "@/lib/types/topic";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
-
+import { useRouter } from "next/navigation";
 const ITEMS_PER_PAGE = 6;
 
 const LEVEL_ORDER = [
-    "A1 - Elementary",
-    "A2 - Pre-Intermediate",
-    "B1 - Intermediate",
-    "B2 - Upper-Intermediate",
-    "C1 - Advanced",
-    "C2 - Proficiency",
+  "A1 - Elementary",
+  "A2 - Pre-Intermediate",
+  "B1 - Intermediate",
+  "B2 - Upper-Intermediate",
+  "C1 - Advanced",
+  "C2 - Proficiency",
 ];
 
 type GroupedLessons = Record<string, Lesson[]>;
 type PageMap = Record<string, number>;
 
-const GrammarPractice: React.FC = () => {
-    const locale = useLocale();
-    const t = useTranslations("LessonPractice");
+const GrammarPracticeList: React.FC = () => {
+  const locale = useLocale();
+  const t = useTranslations("GrammarPractice");
+  const router = useRouter();
+  const lessonService = new LessonService();
+  const { lessons, setLessons, hasFetched, setHasFetched } = useListenStore();
+  const [currentPages, setCurrentPages] = useState<PageMap>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const { lessons, setLessons, hasFetched, setHasFetched, hasHydrated } = useGrammarStore();
-    const [currentPages, setCurrentPages] = useState<PageMap>({});
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+  // Filter states
+  const [selectedTopic, setSelectedTopic] = useState<string>("");
+  const [selectedLevel, setSelectedLevel] = useState<string>("");
 
-    const [selectedTopic, setSelectedTopic] = useState<string>("");
-    const [selectedLevel, setSelectedLevel] = useState<string>("");
+  const breadcrumbs = [
+    { label: t("breadcrumbs.home"), href: "#" },
+    {
+      label: t("breadcrumbs.readingPractice"),
+      href: `/${locale}/student/practice/grammar`,
+    },
+  ];
 
-    const breadcrumbs = [
-        { label: t("breadcrumbs.home"), href: "#" },
-        { label: t("breadcrumbs.grammarPractice"), href: `/${locale}/student/practice/grammar` },
-    ];
-
-    useEffect(() => {
-        if (!hasHydrated || hasFetched) return;
-
-        const fetchLessons = async () => {
-            setIsLoading(true);
-            const result = await grammarPracticeService.getAllGrammarPractices();
-            if (result.success && result.data) {
-                setLessons(result.data);
-            } else {
-                setLessons([]);
-            }
-            setHasFetched(true);
-            setIsLoading(false);
-        };
-
-        fetchLessons();
-    }, [hasHydrated, hasFetched, setHasFetched, setLessons]);
-
-    // Get unique topics and levels from lessons
-    const { uniqueTopics, uniqueLevels } = useMemo(() => {
-        const topics = new Set<string>();
-        const levels = new Set<string>();
-
-        lessons.forEach(lesson => {
-            const topicTitle = lesson.topic?.title;
-
-            if (topicTitle && topicTitle !== "No Topic") {
-                topics.add(topicTitle);
-            }
-
-            if (lesson.level) {
-                levels.add(lesson.level);
-            }
-        });
-
-        return {
-            uniqueTopics: Array.from(topics).sort(),
-            uniqueLevels: Array.from(levels).sort((a, b) => {
-                const indexA = LEVEL_ORDER.indexOf(a);
-                const indexB = LEVEL_ORDER.indexOf(b);
-                if (indexA === -1 && indexB === -1) return a.localeCompare(b);
-                if (indexA === -1) return 1;
-                if (indexB === -1) return -1;
-                return indexA - indexB;
-            })
-        };
-    }, [lessons]);
-
-    // Filter lessons based on selected topic and level
-    const filteredLessons = useMemo(() => {
-        return lessons.filter(lesson => {
-            const topicMatch = !selectedTopic || lesson.topic?.title === selectedTopic;
-            const levelMatch = !selectedLevel || lesson.level === selectedLevel;
-            return topicMatch && levelMatch;
-        });
-    }, [lessons, selectedTopic, selectedLevel]);
-
-    // Group filtered lessons by level
-    const groupedLessons: GroupedLessons = useMemo(() => {
-        return filteredLessons.reduce((acc, lesson) => {
-            const level = lesson.level || "Unknown";
-            if (!acc[level]) acc[level] = [];
-            acc[level].push(lesson);
-            return acc;
-        }, {} as GroupedLessons);
-    }, [filteredLessons]);
-
-    // Sort levels according to predefined order
-    const sortedLevels = useMemo(() => {
-        return Object.keys(groupedLessons).sort((a, b) => {
-            const indexA = LEVEL_ORDER.indexOf(a);
-            const indexB = LEVEL_ORDER.indexOf(b);
-            if (indexA === -1 && indexB === -1) return a.localeCompare(b);
-            if (indexA === -1) return 1;
-            if (indexB === -1) return -1;
-            return indexA - indexB;
-        });
-    }, [groupedLessons]);
-
-    // Reset pagination when filters change
-    useEffect(() => {
-        setCurrentPages({});
-    }, [selectedTopic, selectedLevel]);
-
-    // Pagination utilities
-    const getLessonsForCurrentPage = (level: string): Lesson[] => {
-        const page = currentPages[level] || 1;
-        const start = (page - 1) * ITEMS_PER_PAGE;
-        return groupedLessons[level].slice(start, start + ITEMS_PER_PAGE);
+  useEffect(() => {
+    const fetchLessons = async () => {
+      setIsLoading(true);
+      const result = await lessonService.getAllGrammarLessons();
+      if (result.status === 200) {
+        setLessons(result.data);
+        setHasFetched(true);
+      }
+      setIsLoading(false);
     };
 
-    const getTotalPages = (level: string): number =>
-        Math.ceil(groupedLessons[level].length / ITEMS_PER_PAGE);
+    // Chỉ fetch khi *chưa* fetch lần nào **và** chưa có lessons
+    if (!hasFetched && lessons.length === 0) {
+      fetchLessons();
+    }
+  }, [hasFetched, lessons.length]);
 
-    const handlePageChange = (level: string, page: number): void => {
-        setCurrentPages(prev => ({ ...prev, [level]: page }));
+  // Get unique topics and levels from lessons
+  const { uniqueTopics, uniqueLevels } = useMemo(() => {
+    const topics = new Set<string>();
+    const levels = new Set<string>();
+
+    lessons.forEach((lesson) => {
+      // Handle topic - use title property from Topic object
+      const topicTitle = lesson.topic?.title;
+
+      if (topicTitle && topicTitle !== "No Topic") {
+        topics.add(topicTitle);
+      }
+
+      if (lesson.level) {
+        levels.add(lesson.level);
+      }
+    });
+
+    return {
+      uniqueTopics: Array.from(topics).sort(),
+      uniqueLevels: Array.from(levels).sort((a, b) => {
+        const indexA = LEVEL_ORDER.indexOf(a);
+        const indexB = LEVEL_ORDER.indexOf(b);
+        if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      }),
     };
+  }, [lessons]);
 
-    // Filter handlers
-    const handleTopicChange = (topic: string): void => { setSelectedTopic(topic) };
-    const handleLevelChange = (level: string): void => { setSelectedLevel(level) };
+  // Filter lessons based on selected topic and level
+  const filteredLessons = useMemo(() => {
+    return lessons.filter((lesson) => {
+      // Handle topic comparison using title property
+      const topicMatch =
+        !selectedTopic || lesson.topic?.title === selectedTopic;
+      const levelMatch = !selectedLevel || lesson.level === selectedLevel;
+      return topicMatch && levelMatch;
+    });
+  }, [lessons, selectedTopic, selectedLevel]);
 
-    const handleResetFilters = (): void => {
-        setSelectedTopic("");
-        setSelectedLevel("");
-    };
+  // Group filtered lessons by level
+  const groupedLessons: GroupedLessons = useMemo(() => {
+    return filteredLessons.reduce((acc, lesson) => {
+      const level = lesson.level || "Unknown";
+      if (!acc[level]) acc[level] = [];
+      acc[level].push(lesson);
+      return acc;
+    }, {} as GroupedLessons);
+  }, [filteredLessons]);
 
-    return (
-        <div className="flex flex-col px-10 py-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
-            <Breadcrumb items={breadcrumbs} />
+  // Sort levels according to predefined order
+  const sortedLevels = useMemo(() => {
+    return Object.keys(groupedLessons).sort((a, b) => {
+      const indexA = LEVEL_ORDER.indexOf(a);
+      const indexB = LEVEL_ORDER.indexOf(b);
+      if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  }, [groupedLessons]);
 
-            {/* Filter Component */}
-            <FilterCard
-                topics={uniqueTopics}
-                levels={uniqueLevels}
-                selectedTopic={selectedTopic}
-                selectedLevel={selectedLevel}
-                onTopicChange={handleTopicChange}
-                onLevelChange={handleLevelChange}
-                onReset={handleResetFilters}
-            />
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPages({});
+  }, [selectedTopic, selectedLevel]);
 
-            {/* Loading State */}
-            {isLoading && (
-                <div className="flex justify-center items-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
-                </div>
-            )}
+  // Pagination utilities
+  const getLessonsForCurrentPage = (level: string): Lesson[] => {
+    const page = currentPages[level] || 1;
+    const start = (page - 1) * ITEMS_PER_PAGE;
+    return groupedLessons[level].slice(start, start + ITEMS_PER_PAGE);
+  };
 
-            {/* No Results */}
-            {!isLoading && filteredLessons.length === 0 && lessons.length > 0 && (
-                <div className="text-center py-12">
-                    <p className="text-gray-500 dark:text-gray-400 text-lg">
-                        {t("filter.noResults") || "No lessons found matching your filters."}
-                    </p>
-                    <button
-                        onClick={handleResetFilters}
-                        className="cursor-pointer mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md transition-colors duration-200"
-                    >
-                        {t("filter.clearFilters") || "Clear Filters"}
-                    </button>
-                </div>
-            )}
+  const getTotalPages = (level: string): number =>
+    Math.ceil(groupedLessons[level].length / ITEMS_PER_PAGE);
 
-            {/* Lessons Display */}
-            <div className="mt-4">
-                {sortedLevels.map(level => (
-                    <div key={level} className="mb-10">
-                        <h2 className="text-3xl font-bold text-gray-500 dark:text-white mb-4 border-b-2 border-amber-500 inline-block pb-2">
-                            {level} ({groupedLessons[level].length})
-                        </h2>
+  const handlePageChange = (level: string, page: number): void => {
+    setCurrentPages((prev) => ({ ...prev, [level]: page }));
+  };
 
-                        <div className="min-h-[200px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {getLessonsForCurrentPage(level).map(lesson => (
-                                <LessonCard key={lesson.id} lesson={lesson} />
-                            ))}
-                        </div>
+  // Filter handlers
+  const handleTopicChange = (topic: string): void => {
+    setSelectedTopic(topic);
+  };
 
-                        {getTotalPages(level) > 1 && (
-                            <div className="mt-3 px-6 flex justify-end">
-                                <PaginationCard
-                                    currentPage={currentPages[level] || 1}
-                                    totalPages={getTotalPages(level)}
-                                    onPageChange={page => handlePageChange(level, page)}
-                                />
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </div>
-        </div>
+  const handleLevelChange = (level: string): void => {
+    setSelectedLevel(level);
+  };
+
+  const handleResetFilters = (): void => {
+    setSelectedTopic("");
+    setSelectedLevel("");
+  };
+
+  const handleClickLesson = (lesson: Lesson): void => {
+    localStorage.setItem(
+      "current_lesson",
+      JSON.stringify({
+        title: lesson.title,
+        description: lesson.description,
+      })
     );
+    router.push(`/${locale}/student/practice/grammar/${lesson.id}`);
+  };
+
+  return (
+    <div className="flex flex-col px-10 py-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
+      <Breadcrumb items={breadcrumbs} />
+
+      {/* Filter Component */}
+      <FilterCard
+        topics={uniqueTopics}
+        levels={uniqueLevels}
+        selectedTopic={selectedTopic}
+        selectedLevel={selectedLevel}
+        onTopicChange={handleTopicChange}
+        onLevelChange={handleLevelChange}
+        onReset={handleResetFilters}
+      />
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+        </div>
+      )}
+
+      {/* No Results */}
+      {!isLoading && filteredLessons.length === 0 && lessons.length > 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400 text-lg">
+            {t("filter.noResults") || "No lessons found matching your filters."}
+          </p>
+          <button
+            onClick={handleResetFilters}
+            className="mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md transition-colors duration-200"
+          >
+            {t("filter.clearFilters") || "Clear Filters"}
+          </button>
+        </div>
+      )}
+
+      {/* Lessons Display */}
+      <div className="mt-4">
+        {sortedLevels.map((level) => (
+          <div key={level} className="mb-10">
+            <h2 className="text-3xl font-bold text-gray-500 dark:text-white mb-4 border-b-2 border-amber-500 inline-block pb-2">
+              {level} ({groupedLessons[level].length})
+            </h2>
+
+            <div className="min-h-[200px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {getLessonsForCurrentPage(level).map((lesson) => (
+                <LessonCard
+                  key={lesson.id}
+                  lesson={lesson}
+                  onClick={() => handleClickLesson(lesson)}
+                />
+              ))}
+            </div>
+
+            {getTotalPages(level) > 1 && (
+              <div className="mt-3 px-6 flex justify-end">
+                <PaginationCard
+                  currentPage={currentPages[level] || 1}
+                  totalPages={getTotalPages(level)}
+                  onPageChange={(page) => handlePageChange(level, page)}
+                />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
-export default GrammarPractice;
+export default GrammarPracticeList;

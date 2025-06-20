@@ -8,9 +8,10 @@ import AudioPlayer from "@/app/[locale]/components/AudioPlayer"; // optional cus
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
 import { Lesson } from "@/lib/types/lesson";
 import LessonService from "@/lib/services/lesson.service";
-import { OptionProps } from "react-select";
 import { toast } from "react-toastify";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
+import { LevelOptions } from "@/lib/constants/level";
 
 export default function LessonByGrammar({
   params,
@@ -23,8 +24,8 @@ export default function LessonByGrammar({
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(7);
-  const [lessons, setLessons] = useState<OptionProps[]>([]);
-  const [exerciseTypes, setExerciseTypes] = useState<OptionProps[]>([]);
+  const [lessons, setLessons] = useState<{ value: string; label: string }[]>([]);
+  const [exerciseTypes, setExerciseTypes] = useState<{ value: string; label: string }[]>([]);
 
   const exerciseService = new ExerciseService();
   const lessonService = new LessonService();
@@ -64,13 +65,7 @@ export default function LessonByGrammar({
       key: "level",
       label: "Level",
       type: "select",
-      options: [
-        { key: "A1", label: "A1" },
-        { key: "A2", label: "A2" },
-        { key: "B1", label: "B1" },
-        { key: "B2", label: "B2" },
-        { key: "C1", label: "C2" },
-      ],
+      options: LevelOptions,
     },
     {
       key: "options",
@@ -79,8 +74,8 @@ export default function LessonByGrammar({
       choices: ["A", "B", "C"],
     },
     { key: "description", label: "Description", type: "textarea" },
-    { key: "skill", type: "hidden", default: "listening" },
-    { key: "generated_by", type: "hidden", default: "system" },
+    { key: "skill", label: "", type: "hidden", default: "listening" },
+    { key: "generated_by", label: "", type: "hidden", default: "system" },
   ];
 
   useEffect(() => {
@@ -89,16 +84,21 @@ export default function LessonByGrammar({
         const res = await new ExerciseService().getAll({
           filters: { lesson_id: lessonId, skill: "listening" },
         });
-        setExercises(res.data || []);
+        if ("data" in res && Array.isArray(res.data)) {
+          setExercises(res.data);
+        } else {
+          setExercises([]);
+          toast.error("Error fetching exercises");
+        }
       };
       fetchExercise();
     }
     const fetchLessons = async () => {
       const res = await lessonService.getAll();
-      const tempList = [];
-      if (Array.isArray(res.data)) {
+      const tempList:any[] = [];
+      if ("data" in res && Array.isArray(res.data)) {
         res.data.map((lesson: Lesson) => {
-          tempList.push({ label: lesson.title, value: lesson.id });
+          tempList.push({ label: lesson.title, value: String(lesson.id) });
         });
         setLessons(tempList);
       } else {
@@ -108,12 +108,14 @@ export default function LessonByGrammar({
     fetchLessons();
     async function fetchExerciseTypes() {
       const res = await exerciseTypeService.getAll();
-      if (Array.isArray(res.data)) {
-        const tempList = [];
+      if ("data" in res && Array.isArray(res.data)) {
+        const tempList:any[] = [];
         res.data.map((et) => {
-          tempList.push({ label: et.name, value: et.id });
+          tempList.push({ label: et.name, value: String(et.id) });
         });
         setExerciseTypes(tempList);
+      } else {
+        toast.error("Error fetching exercise types");
       }
     }
     fetchExerciseTypes();
@@ -125,18 +127,14 @@ export default function LessonByGrammar({
       {exercises.length === 0 ? (
         <p>No listening exercises found in {lessonId}.</p>
       ) : (
-        <PaginationTable
+        <AdvancedDataTable
+          page={page}
           fields={fields}
           onPageChange={onPageChange}
           service={exerciseService}
           linkBase="/admin/exercises"
           breadcrumbs={breadcrumbs}
           modalFields={modalFields}
-          config={{
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }}
         />
       )}
     </div>

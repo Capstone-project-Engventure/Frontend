@@ -1,13 +1,12 @@
 import { useApi } from "../Api";
-
+import { DeleteResult, GetAllResult, GetSingleResult, MutationResult } from "@/lib/types/api";
+// import { PaginatedResponse } from "../types/response";
 const api = useApi();
-
-interface ApiResponse<T> {
-  success: boolean;
-  data: Array<T> | T | string;
-  current_page?: number;
-  total_page?: number;
-}
+const defaultConfig = {
+    headers: {
+      'Content-Type': 'application/json',
+    },  
+  };
 
 export abstract class BaseService<T> {
   protected endpoint: string;
@@ -20,13 +19,13 @@ export abstract class BaseService<T> {
     page,
     pageSize,
     keyword,
-    filters
+    filters,
   }: {
     page?: number;
     pageSize?: number;
     keyword?: string;
     filters?: Record<string, any>;
-  }={}): Promise<ApiResponse<T>> {
+  } = {}): Promise<GetAllResult<T>> {
     try {
       const params: Record<string, any> = {};
       if (page) params.page = page;
@@ -40,36 +39,40 @@ export abstract class BaseService<T> {
 
       if (res.status == 200) {
         if (pageSize) {
+          const paginatedData = res.data;
           return {
             success: true,
-            data: res.data.results as T[],
-            current_page: res.data.page,
-            total_page: res.data.num_pages,
+            data: paginatedData.results,
+            pagination: {
+              current_page: paginatedData.page,
+              total_page: paginatedData.num_pages,
+              total_count: paginatedData.total_count,
+            },
           };
         } else {
           return {
             success: true,
-            data: res.data,
+            data: Array.isArray(res.data) ? res.data : [res.data],
           };
         }
       } else {
         return {
           success: false,
-          data: "Unexpected status code: " + res.status,
+          error: `HTTP Error: ${res.status}`,
+          code: res.status.toString(),
         };
       }
     } catch (error: any) {
-      return {
+     return {
         success: false,
-        data: error.message,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
       };
-    }finally{
-      
-       
+    } finally {
     }
   }
 
-  public async getById(id: string|number): Promise<ApiResponse<T>> {
+  public async getById(id: string | number): Promise<GetSingleResult<T>> {
     const res = await api.get(`${this.endpoint}/${id}`);
     if (res.status === 200) {
       return {
@@ -79,17 +82,18 @@ export abstract class BaseService<T> {
     }
     return {
       success: false,
-      data: "Unexpected status code: " + res.status,
+      error: `HTTP Error: ${res.status}`,
+      code: res.status.toString(),
     };
-  }
-  catch(error: any) {
+  } catch (error: any) {
     return {
       success: false,
-      data: error.message,
+      error: error.message || 'Unknown error occurred',
+      code: error.code,
     };
   }
 
-  public async create(data: Partial<T>, config: any): Promise<ApiResponse<T>> {
+  public async create(data: Partial<T>, config: any = defaultConfig): Promise<MutationResult<T>> {
     try {
       const res = await api.post(`${this.endpoint}`, data, config);
       if (res.status === 201) {
@@ -100,12 +104,14 @@ export abstract class BaseService<T> {
       }
       return {
         success: false,
-        data: "Unexpected status code: " + res.status,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
       };
     } catch (error: any) {
       return {
         success: false,
-        data: error.message,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
       };
     }
   }
@@ -113,8 +119,8 @@ export abstract class BaseService<T> {
   public async update(
     id: string | number,
     data: Partial<T>,
-    config: any
-  ): Promise<ApiResponse<T>> {
+    config: any= defaultConfig
+  ): Promise<MutationResult<T>> {
     try {
       const res = await api.put(`${this.endpoint}/${id}`, data, config);
       if (res.status === 200) {
@@ -125,12 +131,14 @@ export abstract class BaseService<T> {
       }
       return {
         success: false,
-        data: "Unexpected status code: " + res.status,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
       };
     } catch (error: any) {
       return {
         success: false,
-        data: error.message,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
       };
     }
   }
@@ -138,8 +146,8 @@ export abstract class BaseService<T> {
   public async partialUpdate(
     id: string | number,
     data: Partial<T>,
-    config: any
-  ): Promise<ApiResponse<T>> {
+    config: any = defaultConfig
+  ): Promise<MutationResult<T>> {
     try {
       const res = await api.patch(`${this.endpoint}/${id}`, data, config);
       if (res.status === 200) {
@@ -150,17 +158,18 @@ export abstract class BaseService<T> {
       }
       return {
         success: false,
-        data: "Unexpected status code: " + res.status,
+        error: `HTTP Error: ${res.status}`,
       };
     } catch (error: any) {
       return {
         success: false,
-        data: error.message,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
       };
     }
   }
 
-  public async delete(id: number): Promise<ApiResponse<null>> {
+  public async delete(id: number): Promise<DeleteResult> {
     try {
       const res = await api.delete(`${this.endpoint}/${id}`);
       if (res.status === 204) {
@@ -171,19 +180,21 @@ export abstract class BaseService<T> {
       }
       return {
         success: false,
-        data: "Unexpected status code: " + res.status,
+        error: `Unexpected status code: ${res.status}`,
+        code: res.status.toString(),
       };
     } catch (error: any) {
       return {
         success: false,
-        data: error.message,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
       };
     }
   }
 
   public async deleteMultiple(
     items: Array<number>
-  ): Promise<ApiResponse<null>> {
+  ): Promise<DeleteResult> {
     try {
       const res = await api.delete(`${this.endpoint}`, {
         data: { ids: items },
@@ -196,12 +207,14 @@ export abstract class BaseService<T> {
       }
       return {
         success: false,
-        data: "Unexpected status code: " + res.status,
+        error: `Unexpected status code: ${res.status}`,
+        code: res.status.toString(),
       };
     } catch (error: any) {
       return {
         success: false,
-        data: error.message,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
       };
     }
   }

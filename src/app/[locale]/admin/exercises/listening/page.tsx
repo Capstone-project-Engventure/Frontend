@@ -37,7 +37,7 @@ export default function AdminListening() {
   };
 
   const topicOptions = topics.map((t) => ({
-    value: t.id,
+    value: String(t.id),
     label: t.title,
   }));
 
@@ -56,9 +56,10 @@ export default function AdminListening() {
           Select Topic:
         </label>
         <CustomSelector
-          topics={topicOptions}
+          objects={topicOptions}
           onChange={handleSelect}
           value={selectedTopic}
+          placeholder="Select a topic"
         />
       </div>
 

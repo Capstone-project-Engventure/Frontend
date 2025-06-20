@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import PronunciationPracticeService from "@/lib/services/pronunciation-practice.service";
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
@@ -11,6 +11,7 @@ import Breadcrumb from "@/app/[locale]/components/breadcumb";
 import SoundService from "@/lib/services/sound.service";
 import { Sound } from "@/lib/types/sound";
 import { toast } from "react-toastify";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 
 const pronunciationService = new PronunciationPracticeService();
 const exerciseService = new ExerciseService();
@@ -47,16 +48,20 @@ const PhoneticExercisePage = () => {
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({});
 
-  const onPageChange = (newPage: number) => setPage(newPage);
+  const onPageChange = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
 
-  const customFetch = async ({ page, pageSize, keyword }: FetchArgs) => {
+  const customFetch = useCallback(async ({ page, pageSize, keyword }: FetchArgs) => {
+    if (!selectedSound?.symbol) return { data: [], total: 0, success: false };
+    
     return await exerciseService.getAll({
       page,
       pageSize,
       keyword,
-      filters: { sound: selectedSound?.symbol },
+      filters: { sound: selectedSound.symbol },
     });
-  };
+  }, [selectedSound?.symbol]);
 
   const breadcrumbs = [
     { label: tc("breadcrumb.home"), href: `/${locale}/admin/home` },
@@ -67,40 +72,48 @@ const PhoneticExercisePage = () => {
     },
   ];
 
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setFilters({ sound: id });
+  // useEffect(() => {
+  //   if (!id) return;
+  //   setLoading(true);
+  //   setFilters({ sound: id });
 
-    Promise.all([
-      fetchExerciseBySymbol(id, t),
-      fetchSoundById(id, t),
-    ])
-      .then(([exerciseData, soundData]) => {
-        setExercises(exerciseData || []);
-        setSelectedSound(soundData);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [id, t]);
+  //   Promise.all([
+  //     fetchExerciseBySymbol(id, t),
+  //     fetchSoundById(id, t),
+  //   ])
+  //     .then(([exerciseData, soundData]) => {
+  //       setExercises(exerciseData || []);
+  //       setSelectedSound(soundData);
+  //     })
+  //     .catch((err) => setError(err.message))
+  //     .finally(() => setLoading(false));
+  // }, [id, t]);
 
-  const createPronunciationPractice = async (formData: any, config: any) => {
-    formData.append("sound_id", selectedSound?.id || "");
-    const res = await pronunciationService.create(formData, config);
-    if (res.success) {
-      toast.info(t("create_successful"));
-    } else {
-      toast.error(t("create_unsuccessful"));
+  const createPronunciationPractice =  useCallback(async (formData: any, config: any) => {
+    if (!selectedSound?.id) {
+      toast.error(t("error.noSoundSelected"));
+      return;
     }
-  };
+    try{
+      formData.append("sound_id", selectedSound?.id || "");
+      const res = await pronunciationService.create(formData, config);
+      if (res.success) {
+        toast.info(t("create_successful"));
+      } else {
+        toast.error(t("create_unsuccessful"));
+      }
+    } catch (error) {
+      toast.error(t("error.general"));
+    }
+  }, [selectedSound?.id, t]);
 
   const fields = [
-    { key: "name", label: t("fields.name") },
-    { key: "question", label: t("fields.question") },
-    { key: "level", label: t("fields.level") },
-    { key: "system_answer", label: t("fields.answer") },
+    { key: "name", label: t("fields.name"), type: "text" },
+    { key: "question", label: t("fields.question"), type: "text" },
+    { key: "level", label: t("fields.level"), type: "select" },
+    { key: "system_answer", label: t("fields.answer"), type: "text"  },
     { key: "audio_file_url", label: t("fields.audio"), type: "audio" },
-    { key: "description", label: t("fields.description") },
+    // { key: "description", label: t("fields.description"), type: "textarea" },
   ];
 
   const modalFields = [
@@ -117,33 +130,133 @@ const PhoneticExercisePage = () => {
     { key: "audio_file", label: t("modal.audioFile"), type: "audio" },
   ];
 
-  if (error) {
-    return <div>{t("error.general")}: {error}</div>;
+  useEffect(() => {
+    if (!id || typeof id !== 'string') return;
+
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      setFilters({ sound: id });
+
+      try {
+        const [exerciseData, soundData] = await Promise.all([
+          fetchExerciseBySymbol(id, t),
+          fetchSoundById(id, t),
+        ]);
+
+        setExercises(
+          Array.isArray(exerciseData)
+            ? exerciseData
+            : exerciseData && typeof exerciseData === "object"
+            ? [exerciseData]
+            : []
+        );
+        setSelectedSound(soundData);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : t("error.general");
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [id, t]);
+
+
+  // Render loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">{tc("loading")}</p>
+        </div>
+      </div>
+    );
   }
 
-  return (
-    <div>
-      <h1 className="text-xl font-semibold mb-4">
-        {t("title", { symbol: selectedSound?.symbol || "..." })}
-      </h1>
-      <Breadcrumb items={breadcrumbs} />
-      <PaginationTable
-        customObjects={exercises}
-        customTotalPages={1}
-        hasCustomFetch
-        customFetch={customFetch}
-        filterArgs={filters}
-        fields={fields}
-        page={page}
-        onPageChange={onPageChange}
-        onAdd={createPronunciationPractice}
-        service={pronunciationService}
-        linkBase={`/${locale}/admin/data/sound`}
-        modalFields={modalFields}
-        onHandleFile={() => {}}
-        hasBreadcrumb={false}
-        config={{ headers: { "Content-Type": "multipart/form-data" } }}
-      />
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                {t("error.general")}
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+   return (
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      {/* Header Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              {t("title", { symbol: selectedSound?.symbol || "..." })}
+            </h1>
+          </div>
+          {selectedSound?.symbol && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+              <span className="text-2xl font-mono font-bold text-blue-800">
+                {selectedSound.symbol}
+              </span>
+            </div>
+          )}
+        </div>
+        <Breadcrumb items={breadcrumbs} />
+      </div>
+
+      {/* Content Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
+            {t("exercises.title")}
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            {t("exercises.description")}
+          </p>
+        </div>
+        
+        <div className="p-6">
+          {/* <PaginationTable
+            customObjects={exercises}
+            customTotalPages={1}
+            hasCustomFetch
+            customFetch={customFetch}
+            filterArgs={filters}
+            fields={tableFields}
+            page={page}
+            onPageChange={onPageChange}
+            onAdd={createPronunciationPractice}
+            service={pronunciationService}
+            linkBase={`/${locale}/admin/data/sound`}
+            modalFields={modalFields}
+            onHandleFile={() => {}}
+            hasBreadcrumb={false}
+            config={{ 
+              headers: { "Content-Type": "multipart/form-data" } 
+            }}
+            className="border-0 shadow-none"
+          /> */}
+          <AdvancedDataTable fields={fields} page={page}
+            onPageChange={onPageChange}  modalFields={modalFields}/>
+        </div>
+      </div>
     </div>
   );
 };
