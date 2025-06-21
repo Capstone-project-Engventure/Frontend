@@ -1,10 +1,10 @@
 import React from "react";
 
 interface AudioPlayerProps {
-  src: string | null;
+  src: string | null | undefined;
 }
 
-const getPublicUrl = (path: string | null) => {
+const getPublicUrl = (path: string | null | undefined) => {
   if (!path) return "";
   return path.startsWith("http")
     ? path

@@ -2,8 +2,8 @@
 
 import { Button } from '@/app/[locale]/components/ui/Button';
 import type { Exercise } from '@/lib/types/exercise';
-import { useEffect, useState } from 'react';
 import MediaThemeTailwindAudio from 'player.style/tailwind-audio/react';
+import { useEffect, useState } from 'react';
 
 interface AudioWithQuestionsProps {
     exercises: Exercise[];
@@ -192,10 +192,10 @@ const AudioWithQuestions = ({ exercises }: AudioWithQuestionsProps) => {
             {/* Current question block */}
             <div className="p-6 border rounded-lg bg-gray-50">
                 <div className="justify-start">
-                    <MediaThemeTailwindAudio style={{ width: "50%", }}>
+                    <MediaThemeTailwindAudio style={{ width: "100%", }}>
                         <audio
                             slot="media"
-                            src={currentExercise.audio_file}
+                            src={`${process.env.NEXT_PUBLIC_GCS_BASE_URL}/${currentExercise.audio_file_url}`}
                             playsInline
                             crossOrigin="anonymous"
                             controls
@@ -267,5 +267,6 @@ const AudioWithQuestions = ({ exercises }: AudioWithQuestionsProps) => {
         </div>
     );
 };
+
 
 export default AudioWithQuestions;

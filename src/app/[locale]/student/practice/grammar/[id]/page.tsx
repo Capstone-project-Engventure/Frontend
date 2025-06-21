@@ -32,7 +32,7 @@ export default function GrammarPracticeDetailPage() {
   const router = useRouter();
   const locale = useLocale();
   const lessonService = new LessonService();
-  const {id} = useParams();
+  const { id } = useParams();
 
   const [exerciseData, setExerciseData] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,23 +48,26 @@ export default function GrammarPracticeDetailPage() {
   const [completedCount, setCompletedCount] = useState(0);
   const [hearts, setHearts] = useState(5);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("current_lesson");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setTitle(parsed.title || "");
-        setDescription(parsed.description || "");
-      } catch (e) {
-        console.error("Failed to parse reading data from localStorage.");
-      }
-    }
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        const stored = localStorage.getItem("current_lesson");
+        let LessonData: any = {};
+        if (stored) {
+          try {
+            LessonData = JSON.parse(stored);
+            setTitle(LessonData.title || "");
+            setDescription(LessonData.description || "");
+            setExerciseData(LessonData.exercises || []);
+          } catch (e) {
+            console.error("Failed to parse reading data from localStorage.");
+          }
+          setLoading(false);
+          return;
+        }
+
         const result = await lessonService.getById(Number(id));
         if (result.success) {
           const exercises = (result.data?.exercises || []).map((ex: any) => ({
@@ -89,8 +92,7 @@ export default function GrammarPracticeDetailPage() {
 
   const currentExercise = exerciseData[currentIndex];
   const totalExercises = exerciseData.length;
-  const progress =
-    totalExercises > 0 ? (completedCount / totalExercises) * 100 : 0;
+  const progress = totalExercises > 0 ? (completedCount / totalExercises) * 100 : 0;
 
   const handleOptionSelect = (optionKey: string) => {
     if (showResult) return;
@@ -145,11 +147,10 @@ export default function GrammarPracticeDetailPage() {
       "w-full p-4 text-left border-2 rounded-xl transition-all duration-200 hover:shadow-md font-medium cursor-pointer";
 
     if (!showResult) {
-      return `${baseStyle} ${
-        selectedOption === optionKey
-          ? "border-amber-500 bg-amber-50 shadow-md text-amber-700"
-          : "border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50"
-      }`;
+      return `${baseStyle} ${selectedOption === optionKey
+        ? "border-amber-500 bg-amber-50 shadow-md text-amber-700"
+        : "border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50"
+        }`;
     }
 
     // Show results
@@ -248,11 +249,10 @@ export default function GrammarPracticeDetailPage() {
           {/* Explanation */}
           {showExplanation && currentExercise.explanation && (
             <div
-              className={`p-4 rounded-xl border-l-4 mb-6 ${
-                isCorrect
-                  ? "bg-green-50 border-green-400"
-                  : "bg-red-50 border-red-400"
-              }`}
+              className={`p-4 rounded-xl border-l-4 mb-6 ${isCorrect
+                ? "bg-green-50 border-green-400"
+                : "bg-red-50 border-red-400"
+                }`}
             >
               <h3 className="font-semibold mb-2 text-gray-800">Explanation:</h3>
               <p className="text-gray-700">{currentExercise.explanation}</p>
@@ -315,7 +315,7 @@ export default function GrammarPracticeDetailPage() {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-6">
       <Button
         variant="destructive"
-        onClick={() => router.push(`/${locale}/student/practice/reading`)}
+        onClick={() => router.push(`/${locale}/student/practice/grammar`)}
         className="mb-6"
       >
         <svg

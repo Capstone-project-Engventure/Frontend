@@ -57,8 +57,12 @@ const LessonCard: FC<LessonCardProps> = ({ lesson }) => {
                 ...commonData,
                 exercises: lesson.exercises || [],
             };
-        }
-        else {
+        } else if (practiceType === 'speaking') {
+            lessonData = {
+                ...commonData,
+                exercises: lesson.exercises || [],
+            };
+        } else {
             console.warn('Unknown practice type:', practiceType);
             return;
         }
