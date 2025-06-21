@@ -1,6 +1,7 @@
+const checkerURL = process.env.NEXT_PUBLIC_CHECK_GRAMMAR || "http://localhost:8001/correct";
 export async function correctText(text: string): Promise<any> {
   try {
-    const response = await fetch('http://localhost:8001/correct', {
+    const response = await fetch(checkerURL as string, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
