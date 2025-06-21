@@ -1,5 +1,5 @@
 "use client";
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import { useApi } from "@/lib/Api";
 import CourseService from "@/lib/services/course.service";
 import { PaginatedResponse } from "@/lib/types/response";
@@ -44,7 +44,7 @@ export default function AdminCourse() {
     <>
       <div className="flex justify-end mb-4">
       </div>
-      <PaginationTable
+      <AdvancedDataTable
         fields={fields}
         page={page}
         service={courseService}

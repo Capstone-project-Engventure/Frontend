@@ -66,17 +66,14 @@ const CustomSelector = ({
   error = false
 }: ObjectSelectProps) => {
 
-  // Handle single select change
-  const handleSingleChange = (newValue: SingleValue<OptionType>) => {
-    if (!multiple) {
-      (onChange as SingleSelectProps['onChange'])(newValue);
-    }
-  };
-
-  // Handle multiple select change
-  const handleMultipleChange = (newValue: MultiValue<OptionType>) => {
+  // Unified onChange handler for react-select
+  const handleChange = (
+    newValue: SingleValue<OptionType> | MultiValue<OptionType>,
+  ) => {
     if (multiple) {
-      (onChange as MultipleSelectProps['onChange'])(Array.from(newValue));
+      (onChange as MultipleSelectProps['onChange'])(Array.isArray(newValue) ? newValue : []);
+    } else {
+      (onChange as SingleSelectProps['onChange'])(newValue as SingleValue<OptionType>);
     }
   };
 
@@ -191,10 +188,9 @@ const CustomSelector = ({
       <Select<OptionType, boolean>
         options={objects}
         value={value}
-        onChange={multiple ? handleMultipleChange : handleSingleChange}
         isSearchable
         isClearable
-        isDisabled={disabled}
+        onChange={handleChange}
         isLoading={loading}
         isMulti={multiple}
         placeholder={placeholder}

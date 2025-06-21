@@ -81,7 +81,7 @@ export default function LoginForm() {
         if (
           userData &&
           Array.isArray(userData.roles) &&
-          userData.roles.some((role) => role.name == "Super Administrator")
+          userData.roles.some((role:any) => role.name == "Super Administrator")
         ) {
           router.push(`/${locale}/admin/home`);
         } else {

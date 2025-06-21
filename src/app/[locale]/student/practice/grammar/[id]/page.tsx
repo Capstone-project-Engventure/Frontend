@@ -67,7 +67,10 @@ export default function GrammarPracticeDetailPage() {
       try {
         const result = await lessonService.getById(Number(id));
         if (result.success) {
-          const exercises = result.data?.exercises || [];
+          const exercises = (result.data?.exercises || []).map((ex: any) => ({
+            ...ex,
+            question: ex.question ?? "",
+          }));
           setExerciseData(exercises);
         } else {
           console.error("Failed to load reading practice from API.");
@@ -82,7 +85,7 @@ export default function GrammarPracticeDetailPage() {
     };
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   const currentExercise = exerciseData[currentIndex];
   const totalExercises = exerciseData.length;

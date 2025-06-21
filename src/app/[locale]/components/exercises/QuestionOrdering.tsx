@@ -1,9 +1,14 @@
 import { useState } from 'react';
 
-function OrderingQuestion({ exercise }:) {
-  const [selected, setSelected] = useState([]);
+type Exercise = {
+  options: string[];
+  // Add other properties if needed
+};
 
-  const handleSelect = (item) => {
+function OrderingQuestion({ exercise }: { exercise: Exercise }) {
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const handleSelect = (item: any) => {
     if (selected.includes(item)) return; // tránh chọn lại
     setSelected([...selected, item]);
   };

@@ -46,8 +46,8 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
       question: "",
       options: [],
       system_answer: "",
-      type: undefined,
-      type_id: undefined,
+      // type: undefined,
+      type_id: 1,
       level: "A1",
       skill: "reading",
       image: null,
@@ -55,7 +55,7 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
       generated_by: "admin",
       description: "",
       explanation: "",
-      audio_file: null,
+      // audio_file: null,
       audio_file_url: "",
     };
 
@@ -134,7 +134,7 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
               <input
                 type="text"
                 className="w-full border rounded px-3 py-1 mt-1"
-                value={q.question}
+                value={q.question ?? ""}
                 onChange={(e) => handleQuestionChange(qIndex, e.target.value)}
               />
 

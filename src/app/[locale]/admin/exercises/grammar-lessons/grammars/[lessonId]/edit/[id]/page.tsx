@@ -53,6 +53,7 @@ const CreateGrammarPage = () => {
                 question: ex.question ?? '', // convert null to empty string
                 audio_file_url: ex.audio_file_url ?? undefined, // convert null to undefined
             })),
+            lesson: typeof reading.lesson === "number" ? reading.lesson : undefined, // ensure lesson is number or undefined
         }
         : undefined;
 

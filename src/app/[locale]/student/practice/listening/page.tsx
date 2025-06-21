@@ -237,4 +237,4 @@ const ListeningPracticeList: React.FC = () => {
   );
 };
 
-export default ListeningPractice;
+export default ListeningPracticeList;

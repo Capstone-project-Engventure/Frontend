@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Transition } from "@headlessui/react";
 import VocabularyService from "@/lib/services/vocabulary.service";
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
 import { HiPlus, HiPencil, HiTrash } from "react-icons/hi";
 import debounce from "lodash.debounce";
@@ -208,7 +208,7 @@ function VocabCard({
 export default function AdminVocabulary() {
   const vocabularyService = new VocabularyService();
   const topicService = new TopicService();
-  const [vocab, setVocab] = useState([]);
+  const [vocab, setVocab] = useState<Vocabulary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
@@ -216,14 +216,14 @@ export default function AdminVocabulary() {
   const [totalPages, setTotalPages] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [topicList, setTopicList] = useState<Topic[]>([]);
-  const [topicListSelection, setTopicListSelection] = useState<[]>([]);
+  const [topicListSelection, setTopicListSelection] = useState<OptionType[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<OptionType>({
     value: "",
     label: "Tìm kiếm chủ đề...",
   });
   const [selectedPOS, setSelectedPOS] = useState("");
   const [isFileModalOpen, setIsFileModalOpen] = useState(false);
-  const [selectedVocab, setSelectedVocab] = useState(null);
+  const [selectedVocab, setSelectedVocab] = useState<(Vocabulary & { mode?: "view" | "edit" | "add" }) | null>(null);
 
   const fetchVocabByFilters = async () => {
     setIsLoading(true);
@@ -357,7 +357,7 @@ export default function AdminVocabulary() {
       await topicService.getAll().then((res) => {
         if (!res.success) throw new Error("Failed to fetch topics");
         if (Array.isArray(res.data)) {
-          const tempList = [];
+          const tempList:any[] = [];
           res.data.map((topic: Topic) =>
             tempList.push({
               value: topic.id,
@@ -395,9 +395,10 @@ export default function AdminVocabulary() {
             <div className="flex flex-col sm:flex-row gap-4 mb-4 justify-between w-full">
               <div className="flex flex-row gap-2">
                 <CustomSelector
-                  topics={topicListSelection}
-                  onChange={setSelectedTopic}
+                  objects={topicListSelection}
+                  onChange={(value) => setSelectedTopic(value ?? { value: "", label: "Tìm kiếm chủ đề..." })}
                   value={selectedTopic}
+                  placeholder="Tìm kiếm chủ đề..."
                 />
 
                 <select

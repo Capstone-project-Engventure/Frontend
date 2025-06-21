@@ -1,6 +1,6 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
@@ -197,7 +197,7 @@ export default function AdminReading() {
     router.push(newPath);
   }, []);
 
-  const onCreate = useCallback((id: string) => {
+  const onCreate = useCallback(() => {
     const newPath = `${pathname}/create`;
     router.push(newPath);
   }, []);
@@ -206,9 +206,9 @@ export default function AdminReading() {
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
-      <PaginationTable
-        filterComponents={filterComponents}
-        customObjects={readings}
+      <AdvancedDataTable
+        // filterComponents={filterComponents}
+        // customObjects={readings}
         customTotalPages={totalPage}
         fields={fields}
         page={page}
@@ -216,8 +216,8 @@ export default function AdminReading() {
         service={exerciseService}
         // breadcrumbs={breadcrumbs}
         modalFields={modalFields}
-        onHandleFile={onHandleFile}
-        hasBreadcrumb={false}
+        // onHandleFile={onHandleFile}
+        // hasBreadcrumb={false}
         hasCustomFetch={true}
         onEdit={onEdit}
         onCreate={onCreate}

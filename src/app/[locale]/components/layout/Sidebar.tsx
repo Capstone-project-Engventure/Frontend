@@ -263,7 +263,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
             <p className={`font-bold ${toggleSidebar ? "" : "hidden"}`}>
               Learning corner
             </p>
-            {learnNavItems.map((item, index) => {
+            {learnNavItems.map((item:any, index) => {
               const Icon = item.icon;
               const isActive = pathname?.startsWith(item.href);
               return (
@@ -318,7 +318,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
                   {/* Render children if they exist */}
                   {item.children && isPracticeOpen && (
                     <div className="ml-6 mt-2 space-y-1 text-sm text-gray-700">
-                      {item.children.map((child, childIndex) => {
+                      {item.children.map((child:any, childIndex:any) => {
                         const isChildActive = pathname?.startsWith(child.href);
                         const ChildIcon = child.icon;
                         return (

@@ -17,7 +17,14 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
 
   useEffect(() => {
     if (initialData) {
-      setExercises(initialData.exercises || []);
+      // setExercises(
+      //   (initialData.exercises || []).map((ex) => ({
+      //     ...ex,
+      //     system_answer: ex.system_answer ?? "",
+      //     type_id: ex.type_id !== undefined ? ex.type_id : 1, // fallback or handle as needed
+      //     level: ex.level ?? "A1", // ensure level is always a string
+      //   }))
+      // );
     }
   }, [initialData]);
 
@@ -33,8 +40,10 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
     value: string
   ) => {
     const newQuestions = [...exercises];
-    newQuestions[qIndex].options[oIndex].option = value;
-    setExercises(newQuestions);
+    if (newQuestions) {
+      newQuestions[qIndex].options[oIndex].option = value;
+      setExercises(newQuestions);
+    }
   };
 
   const addQuestion = () => {
@@ -63,7 +72,7 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
   const addOption = (qIndex: number) => {
     const newQuestions = [...exercises];
     const newOption: Option = {
-      key: "",
+      key: "", 
       option: "",
     };
     newQuestions[qIndex].options.push(newOption);
@@ -81,7 +90,7 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
   };
 
   const handleSubmit = () => {
-    exercises.forEach((ex) => (ex.lesson = 14));
+    exercises.forEach((ex) => (ex.lesson = "14"));
     const grammarData: Exercise[] = exercises;
     onSubmit(grammarData[0]);
   };
@@ -113,7 +122,7 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
               <input
                 type="text"
                 className="w-full border rounded px-3 py-1 mt-1"
-                value={q.question}
+                value={q.question ?? ""}
                 onChange={(e) => handleQuestionChange(qIndex, e.target.value)}
               />
 

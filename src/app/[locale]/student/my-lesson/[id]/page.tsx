@@ -2,12 +2,12 @@
 "use client";
 
 import React, { use, useEffect, useState } from "react";
-import { ExerciseCard } from "@/app/[locale]/components/ExerciseCard";
+import ExerciseCard from "@/app/[locale]/components/ExerciseCard";
 import { useApi } from "@/lib/Api";
 import { useParams } from "next/navigation";
 
 type Exercise = {
-  id: string;
+  id: number;
   name: string;
   question: string;
   description: string;
@@ -35,7 +35,7 @@ export default function LessonPage() {
       const saved = localStorage.getItem(cacheKey);
       if (saved) {
         const lessons: Lesson[] = JSON.parse(saved);
-        const found = lessons.find((l) => l.id === lessonId);
+        const found = lessons.find((l) => l.id === Number(lessonId));
         if (found) {
           setLesson(found);
           return;
@@ -44,7 +44,14 @@ export default function LessonPage() {
       try {
         const res = await api.get(`/lessons/${lessonId}`);
         if (res.status === 200) {
-          const fetched: Lesson = res.data;
+          // Ensure all exercise ids are numbers
+          const fetched: Lesson = {
+            ...res.data,
+            exercises: res.data.exercises.map((ex: any) => ({
+              ...ex,
+              id: Number(ex.id),
+            })),
+          };
           setLesson(fetched);
 
           // 3. Update cache
@@ -74,7 +81,7 @@ export default function LessonPage() {
   return (
     <div className="p-4 grid grid-cols-1 gap-6">
       {lesson.exercises.map((ex, idx) => (
-        <ExerciseCard key={ex.id} exercise={ex} index={idx} />
+        <ExerciseCard key={ex.id} data={ex} index={idx} />
       ))}
     </div>
   );

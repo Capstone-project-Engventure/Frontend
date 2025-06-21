@@ -22,6 +22,6 @@ export interface Field {
 
 
 export interface Option{
-  key?: string;
+  key: string;
   option: string;
 }

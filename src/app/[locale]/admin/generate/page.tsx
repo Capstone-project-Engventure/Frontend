@@ -34,11 +34,17 @@ const sampleExercises = [
     question:
       "Listen to the audio and identify what environmental sound you hear.",
     system_answer: "A",
-    type: { name: "listening" },
+    type: { id: 1, name: "listening", description: "Listening exercises" },
+    type_id: 1,
+    skill: "listening",
     level: "A2",
     topic: "Environmental Awareness",
+    topic_id: 1,
     description: "Identify natural sounds in the environment.",
     audio_file_url: "/audio/nature-sounds.mp3",
+    image: "",
+    lesson: "",
+    generated_by: "sample",
     options: [
       { key: "A", option: "Birds singing in a forest" },
       { key: "B", option: "Ocean waves crashing" },
@@ -54,15 +60,21 @@ const sampleExercises = [
     question:
       "According to the passage, what is the primary cause of global warming?",
     system_answer: "B",
-    type: { name: "reading" },
+    type: { id: 2, name: "reading", description: "Reading exercises" },
+    type_id: 2,
+    skill: "reading",
     level: "B1",
     topic: "Environmental Awareness",
+    topic_id: 1,
     description: "Read the passage and answer the comprehension question.",
     reading: {
       title: "Understanding Climate Change",
       content:
         "Climate change refers to long-term shifts in global temperatures and weather patterns. While climate variations are natural, scientific evidence shows that human activities have been the main driver of climate change since the 1800s. The burning of fossil fuels like coal, oil, and gas produces greenhouse gases that trap heat in our atmosphere. These gases include carbon dioxide, methane, and nitrous oxide. As concentrations of these gases increase, more heat gets trapped, leading to rising global temperatures, melting ice caps, and changing weather patterns worldwide.",
     },
+    image: "",
+    lesson: "",
+    generated_by: "sample",
     options: [
       { key: "A", option: "Natural climate variations" },
       { key: "B", option: "Human activities since the 1800s" },
@@ -78,11 +90,17 @@ const sampleExercises = [
     question:
       'Choose the correct form: "We _____ renewable energy sources for the past decade."',
     system_answer: "C",
-    type: { name: "grammar" },
+    type: { id: 3, name: "grammar", description: "Grammar exercises" },
+    type_id: 3,
+    skill: "grammar",
     level: "B1",
     topic: "Environmental Awareness",
+    topic_id: 1,
     description:
       "Use present perfect tense to describe ongoing environmental actions.",
+    image: "",
+    lesson: "",
+    generated_by: "sample",
     options: [
       { key: "A", option: "use" },
       { key: "B", option: "used" },
@@ -97,10 +115,16 @@ const sampleExercises = [
     name: "Environmental Vocabulary",
     question: 'What does "sustainable" mean in environmental contexts?',
     system_answer: "A",
-    type: { name: "vocabulary" },
+    type: { id: 4, name: "vocabulary", description: "Vocabulary exercises" },
+    type_id: 4,
+    skill: "vocabulary",
     level: "B2",
     topic: "Environmental Awareness",
+    topic_id: 1,
     description: "Learn key environmental vocabulary terms.",
+    image: "",
+    lesson: "",
+    generated_by: "sample",
     options: [
       {
         key: "A",
@@ -119,11 +143,17 @@ const sampleExercises = [
     question:
       "Write a short paragraph about one action you can take to protect the environment.",
     system_answer: "Sample",
-    type: { name: "writing" },
+    type: { id: 5, name: "writing", description: "Writing exercises" },
+    type_id: 5,
+    skill: "writing",
     level: "B2",
     topic: "Environmental Awareness",
+    topic_id: 1,
     description:
       "Express your ideas about environmental protection in writing.",
+    image: "",
+    lesson: "",
+    generated_by: "sample",
     options: [
       {
         key: "Sample",
@@ -139,11 +169,17 @@ const sampleExercises = [
     name: "Environmental Discussion",
     question: "Discuss the pros and cons of renewable energy sources.",
     system_answer: "Speaking",
-    type: { name: "speaking" },
+    type: { id: 6, name: "speaking", description: "Speaking exercises" },
+    type_id: 6,
+    skill: "speaking",
     level: "B2",
     topic: "Environmental Awareness",
+    topic_id: 1,
     description:
       "Practice speaking about environmental topics with structured discussion.",
+    image: "",
+    lesson: "",
+    generated_by: "sample",
     options: [
       {
         key: "Speaking",

@@ -5,4 +5,5 @@ export type Reading = {
     title: string;
     content: string;
     exercises: Exercise[];
+    lesson?: string|number;
 };
