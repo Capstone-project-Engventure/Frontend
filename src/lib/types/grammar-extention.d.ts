@@ -1,6 +1,6 @@
 // types/grammar-extension.d.ts
 import '@tiptap/core'
-import type { GrammarError } from './your-extension-path'
+import type { GrammarError } from '@/lib/types/submission'
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType = any> {

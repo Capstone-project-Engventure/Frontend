@@ -11,8 +11,30 @@ const intlMiddleware = createIntlMiddleware({
   defaultLocale: "en",
 });
 
+// Token refresh function
+async function refreshAccessToken(refreshToken: string): Promise<string | null> {
+  try {
+    const formData = new FormData();
+    formData.append("refresh_token", refreshToken);
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/refresh-token`, {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.access_token;
+    }
+  } catch (error) {
+    console.error("Token refresh failed:", error);
+  }
+  return null;
+}
+
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("access_token")?.value;
+  const refreshToken = request.cookies.get("refresh_token")?.value;
   const pathname = request.nextUrl.pathname;
   const locale = pathname.split("/")[1];
   const isValidLocale = ["en", "vi"].includes(locale);
@@ -21,6 +43,7 @@ export async function middleware(request: NextRequest) {
 
   let role = "anonymous";
   let isValidToken = false;
+  let newAccessToken: string | null = null;
 
   // Validate token if present
   if (token) {
@@ -28,9 +51,34 @@ export async function middleware(request: NextRequest) {
       const publicKey = await importSPKI(PUBLIC_KEY_PEM, "RS256");
       const { payload } = await jwtVerify(token, publicKey);
       isValidToken = true;
-      role = payload.scope?.includes("admin") ? "admin" : "student";
+      
+      // Fix TypeScript error by properly typing the scope
+      const scope = payload.scope as string | string[];
+      if (typeof scope === 'string') {
+        role = scope.includes("admin") ? "admin" : "student";
+      } else if (Array.isArray(scope)) {
+        role = scope.includes("admin") ? "admin" : "student";
+      }
     } catch (error) {
       console.error("JWT verification failed:", error);
+      
+      // Try to refresh token if access token is invalid
+      if (refreshToken) {
+        newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken) {
+          isValidToken = true;
+          // Set new access token in cookie
+          const response = NextResponse.next();
+          response.cookies.set("access_token", newAccessToken, {
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+          });
+          return response;
+        }
+      }
     }
   }
 
