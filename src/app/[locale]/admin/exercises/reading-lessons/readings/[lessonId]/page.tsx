@@ -1,26 +1,23 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
-import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import CustomSelector from "@/app/[locale]/components/CustomSelector";
+import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
 import ExerciseService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
-import { Exercise } from "@/lib/types/exercise";
-import { Lesson } from "@/lib/types/lesson";
 import { OptionType } from "@/lib/types/option";
-import { Topic } from "@/lib/types/topic";
+import { Reading } from "@/lib/types/reading";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { useRouter, usePathname } from "next/navigation";
-import { Reading } from "@/lib/types/reading";
-import { useParams } from "next/navigation";
 
 export default function AdminReading() {
+  console.log(1200);
+
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
@@ -43,7 +40,7 @@ export default function AdminReading() {
   const t = useTranslations("Admin.Exercises");
   const exerciseService = new ExerciseService();
   const topicService = new TopicService();
-  const lessonService = new LessonService();
+  const lessonService = useMemo(() => new LessonService(), []);
   const exerciseTypeService = new ExerciseTypeService();
 
   /* ──────────────────────── meta ───────────────────────── */
@@ -136,16 +133,26 @@ export default function AdminReading() {
     })();
   }, []);
 
-  const fetchLesson = useCallback(async () => {
-    const res = await lessonService.getById(lessonId as string);
-    if (res.success) {
-      setReadings(res?.data?.readings);
-    } else {
-      toast.error("Failed to fetch lesson");
-    }
-  }, [lesson, page]);
+  useEffect(() => {
+    const fetchLesson = async () => {
+      try {
+        const res = await lessonService.getById(lessonId as string);
+        if (res.success) {
+          console.log(res);
+          setReadings(res.data?.readings || []);
+        } else {
+          toast.error("Failed to fetch lesson");
+        }
+      } catch (error) {
+        console.error("Error fetching lesson:", error);
+        toast.error("An error occurred while fetching lesson");
+      }
+    };
 
-  useEffect(() => void fetchLesson(), []);
+    if (lessonId) {
+      fetchLesson();
+    }
+  }, [lessonId, lessonService]);
 
   /* ──────────────────────── derived data ───────────────── */
   const lessonOptions = useMemo(() => {
@@ -206,9 +213,9 @@ export default function AdminReading() {
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
-      <AdvancedDataTable
-        // filterComponents={filterComponents}
-        // customObjects={readings}
+      <PaginationTable
+        filterComponents={filterComponents}
+        customObjects={readings}
         customTotalPages={totalPage}
         fields={fields}
         page={page}
@@ -216,8 +223,8 @@ export default function AdminReading() {
         service={exerciseService}
         // breadcrumbs={breadcrumbs}
         modalFields={modalFields}
-        // onHandleFile={onHandleFile}
-        // hasBreadcrumb={false}
+        onHandleFile={onHandleFile}
+        hasBreadcrumb={false}
         hasCustomFetch={true}
         onEdit={onEdit}
         onCreate={onCreate}
