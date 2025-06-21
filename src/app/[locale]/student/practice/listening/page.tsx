@@ -1,19 +1,15 @@
-"use client"
+"use client";
+
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
 import FilterCard from "@/app/[locale]/components/card/FilterCard";
 import LessonCard from "@/app/[locale]/components/card/LessonCard";
 import PaginationCard from "@/app/[locale]/components/card/PaginationCard";
 import LessonService from "@/lib/services/lesson.service";
-import TopicService from "@/lib/services/topic.service";
-import useReadingStore from "@/lib/store/readingStore";
 import useListenStore from "@/lib/store/useListeningStore";
 import { Lesson } from "@/lib/types/lesson";
-import { Topic } from "@/lib/types/topic";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo, useState } from "react";
 const ITEMS_PER_PAGE = 6;
 
 const LEVEL_ORDER = [
@@ -29,39 +25,39 @@ type GroupedLessons = Record<string, Lesson[]>;
 type PageMap = Record<string, number>;
 
 const ListeningPracticeList: React.FC = () => {
- const locale = useLocale();
-  const t = useTranslations("ListeningPractice");
+  const locale = useLocale();
+  const t = useTranslations("LessonPractice");
   const lessonService = new LessonService();
   const router = useRouter();
   const { lessons, setLessons, hasFetched, setHasFetched } = useListenStore();
   const [currentPages, setCurrentPages] = useState<PageMap>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+
   // Filter states
   const [selectedTopic, setSelectedTopic] = useState<string>("");
   const [selectedLevel, setSelectedLevel] = useState<string>("");
 
   const breadcrumbs = [
     { label: t("breadcrumbs.home"), href: "#" },
-    { label: t("breadcrumbs.readingPractice"), href: `/${locale}/student/practice/reading` },
+    { label: t("breadcrumbs.listeningPractice"), href: `/${locale}/student/practice/reading` },
   ];
 
   useEffect(() => {
-  const fetchLessons = async () => {
-    setIsLoading(true);
-    const result = await lessonService.getAllListeningLessons();
-    if (result.status === 200) {
-      setLessons(result.data);
-      setHasFetched(true);
-    }
-    setIsLoading(false);
-  };
+    const fetchLessons = async () => {
+      setIsLoading(true);
+      const result = await lessonService.getAllListeningLessons();
+      if (result.status === 200) {
+        setLessons(result.data);
+        setHasFetched(true);
+      }
+      setIsLoading(false);
+    };
 
-  // Chỉ fetch khi *chưa* fetch lần nào **và** chưa có lessons
-  if (!hasFetched && lessons.length === 0) {
-    fetchLessons();
-  }
-}, [hasFetched, lessons.length]);
+    // Chỉ fetch khi *chưa* fetch lần nào **và** chưa có lessons
+    if (!hasFetched && hasFetched) {
+      fetchLessons();
+    }
+  }, [hasFetched, lessons.length]);
 
   // Get unique topics and levels from lessons
   const { uniqueTopics, uniqueLevels } = useMemo(() => {
@@ -71,11 +67,11 @@ const ListeningPracticeList: React.FC = () => {
     lessons.forEach(lesson => {
       // Handle topic - use title property from Topic object
       const topicTitle = lesson.topic?.title;
-      
+
       if (topicTitle && topicTitle !== "No Topic") {
         topics.add(topicTitle);
       }
-      
+
       if (lesson.level) {
         levels.add(lesson.level);
       }
@@ -160,15 +156,15 @@ const ListeningPracticeList: React.FC = () => {
   };
 
   const handleClickLesson = (lesson: Lesson): void => {
-      localStorage.setItem(
-        "current_lesson",
-        JSON.stringify({
-          title: lesson.title,
-          description: lesson.description,
-        })
-      );
-      router.push(`/${locale}/student/practice/listening/${lesson.id}`);
-    }
+    localStorage.setItem(
+      "current_lesson",
+      JSON.stringify({
+        title: lesson.title,
+        description: lesson.description,
+      })
+    );
+    router.push(`/${locale}/student/practice/listening/${lesson.id}`);
+  }
 
   return (
     <div className="flex flex-col px-10 py-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">

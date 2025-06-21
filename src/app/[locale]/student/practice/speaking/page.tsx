@@ -164,17 +164,6 @@ const SpeakingPractice: React.FC = () => {
     setSelectedLevel("");
   };
 
-  const handleClickLesson = (lesson: Lesson): void => {
-    localStorage.setItem(
-      "current_lesson",
-      JSON.stringify({
-        title: lesson.title,
-        description: lesson.description,
-      })
-    );
-    router.push(`/${locale}/student/practice/speaking/${lesson.id}`);
-  }
-
   return (
     <div className="flex flex-col px-10 py-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
@@ -222,7 +211,7 @@ const SpeakingPractice: React.FC = () => {
 
             <div className="min-h-[200px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {getLessonsForCurrentPage(level).map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} onClick={handleClickLesson} />
+                <LessonCard key={lesson.id} lesson={lesson} />
               ))}
             </div>
 
