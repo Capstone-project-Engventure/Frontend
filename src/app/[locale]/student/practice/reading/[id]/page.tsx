@@ -36,50 +36,52 @@ export default function ReadingPracticePage() {
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
-      const stored = localStorage.getItem("current_lesson");
-      let lessonData: LessonData | null = null;
 
-      if (stored) {
-        try {
-          lessonData = JSON.parse(stored);
-          setTitle(lessonData?.title || "");
-          setDescription(lessonData?.description || "");
+      try {
+        const stored = localStorage.getItem("current_lesson");
+        let LessonData: any = {};
 
-          if (lessonData?.readings && lessonData.readings.length > 0) {
-            setAllReadings(lessonData.readings);
-            setExerciseData(lessonData.readings[0]);
-            return;
+        if (stored) {
+          try {
+            LessonData = JSON.parse(stored);
+            setTitle(LessonData?.title || "");
+            setDescription(LessonData?.description || "");
+
+            if (LessonData?.readings && LessonData.readings.length > 0) {
+              setAllReadings(LessonData.readings);
+              setExerciseData(LessonData.readings[0]);
+            }
+          } catch (e) {
+            console.error("Failed to parse lesson data from localStorage:", e);
           }
-        } catch (e) {
-          console.error("Failed to parse lesson data from localStorage:", e);
+          setLoading(false);
+          return;
         }
+
+        const result = await readingPracticeService.getById(Number(id));
+        if (result.success && result.dataReading) {
+          const readings = result.dataReading;
+          setAllReadings(readings);
+
+          if (readings.length > 0) {
+            setExerciseData(readings[0]);
+          }
+
+          if (LessonData) {
+            const updatedLessonData = {
+              ...LessonData,
+              readings: readings,
+            };
+            localStorage.setItem("current_lesson", JSON.stringify(updatedLessonData));
+          }
+        } else {
+          console.error("Failed to load reading practice from API.");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
-
-      console.log("Fetching data from API...");
-      const result = await readingPracticeService.getById(Number(id));
-      if (result.success && result.dataReading) {
-        const readings = result.dataReading;
-        setAllReadings(readings);
-
-        if (readings.length > 0) {
-          setExerciseData(readings[0]);
-        }
-
-        if (lessonData) {
-          const updatedLessonData = {
-            ...lessonData,
-            readings: readings,
-          };
-          localStorage.setItem(
-            "current_lesson",
-            JSON.stringify(updatedLessonData)
-          );
-        }
-      } else {
-        console.error("Failed to load reading practice from API.");
-      }
-
-      setLoading(false);
     };
 
     initializeData();
@@ -150,11 +152,10 @@ export default function ReadingPracticePage() {
                 <button
                   key={reading.id || index}
                   onClick={() => handleReadingSelect(index)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    currentReadingIndex === index
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentReadingIndex === index
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
                 >
                   {reading.title || `Reading ${index + 1}`}
                 </button>

@@ -1,14 +1,9 @@
 "use client";
 
-import ExerciseService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
-import TopicService from "@/lib/services/topic.service";
-import VocabularyService from "@/lib/services/vocabulary.service";
 import { Exercise } from "@/lib/types/exercise";
-import { set } from "lodash";
 import { useParams } from "next/navigation";
-import { use, useEffect, useRef, useState } from "react";
-import { OptionProps } from "react-select";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function ListeningPracticeDetailPage() {
@@ -26,7 +21,6 @@ export default function ListeningPracticeDetailPage() {
   const [completedCount, setCompletedCount] = useState(0);
 
   const audioRef = useRef<HTMLAudioElement>(null);
-  const exerciseService = new ExerciseService();
   const lessonService = new LessonService();
 
   // Fetch data
@@ -34,6 +28,22 @@ export default function ListeningPracticeDetailPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
+        const stored = localStorage.getItem("current_lesson");
+        let LessonData: any = {};
+
+        if (stored) {
+          try {
+            LessonData = JSON.parse(stored);
+            if (LessonData && LessonData.exercises?.length > 0) {
+              setExercises(LessonData.exercise);
+            }
+          } catch (e) {
+            console.error("Failed to parse lesson data from localStorage:", e);
+          }
+          setLoading(false);
+          return;
+        }
+
         const result = await lessonService.getById(Number(id));
         if (result.success) {
           const exercises = result.data?.exercises || [];
@@ -42,11 +52,10 @@ export default function ListeningPracticeDetailPage() {
           console.error("Failed to load listening practice from API.");
           toast.error("Failed to load exercises");
         }
+
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Error loading exercises");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -146,11 +155,10 @@ export default function ListeningPracticeDetailPage() {
       "w-full p-4 text-left border-2 rounded-xl transition-all duration-200 hover:shadow-md font-medium";
 
     if (!showResult) {
-      return `${baseStyle} ${
-        selectedOption === optionKey
-          ? "border-blue-500 bg-blue-50 shadow-md text-blue-700"
-          : "border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50"
-      }`;
+      return `${baseStyle} ${selectedOption === optionKey
+        ? "border-blue-500 bg-blue-50 shadow-md text-blue-700"
+        : "border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50"
+        }`;
     }
 
     // Show results
@@ -269,11 +277,10 @@ export default function ListeningPracticeDetailPage() {
             <div className="flex items-center justify-center">
               <button
                 onClick={handlePlay}
-                className={`flex items-center space-x-3 px-6 py-3 rounded-full font-medium transition-all duration-200 ${
-                  isPlaying
-                    ? "bg-red-500 hover:bg-red-600 text-white"
-                    : "bg-blue-500 hover:bg-blue-600 text-white"
-                } shadow-lg hover:shadow-xl transform hover:scale-105`}
+                className={`flex items-center space-x-3 px-6 py-3 rounded-full font-medium transition-all duration-200 ${isPlaying
+                  ? "bg-red-500 hover:bg-red-600 text-white"
+                  : "bg-blue-500 hover:bg-blue-600 text-white"
+                  } shadow-lg hover:shadow-xl transform hover:scale-105`}
               >
                 <span className="text-xl">{isPlaying ? "⏸️" : "🔊"}</span>
                 <span className="text-lg">
@@ -309,11 +316,10 @@ export default function ListeningPracticeDetailPage() {
           {/* Explanation */}
           {showExplanation && currentExercise.explanation && (
             <div
-              className={`p-4 rounded-xl border-l-4 ${
-                isCorrect
-                  ? "bg-green-50 border-green-400"
-                  : "bg-red-50 border-red-400"
-              }`}
+              className={`p-4 rounded-xl border-l-4 ${isCorrect
+                ? "bg-green-50 border-green-400"
+                : "bg-red-50 border-red-400"
+                }`}
             >
               <h3 className="font-semibold mb-2 text-gray-800">Explanation:</h3>
               <p className="text-gray-700">{currentExercise.explanation}</p>
