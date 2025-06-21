@@ -1,6 +1,6 @@
 export async function correctText(text: string): Promise<any> {
   try {
-    const response = await fetch('http://localhost:8001/correct', {
+    const response = await fetch('http://localhost:8007/correct', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

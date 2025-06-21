@@ -1,5 +1,6 @@
 import { useApi } from "../Api";
 import { Lesson } from "../types/lesson";
+import { SubmissionResponse } from "../types/submission";
 import { BaseService } from "./base.service";
 
 const api = useApi();
@@ -42,7 +43,7 @@ class SubmissionService extends BaseService<Lesson> {
   public async submitWritingExercise(
     exerciseId: string,
     content: string
-  ): Promise<ApiResponse<string>> {
+  ): Promise<ApiResponse<SubmissionResponse>> {
     try {
       // Sending JSON instead of FormData:
       const payload = {
@@ -55,7 +56,7 @@ class SubmissionService extends BaseService<Lesson> {
       if (res.status === 201 || res.status === 200) {
         return {
           success: true,
-          data: "Submission successful",
+          data: res.data as SubmissionResponse, // Return the actual response data from BE
         };
       } else {
         return {

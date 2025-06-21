@@ -2,12 +2,7 @@
 import { Editor, Extension, RawCommands } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
-
-export interface GrammarError {
-  orig: string;
-  corrected: string;
-  explanation: string;
-}
+import { GrammarError } from "@/lib/types/submission";
 
 const pluginKey = new PluginKey("grammarHighlight");
 

@@ -22,6 +22,7 @@ import {
   LuFileText,
   LuSave,
   LuEye,
+  LuTriangle,
 } from "react-icons/lu";
 import SubmissionService from "@/lib/services/submission.service";
 import { correctText } from "@/lib/services/writingCheck.service";
@@ -30,6 +31,7 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/lib/context/AuthContext";
 import "./style.css";
 import { GrammarHighlight } from "@/app/[locale]/components/tiptapExtensions/GrammarHighlight";
+import { GrammarError } from "@/lib/types/submission";
 
 export default function StudentWritingPracticePage() {
   const { "exercise-id": exerciseId } = useParams();
@@ -43,11 +45,13 @@ export default function StudentWritingPracticePage() {
   }
 
   const t = useTranslations("StudentWritingPractice");
-  const [exercise, setExercise] = useState<Exercise>(null);
+  const [exercise, setExercise] = useState<Exercise | null>(null);
   const [wordCount, setWordCount] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [grammarErrors, setGrammarErrors] = useState<GrammarError[]>([]);
+  const [isCheckingGrammar, setIsCheckingGrammar] = useState(false);
 
   const exerciseService = new ExerciseService();
   const submissionService = new SubmissionService();
@@ -87,8 +91,8 @@ export default function StudentWritingPracticePage() {
   }, [editor]);
 
   useEffect(() => {
-    if (!exerciseId) {
-      console.error("Exercise ID is required");
+    if (!exerciseId || Array.isArray(exerciseId)) {
+      console.error("Exercise ID is required and must be a string");
       return;
     }
 
@@ -97,21 +101,30 @@ export default function StudentWritingPracticePage() {
       .then((response) => {
         if (response.success) {
           setExercise(response.data);
-          editor?.commands.setContent(response.data.question);
+          if (response.data.question) {
+            editor?.commands.setContent(response.data.question);
+          }
         } else {
-          console.error("Failed to fetch exercise:", response.data);
+          console.error("Failed to fetch exercise:", response.message);
         }
       })
       .catch((error) => {
         console.error("Error fetching exercise:", error);
       });
-  }, []);
+  }, [exerciseId]);
 
   useEffect(() => {
     return () => {
       editor?.destroy();
     };
   }, [editor]);
+
+  // Update grammar errors in editor when grammarErrors state changes
+  useEffect(() => {
+    if (editor) {
+      editor.commands.updateGrammarErrors(grammarErrors);
+    }
+  }, [grammarErrors, editor]);
 
   const handleCheckGrammar = useCallback(async (content: string) => {
     return await correctText(content)
@@ -122,16 +135,27 @@ export default function StudentWritingPracticePage() {
 
     setIsSubmitting(true);
     const content = editor.getText();
-    debugger
+    
     try {
       const response = await submissionService.submitWritingExercise(
         exerciseId as string,
         content
       );
-      const resultCheck: any = await handleCheckGrammar(content);
-
+      console.log("Submission response:", response);
+      
+      // Extract grammar errors from BE response
+      let errors: GrammarError[] = [];
+      
+      if (response.success && response.data) {
+        // Check if response.data has note field with errors
+        if (typeof response.data === 'object' && response.data.note && Array.isArray(response.data.note.errors)) {
+          errors = response.data.note.errors;
+        }
+      }
+      
       // Update grammar highlight in editor
-      editor.commands.updateGrammarErrors(resultCheck.errors);
+      setGrammarErrors(errors);
+      editor.commands.updateGrammarErrors(errors);
 
       if (response.success) {
         toast.success(t("submissionSuccessful") || "Nộp bài thành công!");
@@ -148,10 +172,7 @@ export default function StudentWritingPracticePage() {
   }, [
     editor,
     isSubmitting,
-    handleCheckGrammar,
-    // submissionService,
-    // exercise.id,
-    // user.id,
+    exerciseId,
     t,
   ]);
 
@@ -463,15 +484,51 @@ export default function StudentWritingPracticePage() {
                 <LuCheck className="h-5 w-5 mr-2 text-green-600" />
                 Kiểm tra ngữ pháp
               </h3>
-              <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <LuEye className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500 mb-3">
-                  Tính năng kiểm tra ngữ pháp tự động
-                </p>
-                <button className="text-xs bg-gray-200 text-gray-600 px-3 py-1 rounded-full cursor-not-allowed">
-                  Sắp ra mắt
-                </button>
-              </div>
+              
+              {grammarErrors.length > 0 ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-red-600">
+                      {grammarErrors.length} lỗi ngữ pháp
+                    </span>
+                    <LuTriangle className="h-4 w-4 text-red-500" />
+                  </div>
+                  <div className="max-h-64 overflow-y-auto space-y-2">
+                    {grammarErrors.map((error, index) => (
+                      <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <div className="flex items-start space-x-2">
+                          <div className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-red-800">
+                              {error.message || "Lỗi ngữ pháp"}
+                            </p>
+                            {error.suggestion && (
+                              <p className="text-xs text-red-600 mt-1">
+                                Gợi ý: {error.suggestion}
+                              </p>
+                            )}
+                            {error.context && (
+                              <p className="text-xs text-gray-600 mt-1">
+                                Ngữ cảnh: "{error.context}"
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-green-50 rounded-lg p-4 text-center">
+                  <LuCheck className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                  <p className="text-sm text-green-700 font-medium mb-1">
+                    Không có lỗi ngữ pháp
+                  </p>
+                  <p className="text-xs text-green-600">
+                    Văn bản của bạn đã được kiểm tra
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Last Submission Card */}
