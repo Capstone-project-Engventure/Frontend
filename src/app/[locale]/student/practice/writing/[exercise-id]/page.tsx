@@ -5,7 +5,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useTranslations } from "next-intl";
-import { use, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import {
   LuBold,
   LuItalic,
@@ -24,9 +24,12 @@ import {
   LuEye,
 } from "react-icons/lu";
 import SubmissionService from "@/lib/services/submission.service";
+import { correctText } from "@/lib/services/writingCheck.service";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/lib/context/AuthContext";
+import "./style.css";
+import { GrammarHighlight } from "@/app/[locale]/components/tiptapExtensions/GrammarHighlight";
 
 export default function StudentWritingPracticePage() {
   const { "exercise-id": exerciseId } = useParams();
@@ -56,6 +59,9 @@ export default function StudentWritingPracticePage() {
         placeholder:
           t("placeholder_content") ||
           "Bắt đầu viết câu trả lời của bạn tại đây...",
+      }),
+      GrammarHighlight.configure({
+        errors: [],
       }),
     ],
     content: "\n\n\n",
@@ -101,18 +107,31 @@ export default function StudentWritingPracticePage() {
       });
   }, []);
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    return () => {
+      editor?.destroy();
+    };
+  }, [editor]);
+
+  const handleCheckGrammar = useCallback(async (content: string) => {
+    return await correctText(content)
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
     if (!editor || isSubmitting) return;
 
     setIsSubmitting(true);
-    const content = editor?.getHTML();
-
+    const content = editor.getText();
+    debugger
     try {
       const response = await submissionService.submitWritingExercise(
-        exercise.id,
-        user.id,
+        exerciseId as string,
         content
       );
+      const resultCheck: any = await handleCheckGrammar(content);
+
+      // Update grammar highlight in editor
+      editor.commands.updateGrammarErrors(resultCheck.errors);
 
       if (response.success) {
         toast.success(t("submissionSuccessful") || "Nộp bài thành công!");
@@ -126,7 +145,15 @@ export default function StudentWritingPracticePage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [
+    editor,
+    isSubmitting,
+    handleCheckGrammar,
+    // submissionService,
+    // exercise.id,
+    // user.id,
+    t,
+  ]);
 
   const handleSaveDraft = () => {
     // Implement save draft functionality
@@ -219,7 +246,7 @@ export default function StudentWritingPracticePage() {
             </div>
 
             {/* Editor Card */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200">
               {/* Toolbar */}
               <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
                 <div className="flex flex-wrap gap-1 items-center">
@@ -353,10 +380,10 @@ export default function StudentWritingPracticePage() {
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  <div className="p-4">
+                  <div className="p-4 text-black outline-none border-0 h-[384px]">
                     <EditorContent
                       editor={editor}
-                      className="prose prose-sm max-w-none focus:outline-none"
+                      className="prose prose-sm max-w-none outline-none h-[384px]"
                     />
                   </div>
                 </div>
@@ -381,7 +408,7 @@ export default function StudentWritingPracticePage() {
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={handleSaveDraft}
-                      className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                     >
                       <LuSave className="h-4 w-4 mr-2" />
                       Lưu nháp
@@ -390,7 +417,7 @@ export default function StudentWritingPracticePage() {
                     <button
                       onClick={handleSubmit}
                       disabled={isSubmitting || wordCount === 0}
-                      className="flex items-center px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
+                      className="flex items-center px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg  cursor-pointer"
                     >
                       {isSubmitting ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
