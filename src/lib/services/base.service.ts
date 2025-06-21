@@ -5,7 +5,7 @@ const api = useApi();
 const defaultConfig = {
     headers: {
       'Content-Type': 'application/json',
-    },  
+    },
   };
 
 export abstract class BaseService<T> {
@@ -73,7 +73,7 @@ export abstract class BaseService<T> {
   }
 
   public async getById(id: string | number): Promise<GetSingleResult<T>> {
-    const res = await api.get(`${this.endpoint}/${id}`);
+    const res = await api.get(`${this.endpoint}/${id}?type=reading_practice`);
     if (res.status === 200) {
       return {
         success: true,

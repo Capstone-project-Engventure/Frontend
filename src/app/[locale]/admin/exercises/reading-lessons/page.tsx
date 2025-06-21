@@ -1,6 +1,6 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
-// import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
+import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
 import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
@@ -17,7 +17,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter, usePathname } from "next/navigation";
-import AdvancedDataTable from "@/app/[locale]/components/table/PaginationTable";
 
 export default function AdminReading() {
   const router = useRouter();
@@ -136,10 +135,8 @@ export default function AdminReading() {
     if (lesson) filters.lesson = lesson.value;
     const res = await lessonService.getAll({ page, pageSize: 10, filters });
     if (res.success) {
-      setLessons(
-        res.data.map((v: any) => ({ value: v.id, label: v.title }))
-      );
-      setTotalPage(res?.pagination?.total_page ?? 1);
+      setLesson(res.data);
+      setTotalPage(res.total_page);
     } else {
       toast.error("Failed to fetch lesson");
     }
@@ -201,9 +198,9 @@ export default function AdminReading() {
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
-      <AdvancedDataTable
+      <PaginationTable
         filterComponents={filterComponents}
-        customObjects={lessons}
+        customObjects={lesson}
         customTotalPages={totalPage}
         fields={fields}
         page={page}
@@ -212,6 +209,8 @@ export default function AdminReading() {
         linkBase={`/${locale}/admin/exercises/reading-lessons/readings`}
         breadcrumbs={breadcrumbs}
         modalFields={modalFields}
+        onHandleFile={onHandleFile}
+        hasBreadcrumb={false}
         hasCustomFetch={true}
         onEdit={onEdit}
       />

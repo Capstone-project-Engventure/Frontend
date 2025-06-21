@@ -27,6 +27,14 @@ class OAuthService {
     if (access_token && refresh_token) {
       // Set token in cookie
       saveTokenCookies(access_token, refresh_token, rememberMe, email);
+      
+      // Store remember me preference
+      Cookies.set("rememberMe", rememberMe.toString(), {
+        expires: rememberMe ? 30 : 7,
+        secure: process.env.NEXT_PUBLIC_PRODUCTION === "production",
+        sameSite: "lax",
+        path: "/",
+      });
 
       return { access_token, refresh_token };
     } else {
@@ -63,6 +71,7 @@ class OAuthService {
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         Cookies.remove("email");
+        Cookies.remove("rememberMe");
 
         window.location.href = "/";
       } else {
@@ -70,7 +79,25 @@ class OAuthService {
       }
     } catch (err) {
       console.error("Error during logout:", err);
+      // Even if API call fails, clear local cookies
+      Cookies.remove("access_token");
+      Cookies.remove("refresh_token");
+      Cookies.remove("email");
+      Cookies.remove("rememberMe");
+      window.location.href = "/";
     }
+  }
+
+  // Check if user is currently logged in
+  isLoggedIn(): boolean {
+    const accessToken = Cookies.get("access_token");
+    const refreshToken = Cookies.get("refresh_token");
+    return !!(accessToken && refreshToken);
+  }
+
+  // Get current user's remember me preference
+  getRememberMePreference(): boolean {
+    return Cookies.get("rememberMe") === "true";
   }
 }
 

@@ -16,7 +16,7 @@ interface PaginationTableProps {
   service?: any;
   page: number;
   onPageChange: (page: number) => void;
-  
+
   // Optional customization
   keyField?: string;
   customObjects?: any[];
@@ -27,7 +27,7 @@ interface PaginationTableProps {
   breadcrumbs?: { label: string; href?: string }[];
   hasImport?: boolean;
   hasCustomFetch?: boolean;
-  
+
   // Event handlers
   onAdd?: (data: any) => void;
   onUpdate?: (id: string | number, data: any) => void;
@@ -58,15 +58,17 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
   onCreate,
   onSuccess
 }) => {
+  console.log(123);
+
   // Search and filter state
   const [keyword, setKeyword] = useState("");
   const [sortKey, setSortKey] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  
+
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState<any>(null);
-  
+
   // Custom hooks
   const { objects, totalPages, isLoading, refetch } = useTableData({
     service,
@@ -78,7 +80,7 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
     sortKey,
     sortOrder
   });
-  
+
   const { selectedItems, handleCheckboxChange, toggleSelectAll, clearSelection } = useTableSelection();
 
   const handleSort = (key: string) => {
@@ -112,7 +114,7 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
     e.preventDefault();
     // Handle form submission logic here
     console.log('Form submitted:', formData);
-    
+
     try {
       let response;
       if (formData?.id) {
@@ -124,7 +126,7 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
           ? await onAdd(formData)
           : await service?.create(formData);
       }
-      
+
       if (response?.success) {
         setIsModalOpen(false);
         refetch();
