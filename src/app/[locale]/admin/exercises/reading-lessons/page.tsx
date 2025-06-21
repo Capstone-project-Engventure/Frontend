@@ -1,6 +1,6 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
-import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
+// import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter, usePathname } from "next/navigation";
+import AdvancedDataTable from "@/app/[locale]/components/table/PaginationTable";
 
 export default function AdminReading() {
   const router = useRouter();
@@ -201,8 +202,8 @@ export default function AdminReading() {
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
       <AdvancedDataTable
-        // filterComponents={filterComponents}
-        // customObjects={[]}
+        filterComponents={filterComponents}
+        customObjects={lessons}
         customTotalPages={totalPage}
         fields={fields}
         page={page}
