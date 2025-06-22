@@ -1,4 +1,5 @@
 // Performance monitoring utilities
+import React from 'react';
 
 export class PerformanceMonitor {
   private static instance: PerformanceMonitor;
@@ -81,39 +82,6 @@ export const usePerformanceMonitor = () => {
     measureAsync: monitor.measureAsync.bind(monitor),
     logBundleInfo: monitor.logBundleInfo.bind(monitor)
   };
-};
-
-// HOC for measuring component performance
-export const withPerformanceMonitoring = <P extends object>(
-  Component: React.ComponentType<P>,
-  componentName?: string
-) => {
-  const WrappedComponent = (props: P) => {
-    const monitor = PerformanceMonitor.getInstance();
-    const name = componentName || Component.displayName || Component.name || 'Unknown';
-    
-    return monitor.measureComponent(name, () => <Component {...props} />);
-  };
-
-  WrappedComponent.displayName = `withPerformanceMonitoring(${componentName || Component.displayName || Component.name})`;
-  return WrappedComponent;
-};
-
-// Utility to detect slow components
-export const detectSlowComponents = () => {
-  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
-        if (entry.duration > 100) { // Components taking more than 100ms
-          console.warn(`🐌 Slow component detected: ${entry.name} took ${entry.duration.toFixed(2)}ms`);
-        }
-      });
-    });
-
-    observer.observe({ entryTypes: ['measure'] });
-    return observer;
-  }
-  return null;
 };
 
 // Memory usage monitoring

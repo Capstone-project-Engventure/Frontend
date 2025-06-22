@@ -6,7 +6,6 @@
     "dev": "next dev --turbopack",
     "dev:fast": "next dev --turbopack --experimental-https",
     "build": "next build",
-    "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",

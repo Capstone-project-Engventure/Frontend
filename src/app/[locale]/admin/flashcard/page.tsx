@@ -63,20 +63,21 @@ const AdminFlashcardManager = () => {
     }
   ];
 
-  const DifficultyBadge = ({ level }) => {
-    const colors = {
-      1: 'bg-green-100 text-green-800',
-      2: 'bg-blue-100 text-blue-800',
-      3: 'bg-yellow-100 text-yellow-800',
-      4: 'bg-orange-100 text-orange-800',
-      5: 'bg-red-100 text-red-800'
-    };
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[level]}`}>
-        Level {level}
-      </span>
-    );
-  };
+//   type DifficultyLevel = 1 | 2 | 3 | 4 | 5;
+//   const DifficultyBadge = ({ level }:Record<DifficultyLevel, string>) => {
+//     const colors = {
+//       1: 'bg-green-100 text-green-800',
+//       2: 'bg-blue-100 text-blue-800',
+//       3: 'bg-yellow-100 text-yellow-800',
+//       4: 'bg-orange-100 text-orange-800',
+//       5: 'bg-red-100 text-red-800'
+//     };
+//     return (
+//       <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[level]}`}>
+//         Level {level}
+//       </span>
+//     );
+//   };
 
   const FlashcardTable = () => (
     <div className="bg-white rounded-lg shadow">
@@ -167,9 +168,9 @@ const AdminFlashcardManager = () => {
                 <td className="px-6 py-4">
                   <span className="text-sm text-gray-900">{card.setName}</span>
                 </td>
-                <td className="px-6 py-4">
+                {/* <td className="px-6 py-4">
                   <DifficultyBadge level={card.difficulty} />
-                </td>
+                </td> */}
                 <td className="px-6 py-4">
                   <div className="text-sm">
                     <div className="text-gray-900">{card.viewCount} lượt xem</div>
@@ -179,10 +180,10 @@ const AdminFlashcardManager = () => {
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
                     {card.hasAudio && (
-                      <Volume2 className="w-4 h-4 text-blue-500" title="Có âm thanh" />
+                      <Volume2 className="w-4 h-4 text-blue-500" />
                     )}
                     {card.hasImage && (
-                      <Eye className="w-4 h-4 text-green-500" title="Có hình ảnh" />
+                      <Eye className="w-4 h-4 text-green-500"/>
                     )}
                   </div>
                 </td>
