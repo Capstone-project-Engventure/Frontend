@@ -3,9 +3,9 @@ import useGrammarStore from "@/lib/store/grammarStore";
 import useListeningStore from "@/lib/store/listeningStore";
 
 const resetAllStores = () => {
-    useReadingStore.setState({ lessons: [], hasFetched: false });
-    useGrammarStore.setState({ lessons: [], hasFetched: false });
-    useListeningStore.setState({ lessons: [], hasFetched: false });
+    useReadingStore.getState().reset();
+    useGrammarStore.getState().reset();
+    useListeningStore.getState().reset();
 
     localStorage.removeItem("current-lesson");
 };
