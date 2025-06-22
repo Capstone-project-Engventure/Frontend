@@ -2,6 +2,7 @@ export type Topic = {
     id: number,
     title: string,
     description: string,
-    level: string,
-    order: number
+    category?: string, // Category/skill type (reading, grammar, etc.)
+    level?: string,
+    order?: number
 };

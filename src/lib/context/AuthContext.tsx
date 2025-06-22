@@ -53,13 +53,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     refreshToken: string;
   }) => {
     // if (!accessToken) return;
-    const decoded = jwtDecode(accessToken);
-    const { sub, iat, exp, nbf, scope } = decoded;
+    const decoded = jwtDecode<DecodedToken>(accessToken);
+    const { sub, iat, exp } = decoded;
     // console.log("decoded: ", decoded);
 
-    const scopes = Array.isArray(decoded.scope)
+    const scopes = Array.isArray(decoded?.scope)
       ? decoded.scope
-      : decoded.scope?.split(" ") || [];
+      : typeof decoded.scope === "string"
+        ? decoded.scope.split(" ")
+        : [];
     console.log("scopes", scopes);
     let role = "user";
     if (scopes.includes("admin")) {

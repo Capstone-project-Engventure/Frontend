@@ -5,14 +5,7 @@ import React, { use, useEffect, useState } from "react";
 import ExerciseCard from "@/app/[locale]/components/ExerciseCard";
 import { useApi } from "@/lib/Api";
 import { useParams } from "next/navigation";
-
-type Exercise = {
-  id: number;
-  name: string;
-  question: string;
-  description: string;
-  options: Record<string, string> | string[] | null;
-};
+import { Exercise } from "@/lib/types/exercise";
 
 type Lesson = {
   id: string;
@@ -20,6 +13,7 @@ type Lesson = {
   description: string;
   exercises: Exercise[];
 };
+
 export default function LessonPage() {
   const api = useApi();
   const { id: lessonId } = useParams();
@@ -35,7 +29,7 @@ export default function LessonPage() {
       const saved = localStorage.getItem(cacheKey);
       if (saved) {
         const lessons: Lesson[] = JSON.parse(saved);
-        const found = lessons.find((l) => l.id === Number(lessonId));
+        const found = lessons.find((l) => String(l.id) === String(lessonId));
         if (found) {
           setLesson(found);
           return;
@@ -50,6 +44,7 @@ export default function LessonPage() {
             exercises: res.data.exercises.map((ex: any) => ({
               ...ex,
               id: Number(ex.id),
+              options: ex.options || [],
             })),
           };
           setLesson(fetched);

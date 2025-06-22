@@ -24,7 +24,7 @@ const WritingExercises = () => {
           console.log("Fetched exercises:", response.data);
           setExercises(response.data);
         } else {
-          console.error("Failed to fetch exercises:", response.data);
+          console.error("Failed to fetch exercises:", response.error);
         }
       } catch (error) {
         console.error("Error fetching exercises:", error);

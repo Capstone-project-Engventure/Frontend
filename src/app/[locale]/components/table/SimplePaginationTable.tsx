@@ -39,7 +39,10 @@ const SimplePaginationTable: React.FC<SimplePaginationTableProps> = ({
 
   // Render cell content dựa trên type của field
   const renderCellContent = (item: any, field: Field) => {
-    const value = field.isNest ? item[field.key]?.[field.nestKey] : item[field.key];
+    const value =
+      field.isNest && field.nestKey !== undefined
+        ? item[field.key]?.[field.nestKey]
+        : item[field.key];
 
     if (!value) return <span>-</span>;
 
@@ -204,4 +207,4 @@ const SimplePaginationTable: React.FC<SimplePaginationTableProps> = ({
   );
 };
 
-export default SimplePaginationTable;F
+export default SimplePaginationTable;

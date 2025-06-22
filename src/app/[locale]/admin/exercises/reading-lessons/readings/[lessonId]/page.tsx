@@ -133,21 +133,24 @@ export default function AdminReading() {
     })();
   }, []);
 
-  useEffect(() => {
-    const fetchLesson = async () => {
-      try {
-        const res = await lessonService.getById(lessonId as string);
-        if (res.success) {
-          console.log(res);
-          setReadings(res.data?.readings || []);
-        } else {
-          toast.error("Failed to fetch lesson");
-        }
-      } catch (error) {
-        console.error("Error fetching lesson:", error);
-        toast.error("An error occurred while fetching lesson");
+
+  const fetchLesson = async () => {
+    try {
+      const res = await lessonService.getById(lessonId as string);
+      if (res.success) {
+        console.log(res);
+        setReadings(res.data?.readings || []);
+      } else {
+        toast.error("Failed to fetch lesson");
       }
-    };
+    } catch (error) {
+      console.error("Error fetching lesson:", error);
+      toast.error("An error occurred while fetching lesson");
+    }
+  };
+
+  useEffect(() => {
+    
 
     if (lessonId) {
       fetchLesson();
@@ -221,7 +224,6 @@ export default function AdminReading() {
         page={page}
         onPageChange={onPageChange}
         service={exerciseService}
-        // breadcrumbs={breadcrumbs}
         modalFields={modalFields}
         onHandleFile={onHandleFile}
         hasBreadcrumb={false}

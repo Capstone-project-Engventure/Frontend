@@ -1,6 +1,6 @@
 import { useApi } from "../Api";
 import { Lesson } from "../types/lesson";
-import { Reading } from "../types/Reading";
+import { Reading } from "../types/reading";
 import { BaseService } from "./base.service";
 
 const api = useApi();

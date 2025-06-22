@@ -7,6 +7,7 @@ export type Sound = {
     duration: number;
     sound_audio:string;
     word_audio:string;
+    type:string;
     createdAt: Date;
     updatedAt: Date;
 };

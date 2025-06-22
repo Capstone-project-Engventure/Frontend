@@ -6,6 +6,9 @@ export type Submission = {
 };
 
 export type GrammarError = {
+    context: any;
+    suggestion: any;
+    message: string;
     type: string;
     orig: string;
     corrected: string;

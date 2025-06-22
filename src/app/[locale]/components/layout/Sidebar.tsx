@@ -52,11 +52,29 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
     }
   }, []);
 
+  // Helper function to check if current path exactly matches or is a child of the given path
+  const isActiveLink = (linkHref: string, hasChildren: boolean = false) => {
+    if (!pathname) return false;
+    
+    // For exact match without children
+    if (!hasChildren) {
+      return pathname === linkHref;
+    }
+    
+    // For parent items with children, only active if exactly matches
+    return pathname === linkHref;
+  };
+
+  // Helper function to check if any child is active
+  const hasActiveChild = (children: any[]) => {
+    return children?.some(child => pathname === child.href) || false;
+  };
+
   const mainNavItems = [
     {
       label: t("dashboard"),
       icon: MdOutlineBarChart,
-      href: `${basePath}/${role === "admin" ? "dashboard" : "statistic"}`,
+      href: `${basePath}/${role === "admin" ? "home" : ""}`,
     },
     {
       label: t(role === "admin" ? "courses" : "myCourses"),
@@ -178,6 +196,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
       href: `${basePath}/my-note`,
     },
   ];
+  
   useEffect(() => {
     console.log("pathname: ", pathname);
   }, [pathname]);
@@ -185,162 +204,162 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
   return (
     <div>
       <aside
-        className={`bg-white shadow-md p-4 transition-all duration-300 h-full ${
-          toggleSidebar ? "w-64" : "w-28"
+        className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 h-full ${
+          toggleSidebar ? "w-72" : "w-20"
         }`}
       >
-        <nav className="flex flex-col gap-4">
-          <div className="flex flex-row gap-4 items-center justify-center">
-            <Image
-              src="/engventure-logo.svg"
-              width={60}
-              height={60}
-              alt="Logo"
-            />
-            <span
-              className={`text-xl font-bold text-amber-500 ${
-                toggleSidebar ? "" : "hidden"
-              }`}
-            >
-              EngVenture
-            </span>
+        <nav className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex flex-row items-center justify-between p-4 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/engventure-logo.svg"
+                width={40}
+                height={40}
+                alt="Logo"
+                className="shrink-0"
+              />
+              <span
+                className={`text-lg font-bold text-amber-500 transition-opacity duration-300 ${
+                  toggleSidebar ? "opacity-100" : "opacity-0 w-0"
+                }`}
+              >
+                EngVenture
+              </span>
+            </div>
 
             <button
               type="button"
-              className="p-2 bg-gray-200 text-black rounded-md"
+              className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors duration-200 shrink-0"
               onClick={() => setToggleSidebar((prev) => !prev)}
             >
-              {toggleSidebar ? <MdArrowBackIosNew /> : <MdArrowForwardIos />}
+              {toggleSidebar ? <MdArrowBackIosNew size={16} /> : <MdArrowForwardIos size={16} />}
             </button>
           </div>
 
-          {/* Main Nav */}
-          <div className="min-h-screen">
-            <div className="flex p-2 justify-center items-center">
-              {isAdmin ? (
-                <Link href="/admin/home">
-                  <span className="font-bold">Admin Dashboard</span>
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto py-4">
+            {/* Admin Dashboard Link */}
+            {isAdmin && (
+              <div className="px-4 mb-4">
+                <Link 
+                  href="/admin/home"
+                  className="flex items-center justify-center p-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors duration-200"
+                >
+                  <span className={toggleSidebar ? "" : "hidden"}>Admin Dashboard</span>
+                  {!toggleSidebar && <MdOutlineBarChart size={20} />}
                 </Link>
-              ) : (
-                <span></span>
-              )}
-            </div>
+              </div>
+            )}
 
-            {mainNavItems.map((item, index) => {
-              const Icon = item.icon;
-              const isActive = pathname?.startsWith(item.href);
-              return (
-                <div
-                  className={`px-2 py-2 ${
-                    isActive ? "bg-blue-100 rounded-md" : ""
-                  }`}
-                  key={index}
-                  data-tooltip-target="tooltip-no-arrow"
-                >
-                  <Link
-                    href={item.href}
-                    className="grid grid-cols-3 hover:text-blue-600 justify-between"
-                  >
-                    <Icon className="w-6 h-6 col-span-1 text-black" />
-                    <span
-                      className={`text-black col-span-2 ${
-                        toggleSidebar ? "" : "hidden"
-                      }`}
-                    >
-                      {item.label}
-                    </span>
-                  </Link>
-                  <div
-                    id="tooltip-no-arrow"
-                    role="tooltip"
-                    className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700"
-                  >
-                    {item.label}
-                  </div>
-                </div>
-              );
-            })}
-            <p className={`font-bold ${toggleSidebar ? "" : "hidden"}`}>
-              Learning corner
-            </p>
-            {learnNavItems.map((item:any, index) => {
-              const Icon = item.icon;
-              const isActive = pathname?.startsWith(item.href);
-              return (
-                <div
-                  key={index}
-                  className={`px-2 py-2 ${
-                    isActive ? "bg-blue-100 rounded-md" : ""
-                  }`}
-                >
-                  {/* Render parent item */}
-                  {item.href ? (
+            {/* Main Navigation */}
+            <div className="space-y-1 px-3">
+              {mainNavItems.map((item, index) => {
+                const Icon = item.icon;
+                const isActive = isActiveLink(item.href);
+                return (
+                  <div key={index}>
                     <Link
                       href={item.href}
-                      className="grid grid-cols-3 hover:text-blue-600 justify-between"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                        isActive 
+                          ? "bg-blue-100 text-blue-700 font-medium shadow-sm" 
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
                     >
-                      {Icon && (
-                        <Icon className="w-6 h-6 col-span-1 text-black" />
-                      )}
-                      <span
-                        className={`col-span-2 ${
-                          toggleSidebar ? "" : "hidden"
-                        }`}
-                      >
+                      <Icon className={`shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'}`} size={20} />
+                      <span className={`transition-opacity duration-300 ${toggleSidebar ? "opacity-100" : "opacity-0 w-0"}`}>
                         {item.label}
                       </span>
                     </Link>
-                  ) : (
-                    <div
-                      className="grid grid-cols-3 cursor-pointer hover:text-blue-600"
-                      onClick={() => setIsPracticeOpen((prev) => !prev)}
-                    >
-                      <div className="col-span-1 font-semibold">
-                        {Icon && (
-                          <Icon className="w-6 h-6 col-span-1 text-black" />
-                        )}
-                      </div>
-                      <div className="flex flex-row col-span-2 gap-2">
-                        <span
-                          className={`col-span-2 ${
-                            toggleSidebar ? "" : "hidden"
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Learning Corner Section */}
+            <div className="mt-6">
+              <div className={`px-6 py-2 ${toggleSidebar ? "" : "hidden"}`}>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Learning Corner
+                </h3>
+              </div>
+              
+              <div className="space-y-1 px-3 mt-3">
+                {learnNavItems.map((item: any, index) => {
+                  const Icon = item.icon;
+                  const isActive = item.href ? isActiveLink(item.href) : hasActiveChild(item.children);
+                  
+                  return (
+                    <div key={index}>
+                      {/* Parent item */}
+                      {item.href ? (
+                        <Link
+                          href={item.href}
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                            isActive 
+                              ? "bg-blue-100 text-blue-700 font-medium shadow-sm" 
+                              : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           }`}
                         >
-                          {item.label}
-                        </span>
-                        <div className="flex flex-row left-auto">
-                          <MdArrowDropDown className="w-6 h-6" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Render children if they exist */}
-                  {item.children && isPracticeOpen && (
-                    <div className="ml-6 mt-2 space-y-1 text-sm text-gray-700">
-                      {item.children.map((child:any, childIndex:any) => {
-                        const isChildActive = pathname?.startsWith(child.href);
-                        const ChildIcon = child.icon;
-                        return (
-                          <Link
-                            key={childIndex}
-                            href={child.href}
-                            className={`flex items-center gap-2 p-2 rounded-md transition duration-150 ${
-                              isChildActive
-                                ? "bg-blue-200 text-blue-800 font-medium"
-                                : "hover:bg-gray-100 text-gray-800"
-                            } ${toggleSidebar ? "" : "hidden"}`}
+                          <Icon className={`shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'}`} size={20} />
+                          <span className={`transition-opacity duration-300 ${toggleSidebar ? "opacity-100" : "opacity-0 w-0"}`}>
+                            {item.label}
+                          </span>
+                        </Link>
+                      ) : (
+                        <div>
+                          <button
+                            className={`flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                              isActive 
+                                ? "bg-blue-50 text-blue-700" 
+                                : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                            }`}
+                            onClick={() => setIsPracticeOpen((prev) => !prev)}
                           >
-                            {ChildIcon && <ChildIcon className="w-5 h-5" />}
-                            <span>{child.label}</span>
-                          </Link>
-                        );
-                      })}
+                            <div className="flex items-center gap-3">
+                              <Icon className={`shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'}`} size={20} />
+                              <span className={`transition-opacity duration-300 ${toggleSidebar ? "opacity-100" : "opacity-0 w-0"}`}>
+                                {item.label}
+                              </span>
+                            </div>
+                            {toggleSidebar && (
+                              <div className="shrink-0">
+                                {isPracticeOpen ? <MdArrowDropUp size={20} /> : <MdArrowDropDown size={20} />}
+                              </div>
+                            )}
+                          </button>
+
+                          {/* Children */}
+                          {item.children && isPracticeOpen && toggleSidebar && (
+                            <div className="mt-1 space-y-1">
+                              {item.children.map((child: any, childIndex: any) => {
+                                const isChildActive = isActiveLink(child.href);
+                                const ChildIcon = child.icon;
+                                return (
+                                  <Link
+                                    key={childIndex}
+                                    href={child.href}
+                                    className={`flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg transition-all duration-200 group ${
+                                      isChildActive
+                                        ? "bg-blue-100 text-blue-700 font-medium shadow-sm"
+                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                    }`}
+                                  >
+                                    <ChildIcon className={`shrink-0 ${isChildActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} size={16} />
+                                    <span className="text-sm">{child.label}</span>
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </nav>
       </aside>

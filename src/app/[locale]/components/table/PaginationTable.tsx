@@ -47,7 +47,7 @@ interface Field {
 }
 
 interface PaginationTableProps {
-  customObjects?: [];
+  customObjects?: any[];
   customTotalPages?: number;
   fields: Field[];
   keyField?: string;
@@ -280,9 +280,9 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
           // If the value is a URL, append it directly
           form.append(key, value);
         } else if (value !== null && value !== undefined && value !== "") {
-          form.append(key, value);
+          form.append(key, typeof value === "object" ? "" : value as string | Blob);
         } else {
-          form.append(key, value);
+          form.append(key, value === null || value === undefined ? "" : (typeof value === "object" ? "" : value as string | Blob));
         }
       });
       dataToSend = form;
@@ -414,7 +414,11 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                     onClose={() => {
                       setIsFileModalOpen(false);
                     }}
-                    onHandleFile={onHandleFile}
+                    onHandleFile={
+                      onHandleFile
+                        ? async (file: File) => { await onHandleFile(file); }
+                        : async () => {}
+                    }
                   />
                 </>
               ) : (
@@ -496,7 +500,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                           ) : f.type === "audio" && item[f.key] ? (
                             <AudioPlayer src={item[f.key]} />
                           ) : f.isNest && item[f.key] ? (
-                            <span>{item[f.key]?.[f.nestKey]}</span>
+                            <span>{item[f.key]?.[f.nestKey!]}</span>
                           ) : f.type === "mcq" &&
                             item[f.key] &&
                             Array.isArray(item[f.key]) ? (
@@ -606,6 +610,34 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                   if (field.type === "mcq") {
                     return null;
                   }
+                  if (field.type === "checkbox" && field.choices) {
+                    return (
+                      <div key={field.key} className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {field.label}
+                        </label>
+                        {field.choices.map((opt: string) => (
+                          <div key={opt} className="flex items-center mb-1">
+                            <input
+                              type="checkbox"
+                              id={`${field.key}-${opt}`}
+                              className="mr-2"
+                                                              onChange={(e) => {
+                                  setFormData((prev: any) => ({
+                                    ...prev,
+                                    [field.key]: {
+                                      ...prev[field.key],
+                                      [opt]: e.target.value,
+                                    },
+                                  }));
+                                }}
+                            />
+                            <label htmlFor={`${field.key}-${opt}`} className="mr-2">{opt}</label>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
                   return (
                     <div key={field.key} className="mb-4">
                       <label className="block text-sm font-medium text-gray-700">
@@ -645,24 +677,24 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                       ) : field.type === "mcq" ? (
                         <>
                           {Array.from(formData.options || []).map(
-                            (opt, index) => {
+                            (opt: any, index: number) => {
                               return (
                                 <div
-                                  key={opt?.key}
+                                  key={opt?.key || index}
                                   className="flex items-center mb-2"
                                 >
-                                  <label className="mr-2">{opt?.key}</label>
+                                  <label className="mr-2">{opt?.key || `Option ${index + 1}`}</label>
                                   <input
-                                    key={opt?.key}
+                                    key={opt?.key || index}
                                     type="text"
-                                    placeholder={`Option ${opt}`}
-                                    value={formData.options[index].option || ""}
+                                    placeholder={`Option ${opt?.key || index + 1}`}
+                                    value={formData.options?.[index]?.option || ""}
                                     onChange={(e) =>
                                       setFormData({
                                         ...formData,
                                         options: {
                                           ...(formData.options || {}),
-                                          [opt]: e.target.value,
+                                          [opt?.key || index]: e.target.value,
                                         },
                                       })
                                     }
@@ -778,7 +810,9 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
               <button
                 onClick={() => {
                   setDialogIsOpen(false);
-                  handleDelete(selectedItem);
+                  if (selectedItem) {
+                    handleDelete(selectedItem);
+                  }
                 }}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >

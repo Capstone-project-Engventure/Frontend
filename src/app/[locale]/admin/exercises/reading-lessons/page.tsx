@@ -30,6 +30,8 @@ export default function AdminReading() {
 
   const [topics, setTopics] = useState<OptionType[]>([]);
   const [lessons, setLessons] = useState<OptionType[]>([]);
+  const [readingLessons, setReadingLessons] = useState<Lesson[]>([]);
+
   const [exerciseTypes, setExerciseTypes] = useState<OptionType[]>([]);
 
   const [topic, setTopic] = useState<OptionType | null>(null);
@@ -135,8 +137,8 @@ export default function AdminReading() {
     if (lesson) filters.lesson = lesson.value;
     const res = await lessonService.getAll({ page, pageSize: 10, filters });
     if (res.success) {
-      setLesson(res.data);
-      setTotalPage(res.total_page);
+      setReadingLessons(res.data);
+      setTotalPage(res.pagination?.total_page || 1);
     } else {
       toast.error("Failed to fetch lesson");
     }
@@ -200,7 +202,7 @@ export default function AdminReading() {
       <Breadcrumb items={breadcrumbs} />
       <PaginationTable
         filterComponents={filterComponents}
-        customObjects={lesson}
+        customObjects={readingLessons}
         customTotalPages={totalPage}
         fields={fields}
         page={page}

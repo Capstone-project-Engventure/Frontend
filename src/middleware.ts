@@ -142,5 +142,5 @@ function validateJwtToken(token: string) {
 }
 
 // 1. Specify protected and public routes
-const protectedRoutes = ["/dashboard"];
+const protectedRoutes = ["/home"];
 const publicRoutes = ["/login", "/signup", "/"];
