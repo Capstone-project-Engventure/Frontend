@@ -98,15 +98,15 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
       label: t(role === "admin" ? "exercises" : "practice"),
       icon: TbNotes,
       children: [
-        ...(role === "admin"
-          ? [
-              {
-                label: t("allExercises"),
-                href: `${basePath}/exercises`,
-                icon: MdLibraryBooks,
-              },
-            ]
-          : []),
+        // ...(role === "admin"
+        //   ? [
+        //       {
+        //         label: t("allExercises"),
+        //         href: `${basePath}/exercises`,
+        //         icon: MdLibraryBooks,
+        //       },
+        //     ]
+        //   : []),
         {
           label: t("reading"),
           href: `${basePath}/${

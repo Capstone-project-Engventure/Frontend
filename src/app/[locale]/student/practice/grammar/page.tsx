@@ -1,20 +1,15 @@
 "use client";
+
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
 import FilterCard from "@/app/[locale]/components/card/FilterCard";
 import LessonCard from "@/app/[locale]/components/card/LessonCard";
 import PaginationCard from "@/app/[locale]/components/card/PaginationCard";
-import LessonService from "@/lib/services/lesson.service";
-import TopicService from "@/lib/services/topic.service";
-import useReadingStore from "@/lib/store/readingStore";
-import useListenStore from "@/lib/store/useListeningStore";
+import grammarPracticeService from "@/lib/services/student/grammar-practice.service";
+import useGrammarStore from "@/lib/store/grammarStore";
 import { Lesson } from "@/lib/types/lesson";
-import { Topic } from "@/lib/types/topic";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
 
-import { useRouter } from "next/navigation";
 const ITEMS_PER_PAGE = 6;
 
 const LEVEL_ORDER = [
@@ -31,10 +26,8 @@ type PageMap = Record<string, number>;
 
 const GrammarPracticeList: React.FC = () => {
   const locale = useLocale();
-  const t = useTranslations("GrammarPractice");
-  const router = useRouter();
-  const lessonService = new LessonService();
-  const { lessons, setLessons, hasFetched, setHasFetched } = useListenStore();
+  const t = useTranslations("LessonPractice");
+  const { lessons, setLessons, hasFetched, setHasFetched, hasHydrated } = useGrammarStore();
   const [currentPages, setCurrentPages] = useState<PageMap>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -45,35 +38,35 @@ const GrammarPracticeList: React.FC = () => {
   const breadcrumbs = [
     { label: t("breadcrumbs.home"), href: "#" },
     {
-      label: t("breadcrumbs.readingPractice"),
+      label: t("breadcrumbs.grammarPractice"),
       href: `/${locale}/student/practice/grammar`,
     },
   ];
 
   useEffect(() => {
+    if (!hasHydrated || hasFetched) return;
+
     const fetchLessons = async () => {
       setIsLoading(true);
-      const result = await lessonService.getAllGrammarLessons();
-      if (result.status === 200) {
+      const result = await grammarPracticeService.getAllGrammarPractices();
+      if (result.success && result.data) {
         setLessons(result.data);
-        setHasFetched(true);
+      } else {
+        setLessons([]);
       }
+      setHasFetched(true);
       setIsLoading(false);
     };
 
-    // Chỉ fetch khi *chưa* fetch lần nào **và** chưa có lessons
-    if (!hasFetched && lessons.length === 0) {
-      fetchLessons();
-    }
-  }, [hasFetched, lessons.length]);
+    fetchLessons();
+  }, [hasHydrated, hasFetched, setHasFetched, setLessons]);
 
-  // Get unique topics and levels from lessons
+
   const { uniqueTopics, uniqueLevels } = useMemo(() => {
     const topics = new Set<string>();
     const levels = new Set<string>();
 
     lessons.forEach((lesson) => {
-      // Handle topic - use title property from Topic object
       const topicTitle = lesson.topic?.title;
 
       if (topicTitle && topicTitle !== "No Topic") {
@@ -98,10 +91,9 @@ const GrammarPracticeList: React.FC = () => {
     };
   }, [lessons]);
 
-  // Filter lessons based on selected topic and level
+
   const filteredLessons = useMemo(() => {
     return lessons.filter((lesson) => {
-      // Handle topic comparison using title property
       const topicMatch =
         !selectedTopic || lesson.topic?.title === selectedTopic;
       const levelMatch = !selectedLevel || lesson.level === selectedLevel;
@@ -109,7 +101,7 @@ const GrammarPracticeList: React.FC = () => {
     });
   }, [lessons, selectedTopic, selectedLevel]);
 
-  // Group filtered lessons by level
+
   const groupedLessons: GroupedLessons = useMemo(() => {
     return filteredLessons.reduce((acc, lesson) => {
       const level = lesson.level || "Unknown";
@@ -119,7 +111,7 @@ const GrammarPracticeList: React.FC = () => {
     }, {} as GroupedLessons);
   }, [filteredLessons]);
 
-  // Sort levels according to predefined order
+
   const sortedLevels = useMemo(() => {
     return Object.keys(groupedLessons).sort((a, b) => {
       const indexA = LEVEL_ORDER.indexOf(a);
@@ -131,7 +123,7 @@ const GrammarPracticeList: React.FC = () => {
     });
   }, [groupedLessons]);
 
-  // Reset pagination when filters change
+
   useEffect(() => {
     setCurrentPages({});
   }, [selectedTopic, selectedLevel]);
@@ -164,16 +156,6 @@ const GrammarPracticeList: React.FC = () => {
     setSelectedLevel("");
   };
 
-  const handleClickLesson = (lesson: Lesson): void => {
-    localStorage.setItem(
-      "current_lesson",
-      JSON.stringify({
-        title: lesson.title,
-        description: lesson.description,
-      })
-    );
-    router.push(`/${locale}/student/practice/grammar/${lesson.id}`);
-  };
 
   return (
     <div className="flex flex-col px-10 py-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
@@ -225,7 +207,7 @@ const GrammarPracticeList: React.FC = () => {
                 <LessonCard
                   key={lesson.id}
                   lesson={lesson}
-                 
+
                 />
               ))}
             </div>

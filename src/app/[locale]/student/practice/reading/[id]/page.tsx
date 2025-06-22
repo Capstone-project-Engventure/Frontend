@@ -8,19 +8,6 @@ import ReadingWithQuestions from "@/app/[locale]/components/ReadingWithQuestions
 import { Button } from "@/app/[locale]/components/ui/Button";
 import readingPracticeService from "@/lib/services/student/reading-practice.service";
 
-interface PageProps {
-  params: {
-    locale: string;
-    id: string;
-  };
-}
-
-interface LessonData {
-  title: string;
-  description: string;
-  readings: any[];
-  id: string;
-}
 
 export default function ReadingPracticePage() {
   const router = useRouter();
