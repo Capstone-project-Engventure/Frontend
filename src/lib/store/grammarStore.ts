@@ -9,6 +9,7 @@ interface GrammarState {
     setLessons: (data: Lesson[]) => void;
     setHasFetched: (value: boolean) => void;
     setHasHydrated: (value: boolean) => void;
+    reset: () => void;
 }
 
 const useGrammarStore = create<GrammarState>()(
@@ -19,7 +20,8 @@ const useGrammarStore = create<GrammarState>()(
             hasHydrated: false,
             setLessons: (data) => set({ lessons: data }),
             setHasFetched: (value) => set({ hasFetched: value }),
-            setHasHydrated: (value) => set({ hasHydrated: value })
+            setHasHydrated: (value) => set({ hasHydrated: value }),
+            reset: () => set({ lessons: [], hasFetched: false })
         }),
         {
             name: 'GrammarPractice-storage',

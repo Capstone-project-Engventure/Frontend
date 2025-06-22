@@ -1,12 +1,10 @@
 "use client";
 
+import { Button } from "@/app/[locale]/components/ui/Button";
+import LessonService from "@/lib/services/lesson.service";
 import { useLocale } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-import { Button } from "@/app/[locale]/components/ui/Button";
-import readingPracticeService from "@/lib/services/reading-practice.service";
-import LessonService from "@/lib/services/lesson.service";
 import { toast } from "react-toastify";
 
 interface Exercise {
@@ -54,18 +52,15 @@ export default function GrammarPracticeDetailPage() {
       setLoading(true);
       try {
         const stored = localStorage.getItem("current_lesson");
-        let LessonData: any = {};
         if (stored) {
-          try {
-            LessonData = JSON.parse(stored);
+          const LessonData = JSON.parse(stored);
+          if (LessonData?.exercises?.length > 0) {
             setTitle(LessonData.title || "");
             setDescription(LessonData.description || "");
             setExerciseData(LessonData.exercises || []);
-          } catch (e) {
-            console.error("Failed to parse reading data from localStorage.");
+            setLoading(false);
+            return;
           }
-          setLoading(false);
-          return;
         }
 
         const result = await lessonService.getById(Number(id));

@@ -9,6 +9,7 @@ interface ReadingState {
     setLessons: (data: Lesson[]) => void;
     setHasFetched: (value: boolean) => void;
     setHasHydrated: (value: boolean) => void;
+    reset: () => void;
 }
 
 const useReadingStore = create<ReadingState>()(
@@ -19,7 +20,8 @@ const useReadingStore = create<ReadingState>()(
             hasHydrated: false,
             setLessons: (data) => set({ lessons: data }),
             setHasFetched: (value) => set({ hasFetched: value }),
-            setHasHydrated: (value) => set({ hasHydrated: value })
+            setHasHydrated: (value) => set({ hasHydrated: value }),
+            reset: () => set({ lessons: [], hasFetched: false })
         }),
         {
             name: 'ReadingPractice-storage',
