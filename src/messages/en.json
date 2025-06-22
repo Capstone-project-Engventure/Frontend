@@ -261,7 +261,36 @@
           "addExercisesPartialFail": "{fail}/{total} exercises could not be added to the lesson"
         }
       }
-    }
+    },
+    "Courses": {
+      "title": "Course Management",
+      "breadcrumbs": {
+        "home": "Home",
+        "courses": "Courses"
+      },
+      "fields": {
+        "name": "Course Name",
+        "description": "Description",
+        "scope": "Scope",
+        "createdDate": "Created Date"
+      },
+      "modal": {
+        "addTitle": "Add New Course",
+        "editTitle": "Edit Course",
+        "nameLabel": "Course Name",
+        "descriptionLabel": "Description",
+        "scopeLabel": "Scope & Objectives",
+        "namePlaceholder": "Enter course name",
+        "descriptionPlaceholder": "Enter course description",
+        "scopePlaceholder": "Enter course scope and objectives"
+      },
+      "messages": {
+        "addSuccess": "Course added successfully!",
+        "updateSuccess": "Course updated successfully!",
+        "deleteSuccess": "Course deleted successfully!",
+        "error": "An error occurred. Please try again."
+             }
+     }
   },
   "Common": {
     "breadcrumbs": {

@@ -1,15 +1,7 @@
-import { useApi } from "../Api";
+import { axiosInstance } from "../Api";
 import { Lesson } from "../types/lesson";
 import { BaseService } from "./base.service";
 
-const api = useApi();
-
-interface ApiResponse<T> {
-  success: boolean;
-  data: T | string;
-  current_page?: number;
-  total_page?: number;
-}
 
 class LessonService extends BaseService<Lesson> {
   constructor() {
@@ -20,7 +12,7 @@ class LessonService extends BaseService<Lesson> {
     topicId: string,
     params?: { page?: number; pageSize?: number }
   ) {
-    return api.get("/lessons", {
+    return axiosInstance.get("/lessons", {
       params: { topic: topicId, ...params },
     });
   }
@@ -29,7 +21,7 @@ class LessonService extends BaseService<Lesson> {
     console.log("it came here");
 
     formData.append("file", file);
-    return api.post("/lessons/import-file", formData, {
+    return axiosInstance.post("/lessons/import-file", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -39,7 +31,7 @@ class LessonService extends BaseService<Lesson> {
   async getAllSpeakingLessons(
     params?: { page?: number; pageSize?: number }
   ) {
-    const response = await api.get("/lessons", {
+    const response = await axiosInstance.get("/lessons", {
       params: { type: "practice_speaking", ...params },
     });
     return response;
@@ -48,7 +40,7 @@ class LessonService extends BaseService<Lesson> {
   async getAllListeningLessons(
     params?: { page?: number; pageSize?: number }
   ) {
-    const response = await api.get("/lessons", {
+    const response = await axiosInstance.get("/lessons", {
       params: { type: "listening_practice", ...params },
     });
     return response;
@@ -57,7 +49,7 @@ class LessonService extends BaseService<Lesson> {
   async getAllGrammarLessons(
     params?: { page?: number; pageSize?: number }
   ) {
-    const response = await api.get("/lessons", {
+    const response = await axiosInstance.get("/lessons", {
       params: { type: "grammar_practice", ...params },
     });
     return response;

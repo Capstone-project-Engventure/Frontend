@@ -8,7 +8,7 @@ type Exercise = {
 function OrderingQuestion({ exercise }: { exercise: Exercise }) {
   const [selected, setSelected] = useState<string[]>([]);
 
-  const handleSelect = (item: any) => {
+  const handleSelect = (item: string) => {
     if (selected.includes(item)) return; // tránh chọn lại
     setSelected([...selected, item]);
   };

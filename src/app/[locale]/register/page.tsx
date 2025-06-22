@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 const BackgroundImg = "/english_app_background.jpg";
 import {
   MdOutlineEmail,
@@ -7,13 +8,13 @@ import {
   MdOutlinePhoneInTalk,
 } from "react-icons/md";
 
-import { LuEye, LuEyeClosed } from "react-icons/lu";
+import { LuEyeClosed } from "react-icons/lu";
 import { FaUser } from "react-icons/fa";
 import { RiFileUserFill } from "react-icons/ri";
 import { FaEarthAmericas } from "react-icons/fa6";
 import { useApi } from "@/lib/Api";
-import { GenderOptions, GenderEnum } from "@/lib/constants/gender";
-import { NationOptions, NationEnum } from "@/lib/constants/nation";
+import { GenderEnum } from "@/lib/constants/gender";
+import { NationEnum } from "@/lib/constants/nation";
 import { useState } from "react";
 import GenderSelect from "../components/GenderSelect";
 import NationSelect from "../components/NationSelector";
@@ -352,12 +353,12 @@ export default function Register() {
                 </div>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400 text-center">
                   Đã có tài khoản?{" "}
-                  <a
+                  <Link
                     href="/"
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                   >
                     Sign in
-                  </a>
+                  </Link>
                 </p>
               </form>
             </div>

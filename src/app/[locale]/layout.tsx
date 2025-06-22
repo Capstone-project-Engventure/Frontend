@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { Providers } from "./providers";
 // import { LocaleProvider } from "@/lib/context/LocaleContext";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
@@ -40,7 +40,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 transition-colors duration-300`}
       >
         <NextIntlClientProvider>
           <Providers>

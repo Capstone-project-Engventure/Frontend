@@ -1,21 +1,15 @@
 "use client";
 import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import SkillTabFilter from "@/app/[locale]/components/filter/SkillTabFilter";
-import { useApi } from "@/lib/Api";
 import { CategoryOptions } from "@/lib/constants/category";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
 import { Lesson } from "@/lib/types/lesson";
-import { PaginatedResponse } from "@/lib/types/response";
 import { Topic } from "@/lib/types/topic";
 import { useEffect, useState, useMemo } from "react";
 
 import {
   HiPlus,
-  HiPencil,
-  HiTrash,
-  HiChevronLeft,
-  HiChevronRight,
 } from "react-icons/hi";
 import { toast } from "react-toastify";
 
@@ -23,12 +17,9 @@ export default function AdminTopic() {
   const topicService = new TopicService();
   const lessonService = new LessonService();
   const [isLoading, setIsLoading] = useState(false);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [allTopics, setAllTopics] = useState<Topic[]>([]); // Store all topics for filtering
   const [page, setPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(7);
-  const [keyword, setKeyword] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
   const fields = [
@@ -104,16 +95,11 @@ export default function AdminTopic() {
     setTopics(filteredTopics);
   }, [filteredTopics]);
 
-  const [formData, setFormData] = useState<any>(null);
-  const isModalOpen = formData !== null;
-
-  const handleAddClick = () => {
-    setFormData({
-      title: "",
-      category: "",
-      description: "",
-    });
-  };
+  const [formData, setFormData] = useState<{
+    title: string;
+    category: string;
+    description: string;
+  } | null>(null);
 
   function fetchLessonData() {
     throw new Error("Function not implemented.");

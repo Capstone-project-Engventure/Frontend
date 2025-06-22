@@ -4,7 +4,6 @@ import createIntlMiddleware from "next-intl/middleware";
 // import { parseAuthCookie, verifyJwt } from './lib/utils/jwt';
 import { decodeJwt, jwtVerify, importSPKI } from "jose";
 import { PUBLIC_KEY_PEM } from "@/lib/key/publicKey";
-import Cookies from "js-cookie";
 
 const intlMiddleware = createIntlMiddleware({
   locales: ["en", "vi"],
@@ -43,7 +42,6 @@ export async function middleware(request: NextRequest) {
 
   let role = "anonymous";
   let isValidToken = false;
-  let newAccessToken: string | null = null;
 
   // Validate token if present
   if (token) {
@@ -64,7 +62,7 @@ export async function middleware(request: NextRequest) {
       
       // Try to refresh token if access token is invalid
       if (refreshToken) {
-        newAccessToken = await refreshAccessToken(refreshToken);
+        const newAccessToken = await refreshAccessToken(refreshToken);
         if (newAccessToken) {
           isValidToken = true;
           // Set new access token in cookie
@@ -116,31 +114,4 @@ export const config = {
   matcher: ["/", "/(en|vi)/:path*"],
 };
 
-function checkAuthStatus(req: NextRequest): string | null {
-  try {
-    const cookie = req.cookies.get("access_token")?.value;
-    return JSON.parse(cookie || "false");
-  } catch {
-    return null;
-  }
-}
 
-function validateJwtToken(token: string) {
-  try {
-    const decoded = decodeJwt(token);
-    const now = Math.floor(Date.now() / 1000);
-    if (decoded.exp && decoded.exp < now) {
-      console.log("expired: ", decoded.exp, now);
-      Cookies.remove("access_token");
-      return false;
-    }
-    return true;
-  } catch (error) {
-    console.error("JWT verification failed:", error);
-    return false;
-  }
-}
-
-// 1. Specify protected and public routes
-const protectedRoutes = ["/home"];
-const publicRoutes = ["/login", "/signup", "/"];

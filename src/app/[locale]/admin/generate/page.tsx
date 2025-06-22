@@ -12,10 +12,12 @@ import { useExerciseTypeStore } from "@/lib/store/exerciseTypeStore";
 import { useGenerateStore } from "@/lib/store/generateStore";
 import { usePromptStore } from "@/lib/store/promptStore";
 import { useTopicStore } from "@/lib/store/topicStore";
+import { useHistoryGenerateStore } from "@/lib/store/historyGenerateStore";
 import { Exercise } from "@/lib/types/exercise";
 import { Prompt } from "@/lib/types/prompt";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useMemo } from "react";
+import { useRouter, useParams } from "next/navigation";
 import ExerciseCard from "@/app/[locale]/components/ExerciseCard";
 import { toast } from "react-toastify";
 import { useApproveExercise } from "@/lib/hooks/useApproveExercise";
@@ -23,16 +25,7 @@ import ExerciseApprovalCard from "@/app/[locale]/components/ExerciseApprovalCard
 import { useLLMModeValidator } from "@/lib/utils/llmModeValidator";
 // import OrbitProgress from "react-loading-indicator"; // Đảm bảo bạn đã cài đặt thư viện này
 
-const breadcrumbs = [
-  {
-    label: "Trang chủ",
-    href: "/admin/home",
-  },
-  {
-    label: "Tạo sinh bài tập",
-    href: "/admin/generate",
-  },
-];
+
 const sampleExercises = [
   {
     id: 1,
@@ -199,6 +192,21 @@ const sampleExercises = [
 ];
 
 export default function ExerciseGenerate() {
+  const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string;
+
+  const breadcrumbs = [
+    {
+      label: "Trang chủ",
+      href: `/${locale}/admin/home`,
+    },
+    {
+      label: "Tạo sinh bài tập",
+      href: `/${locale}/admin/generate`,
+    },
+  ];
+
   const { 
     topics, 
     categoryCounts, 
@@ -244,6 +252,12 @@ export default function ExerciseGenerate() {
   } = useGenerateStore();
 
   const { 
+    histories, 
+    fetchHistories, 
+    addHistory
+  } = useHistoryGenerateStore();
+
+  const { 
     loading: approveLoading, 
     error: approveError, 
     checkExerciseExists, 
@@ -282,7 +296,8 @@ export default function ExerciseGenerate() {
           fetchTopics(),
           fetchTypes(),
           fetchCategoryStats(),
-          promptStore.fetchPrompts()
+          promptStore.fetchPrompts(),
+          fetchHistories()
         ]);
       } catch (error) {
         console.error('Failed to initialize data:', error);
@@ -290,7 +305,7 @@ export default function ExerciseGenerate() {
     };
 
     initializeData();
-  }, [fetchTopics, fetchTypes, fetchCategoryStats, promptStore.fetchPrompts]);
+  }, [fetchTopics, fetchTypes, fetchCategoryStats, promptStore.fetchPrompts, fetchHistories]);
 
   // Handle skill category change
   const handleCategoryChange = (category: string) => {
@@ -319,6 +334,16 @@ export default function ExerciseGenerate() {
       await generate();
       if (results && results.length > 0) {
         await checkAllExercisesExistence(results);
+        
+        // Add to history
+        const historyEntry = {
+          id: Date.now(),
+          created_at: new Date().toISOString(),
+          params: { number, skill, level, topicId, typeId, mode, useRag },
+          response: { exercises: results },
+          created_exercises: results
+        };
+        addHistory(historyEntry);
       }
     } catch (error) {
       console.error("❌ Error generating exercises:", error);
@@ -426,7 +451,6 @@ export default function ExerciseGenerate() {
   const isSystemHealthy = healthStatus?.overall || false;
   const canGenerate = isFormValid && isSystemHealthy && !loading;
   const hasResults = results && results.length > 0;
-  const [showHistory, setShowHistory] = useState(false);
 
   return (
     <div className="p-6 space-y-6">
@@ -695,6 +719,127 @@ export default function ExerciseGenerate() {
           )}
         </div>
       </div>
+
+      {/* Generate Button and Actions */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleGenerate}
+              disabled={!canGenerate || loading}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white transition-colors ${
+                canGenerate && !loading
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Generate Exercises
+                </>
+              )}
+            </button>
+            
+            {hasResults && (
+              <button
+                onClick={exportResults}
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Export Results
+              </button>
+            )}
+          </div>
+          
+                      <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowSampleExercises(!showSampleExercises)}
+                className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                {showSampleExercises ? 'Hide' : 'Show'} Sample Exercises
+              </button>
+              
+              <button
+                onClick={() => router.push(`/${locale}/admin/history`)}
+                className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                View History ({histories.length})
+              </button>
+            </div>
+        </div>
+        
+        {/* Form validation feedback */}
+        {!isFormValid && (
+          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              Please fill in all required fields: skill, level, topic, type, and prompt content.
+            </p>
+          </div>
+        )}
+        
+        {!isSystemHealthy && (
+          <div className="mt-4 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
+            <p className="text-sm text-red-800 dark:text-red-200">
+              System health check failed. Please wait for the system to be ready before generating.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Sample Exercises */}
+      {showSampleExercises && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            Sample Exercises
+          </h3>
+          <div className="flex flex-col gap-2">
+            {sampleExercises.map((exercise) => (
+                 <ExerciseCard key={exercise.id} data={exercise} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      
+
+      {/* Results Section */}
+      {hasResults && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Generated Exercises ({results.length})
+            </h3>
+            <div className="flex gap-2">
+              <button
+                onClick={exportResults}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                Export All
+              </button>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            {results.map((exercise, index) => (
+              <ExerciseCard
+                key={exercise.id || index}
+                data={exercise}
+                index={index}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

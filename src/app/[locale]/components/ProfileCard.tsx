@@ -3,7 +3,7 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { Fragment, useEffect, useState } from "react";
 import clsx from "clsx";
 import { FaUser } from "react-icons/fa";
-import { MdOutlineEmail, MdLockOutline, MdPhone } from "react-icons/md";
+import { MdOutlineEmail, MdPhone } from "react-icons/md";
 import { LiaBirthdayCakeSolid } from "react-icons/lia";
 import { SiLevelsdotfyi } from "react-icons/si";
 import { useApi } from "@/lib/Api";
@@ -26,7 +26,7 @@ interface ProfileFormData {
 export default function ProfileCard() {
   const api = useApi();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const [profileForm, setProfileForm] = useState<ProfileFormData>({
     first_name: "",
     last_name: "",

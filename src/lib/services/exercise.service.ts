@@ -1,9 +1,6 @@
-import { extend } from "lodash";
-import { useApi } from "../Api";
+import { axiosInstance } from "../Api";
 import { Exercise } from "../types/exercise";
 import { BaseService } from "./base.service";
-
-const api = useApi();
 
 class ExerciseService extends BaseService<Exercise> {
   constructor() {
@@ -15,7 +12,7 @@ class ExerciseService extends BaseService<Exercise> {
     console.log("it came here");
 
     formData.append("file", file);
-    return api.post("exercises/import-file", formData, {
+    return axiosInstance.post("exercises/import-file", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -23,7 +20,7 @@ class ExerciseService extends BaseService<Exercise> {
   }
 
   submitExercise(exerciseId: string, content: string) {
-    return api.post(`exercises/${exerciseId}/submit`, { content });
+    return axiosInstance.post(`exercises/${exerciseId}/submit`, { content });
   }
 
   async checkPronunciation({ audio, exercise }: { audio: File; exercise: any }) {
@@ -31,7 +28,7 @@ class ExerciseService extends BaseService<Exercise> {
     formData.append("audio", audio);
     formData.append("exercise", exercise);
 
-    return api.post("/exercises/check-pronunciation", formData, {
+    return axiosInstance.post("/exercises/check-pronunciation", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   }
@@ -39,7 +36,7 @@ class ExerciseService extends BaseService<Exercise> {
   // Approve service - check if exercise already exists in database
   async checkExerciseExists(exerciseData: Partial<Exercise>) {
     try {
-      const response = await api.post("exercises/check-exists", exerciseData);
+      const response = await axiosInstance.post("exercises/check-exists", exerciseData);
       return response.data;
     } catch (error) {
       console.error("Error checking exercise existence:", error);
@@ -50,7 +47,7 @@ class ExerciseService extends BaseService<Exercise> {
   // Approve service - approve and save exercise to database
   async approveExercise(exerciseData: Exercise) {
     try {
-      const response = await api.post("exercises/approve", exerciseData);
+      const response = await axiosInstance.post("exercises/approve", exerciseData);
       return response.data;
     } catch (error) {
       console.error("Error approving exercise:", error);
@@ -61,7 +58,7 @@ class ExerciseService extends BaseService<Exercise> {
   // Approve service - get all pending exercises for approval
   async getPendingExercises() {
     try {
-      const response = await api.get("exercises/pending");
+      const response = await axiosInstance.get("exercises/pending");
       return response.data;
     } catch (error) {
       console.error("Error fetching pending exercises:", error);
@@ -72,7 +69,7 @@ class ExerciseService extends BaseService<Exercise> {
   // Approve service - reject exercise
   async rejectExercise(exerciseId: string, reason?: string) {
     try {
-      const response = await api.post(`exercises/${exerciseId}/reject`, { reason });
+      const response = await axiosInstance.post(`exercises/${exerciseId}/reject`, { reason });
       return response.data;
     } catch (error) {
       console.error("Error rejecting exercise:", error);
