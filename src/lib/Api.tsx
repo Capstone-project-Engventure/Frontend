@@ -7,10 +7,6 @@ import { isTokenExpiringSoon } from "./utils/jwt";
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // Create a base axios instance for services
-export const axiosInstance = axios.create({
-  baseURL: baseURL,
-  withCredentials: false,
-});
 
 export const useApi = () => {
   // const { currentLanguage } = useLocale();
@@ -127,3 +123,5 @@ export const useApi = () => {
 
   return api;
 };
+
+export const axiosInstance = useApi();

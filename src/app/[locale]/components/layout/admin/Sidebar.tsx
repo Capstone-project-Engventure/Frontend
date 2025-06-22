@@ -87,7 +87,7 @@ export default function Sidebar() {
   return (
     <div>
       <aside
-        className={`bg-white shadow-md p-4 transition-all duration-300 h-full ${
+        className={`bg-white dark:bg-gray-800 shadow-md p-4 transition-all duration-300 h-full border-r border-gray-200 dark:border-gray-700 ${
           toggleSidebar ? "w-64" : "w-28"
         }`}
       >
@@ -101,7 +101,7 @@ export default function Sidebar() {
                 alt="Logo"
               />
               <span
-                className={`text-xl font-bold text-amber-500 ${
+                className={`text-xl font-bold text-amber-500 dark:text-amber-400 ${
                   toggleSidebar ? "" : "hidden"
                 }`}
               >
@@ -110,7 +110,7 @@ export default function Sidebar() {
             </Link>
             <button
               type="button"
-              className="p-2 bg-gray-200 text-black rounded-md"
+              className="p-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
               onClick={() => setToggleSidebar((prev) => !prev)}
             >
               {toggleSidebar ? <MdArrowForwardIos /> : <MdArrowBackIosNew />}

@@ -32,7 +32,7 @@ interface PaginationTableProps {
   onAdd?: (data: any) => void;
   onUpdate?: (id: string | number, data: any) => void;
   onDelete?: (id: string | number) => void;
-  onEdit?: (item: any) => void;
+  onEdit?: (item: any) => any;
   onCreate?: () => void;
   onSuccess?: () => void;
 }
@@ -95,16 +95,23 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
   const handleAdd = () => {
     if (onCreate) {
       onCreate();
+      setIsModalOpen(true);
     } else {
+      console.log('Setting modal open for add');
       setFormData({});
       setIsModalOpen(true);
     }
   };
 
   const handleEdit = (item: any) => {
+    console.log('handleEdit called, item:', item, 'onEdit:', onEdit);
     if (onEdit) {
-      onEdit(item.id);
+      const editData = onEdit(item);
+      // Use returned data from onEdit or fallback to item
+      setFormData(editData && typeof editData === 'object' ? editData : item);
+      setIsModalOpen(true);
     } else {
+      console.log('Setting modal open for edit');
       setFormData(item);
       setIsModalOpen(true);
     }
@@ -112,23 +119,26 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log('Form submitted:', formData);
+    
+    // Get form data from the custom event if available, otherwise use current formData
+    const submissionData = (e.target as any)?.formData || formData;
+    console.log('Form submitted:', submissionData);
 
     try {
       let response;
-      if (formData?.id) {
+      if (submissionData?.id) {
         response = onUpdate
-          ? await onUpdate(formData.id, formData)
-          : await service?.update(formData.id, formData);
+          ? await onUpdate(submissionData.id, submissionData)
+          : await service?.update(submissionData.id, submissionData);
       } else {
         response = onAdd
-          ? await onAdd(formData)
-          : await service?.create(formData);
+          ? await onAdd(submissionData)
+          : await service?.create(submissionData);
       }
 
       if (response?.success) {
         setIsModalOpen(false);
+        setFormData(null);
         refetch();
         onSuccess?.();
       }
@@ -200,13 +210,22 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
       />
 
       {/* Modal */}
+      {(() => {
+        console.log('Modal render check:', { isModalOpen, modalFields, formData });
+        return null;
+      })()}
+
       {isModalOpen && modalFields && (
         <FormModal
           fields={modalFields}
           title={modalTitle}
           formData={formData}
           onSubmit={handleSubmit}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            console.log('Modal closing');
+            setIsModalOpen(false);
+            setFormData(null);
+          }}
           isLoading={isLoading}
         />
       )}

@@ -271,6 +271,35 @@
           "addExercisesPartialFail": "{fail}/{total} bài tập không thể thêm vào bài học"
         }
       }
+    },
+    "Courses": {
+      "title": "Quản lý Khóa học",
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "courses": "Khóa học"
+      },
+      "fields": {
+        "name": "Tên khóa học",
+        "description": "Mô tả",
+        "scope": "Phạm vi",
+        "createdDate": "Ngày tạo"
+      },
+      "modal": {
+        "addTitle": "Thêm khóa học mới",
+        "editTitle": "Chỉnh sửa khóa học",
+        "nameLabel": "Tên khóa học",
+        "descriptionLabel": "Mô tả",
+        "scopeLabel": "Phạm vi & Mục tiêu",
+        "namePlaceholder": "Nhập tên khóa học",
+        "descriptionPlaceholder": "Nhập mô tả khóa học",
+        "scopePlaceholder": "Nhập phạm vi và mục tiêu khóa học"
+      },
+      "messages": {
+        "addSuccess": "Thêm khóa học thành công!",
+        "updateSuccess": "Cập nhật khóa học thành công!",
+        "deleteSuccess": "Xóa khóa học thành công!",
+        "error": "Đã xảy ra lỗi. Vui lòng thử lại."
+      }
     }
   },
   "Common": {
