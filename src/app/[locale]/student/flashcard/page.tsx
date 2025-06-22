@@ -277,7 +277,7 @@ const UserFlashcardApp = () => {
   const FlashcardStudy = () => {
     const currentCard = flashcards[currentCardIndex];
     
-    const handleAnswer = (isCorrect) => {
+    const handleAnswer = (isCorrect:any) => {
       setSessionStats(prev => ({
         ...prev,
         [isCorrect ? 'correct' : 'incorrect']: prev[isCorrect ? 'correct' : 'incorrect'] + 1,
