@@ -500,16 +500,16 @@ export default function StudentWritingPracticePage() {
                           <div className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full mt-2"></div>
                           <div className="flex-1">
                             <p className="text-sm font-medium text-red-800">
-                              {error.message || "Lỗi ngữ pháp"}
+                              {(error as any)?.message || "Lỗi ngữ pháp"}
                             </p>
-                            {error.suggestion && (
+                            {(error as any).suggestion && (
                               <p className="text-xs text-red-600 mt-1">
-                                Gợi ý: {error.suggestion}
+                                Gợi ý: {(error as any).suggestion}
                               </p>
                             )}
-                            {error.context && (
+                            {(error as any).context && (
                               <p className="text-xs text-gray-600 mt-1">
-                                Ngữ cảnh: "{error.context}"
+                                Ngữ cảnh: "{(error as any).context}"
                               </p>
                             )}
                           </div>

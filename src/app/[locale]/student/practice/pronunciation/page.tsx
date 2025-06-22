@@ -15,6 +15,7 @@ const PronunciationPracticePage = () => {
     soundService.getAll().then((response) => {
       if (!response.success) {
         toast.error("fetch error");
+        return;
       }
       setSounds(response.data);
     });

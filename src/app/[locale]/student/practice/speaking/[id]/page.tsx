@@ -168,7 +168,7 @@ export default function SpeakingPracticeDetailPage() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [vadState, setVadState] = useState("idle"); // 'idle', 'detecting', 'speaking', 'silence'
@@ -182,16 +182,16 @@ export default function SpeakingPracticeDetailPage() {
   };
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
-  const mediaRecorderRef = useRef(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRef = useRef(null);
   const playbackRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const streamRef = useRef(null);
-  const vadTimerRef = useRef(null);
-  const silenceTimerRef = useRef(null);
-  const recordingTimerRef = useRef(null);
-  const animationFrameRef = useRef(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const vadTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("current_lesson");
@@ -293,10 +293,12 @@ export default function SpeakingPracticeDetailPage() {
   }, [isRecording, vadState]);
 
   // Setup audio context and analyzer
-  const setupAudioAnalysis = async (stream) => {
+  const setupAudioAnalysis = async (stream:any) => {
     try {
-      audioContextRef.current = new (window.AudioContext ||
-        window.webkitAudioContext)();
+      audioContextRef.current = new (
+        window.AudioContext ||
+        (window as any).webkitAudioContext
+      )();
       const source = audioContextRef.current.createMediaStreamSource(stream);
       analyserRef.current = audioContextRef.current.createAnalyser();
 
@@ -333,7 +335,7 @@ export default function SpeakingPracticeDetailPage() {
       });
       mediaRecorderRef.current = mediaRecorder;
 
-      const chunks = [];
+      const chunks: BlobPart[] = [];
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.push(event.data);
@@ -346,9 +348,12 @@ export default function SpeakingPracticeDetailPage() {
         cleanup();
 
         try {
+          // Create a File object from the blob for the API
+          const audioFile = new File([blob], 'recording.webm', { type: 'audio/webm' });
+          
           // Gửi audio blob kèm câu cần phát âm lên server
           const result = await exerciseService.checkPronunciation({
-            audio: blob,
+            audio: audioFile,
             exercise: currentExercise?.id || "",
           });
           setResult(result.data);
@@ -401,7 +406,7 @@ export default function SpeakingPracticeDetailPage() {
   };
 
   // Play text using speech synthesis
-  const speakText = (text) => {
+  const speakText = (text: string) => {
     if ("speechSynthesis" in window) {
       setIsPlaying(true);
       const utterance = new SpeechSynthesisUtterance(text);
@@ -636,8 +641,10 @@ export default function SpeakingPracticeDetailPage() {
                 </p>
                 {result.note?.length > 0 && (
                   <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                    {result.note.map((n, i) => (
-                      <li key={i}>{n}</li>
+                    {result.note.map((n: any, i: number) => (
+                      <div key={i} className="text-sm text-gray-600 mb-1">
+                        • {n}
+                      </div>
                     ))}
                   </ul>
                 )}

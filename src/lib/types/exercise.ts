@@ -24,7 +24,7 @@ export type Exercise = {
     description?: string;
     audio_file?: string;
     audio_file_url?: string | null;
-    options: ExerciseOption[] | [];
+    options: ExerciseOption[] | any[];
     explanation?: string | null;
     reading?: {
         title: string;

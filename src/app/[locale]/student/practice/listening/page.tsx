@@ -213,7 +213,7 @@ const ListeningPracticeList: React.FC = () => {
 
             <div className="min-h-[200px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {getLessonsForCurrentPage(level).map(lesson => (
-                <LessonCard key={lesson.id} lesson={lesson} onClick={() => handleClickLesson(lesson)} />
+                <LessonCard key={lesson.id} lesson={lesson} />
               ))}
             </div>
 

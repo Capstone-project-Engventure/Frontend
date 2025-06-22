@@ -40,13 +40,12 @@ export default function StudentPronunciationPractice() {
   const t = useTranslations("StudentPronunciationPractice");
   const locale = useLocale();
   const breadcrumbs = [
-    { label: t("home"), href: `/${locale}/student/home` },
-    {
-      label: t("pronunciation"),
-      href: `/${locale}/student/practice/pronunciation`,
-    },
-    { label: selectedSound?.symbol },
-  ];
+    { label: "Trang chủ", href: `/${locale}/student` },
+    { label: "Luyện phát âm", href: `/${locale}/student/practice/pronunciation` },
+    { label: selectedSound?.symbol || "...", href: undefined },
+  ].filter((item): item is { label: string; href?: string } => 
+    typeof item.label === 'string' && item.label.length > 0
+  );
 
   /* --------------------------------------------------- */
   /*                      SERVICES                      */
@@ -150,7 +149,7 @@ export default function StudentPronunciationPractice() {
           exerciseId: currentExercise?.id,
           blob,
         });
-        if (res.success) {
+        if (res) {
           updateResult(currentIndex, { success: res.data?.is_correct });
         } else {
           toast.error(t("check_unsuccessful"));

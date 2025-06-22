@@ -1,6 +1,8 @@
 "use client";
 
 import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import SkillTabFilter from "@/app/[locale]/components/filter/SkillTabFilter";
+import PromptSelector from "@/app/[locale]/components/prompt/PromptSelector";
 import { useApi } from "@/lib/Api";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
@@ -11,10 +13,14 @@ import { useGenerateStore } from "@/lib/store/generateStore";
 import { usePromptStore } from "@/lib/store/promptStore";
 import { useTopicStore } from "@/lib/store/topicStore";
 import { Exercise } from "@/lib/types/exercise";
+import { Prompt } from "@/lib/types/prompt";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import ExerciseCard from "@/app/[locale]/components/ExerciseCard";
 import { toast } from "react-toastify";
+import { useApproveExercise } from "@/lib/hooks/useApproveExercise";
+import ExerciseApprovalCard from "@/app/[locale]/components/ExerciseApprovalCard";
+import { useLLMModeValidator } from "@/lib/utils/llmModeValidator";
 // import OrbitProgress from "react-loading-indicator"; // Đảm bảo bạn đã cài đặt thư viện này
 
 const breadcrumbs = [
@@ -193,9 +199,21 @@ const sampleExercises = [
 ];
 
 export default function ExerciseGenerate() {
-  const { topics, fetchTopics } = useTopicStore();
+  const { 
+    topics, 
+    categoryCounts, 
+    filteredTopics,
+    selectedCategory,
+    isLoading: topicsLoading,
+    error: topicsError,
+    fetchTopics, 
+    fetchCategoryStats,
+    setSelectedCategory,
+    clearError
+  } = useTopicStore();
+
   const { types, fetchTypes } = useExerciseTypeStore();
-  const { prompts, fetchPrompts } = usePromptStore();
+  // const { prompts, fetchPrompts } = usePromptStore();
   const {
     number,
     skill,
@@ -208,7 +226,9 @@ export default function ExerciseGenerate() {
     prompt_content,
     results,
     loading,
+    healthLoading,
     error,
+    healthStatus,
     setNumber,
     setSkill,
     setLevel,
@@ -218,68 +238,282 @@ export default function ExerciseGenerate() {
     setUseRag,
     updatePrompt,
     setPromptContent,
+    checkHealth,
     generate,
     exportResults,
   } = useGenerateStore();
 
+  const { 
+    loading: approveLoading, 
+    error: approveError, 
+    checkExerciseExists, 
+    approveExercise, 
+    rejectExercise 
+  } = useApproveExercise();
+
   const [showSampleExercises, setShowSampleExercises] = useState(false);
+  const [exerciseStatuses, setExerciseStatuses] = useState<{[key: string]: 'pending' | 'approved' | 'rejected' | 'exists'}>({});
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+
+  // Prompt Store
+  const promptStore = usePromptStore();
+  
+  // LLM Mode Validator
+  const { validateAndWarn, showWarning } = useLLMModeValidator();
+
+  // Filter topics based on selected skill
+  const availableTopics = useMemo(() => {
+    if (!skill) return filteredTopics;
+    return filteredTopics.filter(topic => topic.category === skill);
+  }, [filteredTopics, skill]);
+
+  // Auto-select category when skill changes
+  useEffect(() => {
+    if (skill && skill !== selectedCategory) {
+      setSelectedCategory(skill);
+    }
+  }, [skill, selectedCategory, setSelectedCategory]);
+
+  // Initialize data
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        await Promise.all([
+          fetchTopics(),
+          fetchTypes(),
+          fetchCategoryStats(),
+          promptStore.fetchPrompts()
+        ]);
+      } catch (error) {
+        console.error('Failed to initialize data:', error);
+      }
+    };
+
+    initializeData();
+  }, [fetchTopics, fetchTypes, fetchCategoryStats, promptStore.fetchPrompts]);
+
+  // Handle skill category change
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setSkill(category); // Sync with generate store
+    setTopic(''); // Reset topic selection
+  };
+
   const setPrompt = (val: string) => {
     useGenerateStore.setState({ prompt: val });
-    updatePrompt(); // gọi lại sau khi set prompt
+    updatePrompt();
   };
 
   const handleGenerate = async () => {
-    if (!isFormValid) {
-      toast.error("Vui lòng điền đầy đủ thông tin!");
+    if (!canGenerate) {
+      if (!isSystemHealthy) {
+        toast.error("System is not ready. Please wait for health check to complete.");
+      } else {
+        toast.error("Vui lòng điền đầy đủ thông tin");
+      }
       return;
     }
 
     try {
-      // Gọi hàm generate từ store
+      console.log('🚀 Starting exercise generation...');
       await generate();
-
-      // Kiểm tra kết quả sau khi generate
-      const currentResults = useGenerateStore.getState().results;
-
-      if (currentResults.length === 0) {
-        toast.error("Không tạo được bài tập nào phù hợp với tiêu chí đã chọn!");
-      } else {
-        toast.success(`Tạo thành công ${currentResults.length} bài tập!`);
+      if (results && results.length > 0) {
+        await checkAllExercisesExistence(results);
       }
-    } catch (error: any) {
-      console.error("Error generating exercises:", error);
-      toast.error(error.message || "Có lỗi xảy ra khi tạo bài tập!");
+    } catch (error) {
+      console.error("❌ Error generating exercises:", error);
+      toast.error("Có lỗi xảy ra khi tạo bài tập");
+      
+      // Re-check health if generation fails
+      console.log('🏥 Re-checking system health after failure...');
+      checkHealth();
     }
   };
 
+  const checkAllExercisesExistence = async (exercises: Exercise[]) => {
+    const statuses: {[key: string]: 'pending' | 'approved' | 'rejected' | 'exists'} = {};
+    
+    for (const exercise of exercises) {
+      try {
+        const questionKey = exercise.question || `exercise-${exercise.id}`;
+        const exists = await checkExerciseExists({
+          question: exercise.question,
+          skill: exercise.skill,
+          level: exercise.level
+        });
+        statuses[questionKey] = exists ? 'exists' : 'pending';
+      } catch (error) {
+        console.error('Error checking exercise existence:', error);
+        const questionKey = exercise.question || `exercise-${exercise.id}`;
+        statuses[questionKey] = 'pending';
+      }
+    }
+    
+    setExerciseStatuses(statuses);
+  };
+
+  const handleApproveExercise = async (exercise: Exercise) => {
+    try {
+      await approveExercise(exercise);
+      const questionKey = exercise.question || `exercise-${exercise.id}`;
+      setExerciseStatuses(prev => ({
+        ...prev,
+        [questionKey]: 'approved'
+      }));
+      toast.success("Bài tập đã được phê duyệt!");
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi phê duyệt bài tập");
+    }
+  };
+
+  const handleRejectExercise = async (exercise: Exercise, reason?: string) => {
+    try {
+      const exerciseId = exercise.id?.toString() || 'unknown';
+      await rejectExercise(exerciseId, reason);
+      const questionKey = exercise.question || `exercise-${exercise.id}`;
+      setExerciseStatuses(prev => ({
+        ...prev,
+        [questionKey]: 'rejected'
+      }));
+      toast.success("Bài tập đã bị từ chối!");
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi từ chối bài tập");
+    }
+  };
+
+  // Auto health check on mount and periodic checks
   useEffect(() => {
-    fetchTopics();
-    fetchTypes();
-    fetchPrompts();
+    const checkHealthOnMount = async () => {
+      console.log('🏥 Checking system health on mount...');
+      await checkHealth();
+    };
+    
+    // Check health immediately
+    checkHealthOnMount();
+    
+    // Set up periodic health check every 2 minutes
+    const healthCheckInterval = setInterval(async () => {
+      console.log('🔄 Periodic health check...');
+      await checkHealth();
+    }, 2 * 60 * 1000); // 2 minutes
+    
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(healthCheckInterval);
+    };
   }, []);
 
+  // Also check health when mode changes
   useEffect(() => {
-    updatePrompt();
-  }, [prompt, skill, level, topicId, typeId, mode, useRag]);
+    if (healthStatus) {
+      console.log(`🔄 Mode changed to ${mode}, rechecking health...`);
+      checkHealth();
+    }
+  }, [mode]);
+
+  // Validate mode when health status changes
+  useEffect(() => {
+    if (healthStatus) {
+      const validation = validateAndWarn(mode, healthStatus);
+      if (!validation.isValid) {
+        showWarning(mode, healthStatus);
+      }
+    }
+  }, [healthStatus, mode, validateAndWarn, showWarning]);
 
   const t = useTranslations("GenerateExercise");
   const isFormValid = skill && level && topicId && typeId && prompt;
+  const isSystemHealthy = healthStatus?.overall || false;
+  const canGenerate = isFormValid && isSystemHealthy && !loading;
   const hasResults = results && results.length > 0;
   const [showHistory, setShowHistory] = useState(false);
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-6 space-y-6">
       <Breadcrumb items={breadcrumbs} />
-      <h2 className="text-xl font-semibold">{t("heading")}</h2>
+      
+      {/* Header */}
+      <div className="flex flex-col space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            {t("heading")}
+          </h2>
+          
+          {/* System Status Indicator */}
+          <div className="flex items-center gap-2">
+            {healthLoading ? (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-medium">Checking...</span>
+              </div>
+            ) : healthStatus ? (
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${
+                isSystemHealthy 
+                  ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                  : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${
+                  isSystemHealthy ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+                }`}></div>
+                <span className="text-xs font-medium">
+                  {isSystemHealthy ? 'System Ready' : 'System Issue'}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <span className="text-xs font-medium">Status Unknown</span>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <p className="text-gray-600 dark:text-gray-400">
+          Generate exercises by selecting skill, level, and topic. Use the skill filter to find relevant topics.
+          {!isSystemHealthy && healthStatus && (
+            <span className="text-red-600 dark:text-red-400 font-medium ml-2">
+              ⚠️ System check required before generating.
+            </span>
+          )}
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {
-          /* Number of exercises */
-          <div>
-            <label
-              htmlFor="number"
-              className="block mb-1 text-sm font-medium text-gray-700"
+      {/* Error States */}
+      {topicsError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-red-800">Failed to load topics: {topicsError}</p>
+            <button
+              onClick={() => {
+                clearError();
+                fetchTopics(true);
+              }}
+              className="text-red-600 hover:text-red-700 font-medium"
             >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Skill Filter */}
+      <SkillTabFilter
+        selectedCategory={selectedCategory}
+        onCategoryChange={handleCategoryChange}
+        categoryCounts={categoryCounts}
+        showCounts={true}
+      />
+
+      {/* Generate Form */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          Exercise Configuration
+        </h3>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Number of exercises */}
+          <div>
+            <label htmlFor="number" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("numberOfQuestions")}
             </label>
             <input
@@ -288,275 +522,178 @@ export default function ExerciseGenerate() {
               min={1}
               value={number}
               onChange={(e) => setNumber(Number(e.target.value))}
-              className="block w-full p-3 border border-gray-300 rounded-md 
-         bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-        }
 
-        {/* Skill */}
-        <div>
-          <label
-            htmlFor="skill"
-            className="block mb-1 text-sm font-medium text-gray-700"
-          >
-            {t("selectSkill")}
-          </label>
-          <select
-            id="skill"
-            value={skill}
-            onChange={(e) => setSkill(e.target.value)}
-            className="block w-full p-3 border border-gray-300 rounded-md 
-                 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            <option value="">{t("selectSkill")}</option>
-            {SkillOptions.map((s) => (
-              <option key={s.value} value={s.value}>
-                {/* {t(`skills.${s.value}`)} */}
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Level */}
-        <div>
-          <label
-            htmlFor="level"
-            className="block mb-1 text-sm font-medium text-gray-700"
-          >
-            {t("selectLevel")}
-          </label>
-          <select
-            id="level"
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            className="block w-full p-3 border border-gray-300 rounded-md 
-                 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            <option value="">{t("selectLevel")}</option>
-            {LevelOptions.map((l) => (
-              <option key={l.value} value={l.value}>
-                {l.value}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Topic */}
-        <div>
-          <label
-            htmlFor="topic"
-            className="block mb-1 text-sm font-medium text-gray-700"
-          >
-            {t("selectTopic")}
-          </label>
-          <select
-            id="topic"
-            value={topicId}
-            onChange={(e) => setTopic(e.target.value)}
-            className="block w-full p-3 border border-gray-300 rounded-md 
-                 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            <option value="">{t("selectTopic")}</option>
-            {topics.map((tpc) => (
-              <option key={tpc.id} value={tpc.id}>
-                {tpc.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Type */}
-        <div>
-          <label
-            htmlFor="type"
-            className="block mb-1 text-sm font-medium text-gray-700"
-          >
-            {t("selectType")}
-          </label>
-          <select
-            id="type"
-            value={typeId}
-            onChange={(e) => setType(e.target.value)}
-            className="block w-full p-3 border border-gray-300 rounded-md 
-                 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            <option value="">{t("selectType")}</option>
-            {types.map((tp) => (
-              <option key={tp.id} value={tp.id}>
-                {tp.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Mode */}
-        <div>
-          <label
-            htmlFor="mode"
-            className="block mb-1 text-sm font-medium text-gray-700"
-          >
-            {t("selectMode")}
-          </label>
-          <select
-            id="mode"
-            value={mode}
-            onChange={(e) => setMode(e.target.value as "vertex" | "ollama")}
-            className="block w-full p-3 border border-gray-300 rounded-md 
-                 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            <option value="ollama">Ollama (Local)</option>
-            <option value="vertex">Vertex AI (Cloud)</option>
-          </select>
-        </div>
-
-        {/* RAG */}
-        <div className="flex items-center mt-2">
-          <input
-            id="useRag"
-            type="checkbox"
-            checked={useRag}
-            onChange={(e) => setUseRag(e.target.checked)}
-            className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-          />
-          <label htmlFor="useRag" className="ml-2 text-sm text-gray-700">
-            {t("useRag")}
-          </label>
-        </div>
-
-        {/* Prompt Selection */}
-        <div className="sm:col-span-2 lg:col-span-2">
-          <label
-            htmlFor="prompt"
-            className="block mb-1 text-sm font-medium text-gray-700"
-          >
-            {t("selectPrompt")}
-          </label>
-          <select
-            id="prompt"
-            value={prompt}
-            onChange={(e) => {
-              useGenerateStore.setState({ prompt: e.target.value });
-              updatePrompt();
-            }}
-            className="block w-full p-3 border border-gray-300 rounded-md 
-                 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            <option value="">{t("selectPrompt")}</option>
-            {Array.isArray(prompts) &&
-              prompts.map((p) => (
-                <option key={p.id} value={p.name}>
-                  {p.name}
+          {/* Skill (Auto-filled from filter) */}
+          <div>
+            <label htmlFor="skill" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("selectSkill")}
+            </label>
+            <select
+              id="skill"
+              value={skill}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">{t("selectSkill")}</option>
+              {SkillOptions.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
                 </option>
               ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Prompt content display */}
-      <div>
-        <label className="block mb-2 font-medium">{t("promptLabel")}</label>
-        <textarea
-          rows={15}
-          value={prompt_content}
-          onChange={(e) => setPromptContent(e.target.value)}
-          className="w-full p-2 border rounded font-mono text-sm bg-gray-50"
-        />
-      </div>
-
-      {/* Action buttons */}
-      <div className="flex gap-4">
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !isFormValid}
-          className={`px-6 py-3 rounded-md font-medium transition-colors duration-200 ${
-            loading || !isFormValid
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
-          }`}
-        >
-          {loading ? (
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              {t("creating")}
-            </div>
-          ) : (
-            t("createExercise")
-          )}
-        </button>
-
-        <button
-          onClick={exportResults}
-          className="px-4 py-2 bg-green-500 text-white rounded"
-        >
-          {t("exportJson")}
-        </button>
-      </div>
-
-      {error && <p className="text-red-500">{error}</p>}
-
-      {/* {sampleExercises.map((ex) => (
-        <ExerciseCard key={ex.id} data={ex} />
-      ))} */}
-      {/* Loading state */}
-      {loading && (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-2">Đang tải bài tập...</span>
-        </div>
-      )}
-
-      {/* Results & Sample Toggle */}
-      <div className="space-y-4">
-        {hasResults && (
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-green-700">
-              Kết quả từ hệ thống ({results.length} bài tập)
-            </h3>
-            {results.map((ex) => (
-              <ExerciseCard key={ex.id} data={ex} />
-            ))}
+            </select>
           </div>
-        )}
 
-        {/* Toggle sample with arrow */}
-        <div
-          className="flex items-center cursor-pointer text-sm text-gray-500"
-          onClick={() => setShowSampleExercises((prev) => !prev)}
-        >
-          <span>Hiển thị sample</span>
-          <svg
-            className={`ml-1 transition-transform ${
-              showSampleExercises ? "rotate-180" : "rotate-0"
-            }`}
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-          >
-            <path
-              fillRule="evenodd"
-              d="M1.646 5.646a.5.5 0 01.708 0L8 11.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z"
+          {/* Level */}
+          <div>
+            <label htmlFor="level" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("selectLevel")}
+            </label>
+            <select
+              id="level"
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              className="block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">{t("selectLevel")}</option>
+              {LevelOptions.map((l) => (
+                <option key={l.value} value={l.value}>
+                  {l.value}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Topic (Filtered by selected skill) */}
+          <div>
+            <label htmlFor="topic" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("selectTopic")}
+              {topicsLoading && (
+                <span className="ml-2 text-xs text-blue-600">Loading...</span>
+              )}
+            </label>
+            <select
+              id="topic"
+              value={topicId}
+              onChange={(e) => setTopic(e.target.value)}
+              disabled={topicsLoading || !skill}
+              className="block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              <option value="">
+                {!skill ? "Select skill first" : t("selectTopic")}
+              </option>
+              {availableTopics.map((tpc) => (
+                <option key={tpc.id} value={tpc.id}>
+                  {tpc.title}
+                </option>
+              ))}
+            </select>
+            {skill && availableTopics.length === 0 && !topicsLoading && (
+              <p className="text-sm text-yellow-600 mt-1">
+                No topics available for {skill}. Try selecting a different skill.
+              </p>
+            )}
+          </div>
+
+          {/* Type */}
+          <div>
+            <label htmlFor="type" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("selectType")}
+            </label>
+            <select
+              id="type"
+              value={typeId}
+              onChange={(e) => setType(e.target.value)}
+              className="block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">{t("selectType")}</option>
+              {types.map((tp) => (
+                <option key={tp.id} value={tp.id}>
+                  {tp.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Mode */}
+          <div>
+            <label htmlFor="mode" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("selectMode")}
+            </label>
+            <select
+              id="mode"
+              value={mode}
+              onChange={(e) => setMode(e.target.value as "vertex" | "ollama")}
+              className="block w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="ollama">Ollama (Local)</option>
+              <option value="vertex">Vertex AI (Cloud)</option>
+            </select>
+          </div>
+
+          {/* RAG */}
+          <div className="flex items-center mt-6">
+            <input
+              id="useRag"
+              type="checkbox"
+              checked={useRag}
+              onChange={(e) => setUseRag(e.target.checked)}
+              className="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
             />
-          </svg>
-        </div>
-
-        {showSampleExercises && (
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-600">
-              Bài tập mẫu (Demo) - {sampleExercises.length} bài tập
-            </h3>
-            <p className="text-sm text-gray-500 mb-4">
-              Đây là các bài tập mẫu để bạn tham khảo. Hãy điền form và nhấn
-              "Tạo bài tập" để tạo bài tập thực tế.
-            </p>
-            {sampleExercises.map((ex) => (
-              <ExerciseCard key={ex.id} data={ex} />
-            ))}
+            <label htmlFor="useRag" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+              {t("useRag")}
+            </label>
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Prompt Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        {/* Prompt Selector */}
+        <PromptSelector
+          selectedPrompt={selectedPrompt}
+          onPromptSelect={setSelectedPrompt}
+          onPromptContentChange={setPromptContent}
+          skill={skill}
+          type={typeId}
+        />
+        
+        {/* Prompt Content Editor */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t("promptLabel")} Content
+            </label>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {prompt_content.length} characters
+            </div>
+          </div>
+          <textarea
+            rows={15}
+            value={prompt_content}
+            onChange={(e) => setPromptContent(e.target.value)}
+            className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg font-mono text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder={selectedPrompt ? `Edit ${selectedPrompt.name} template...` : "Enter your prompt here or select a template above..."}
+          />
+          
+          {/* Prompt Variables Info */}
+          {selectedPrompt && selectedPrompt.variables && selectedPrompt.variables.length > 0 && (
+            <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg">
+              <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                Available Variables:
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {selectedPrompt.variables.map((variable, index) => (
+                  <div key={index} className="bg-white dark:bg-blue-800 px-2 py-1 rounded text-xs font-mono">
+                    {`{${variable.name}}`}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

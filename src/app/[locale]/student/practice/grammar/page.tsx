@@ -225,7 +225,7 @@ const GrammarPracticeList: React.FC = () => {
                 <LessonCard
                   key={lesson.id}
                   lesson={lesson}
-                  onClick={() => handleClickLesson(lesson)}
+                 
                 />
               ))}
             </div>

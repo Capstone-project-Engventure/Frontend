@@ -11,13 +11,14 @@ export default function VocabByTopic() {
   const { "topic-id": topicId } = useParams();
 
   const vocabService = new VocabularyService();
-  const [vocabList, setVocabList] = useState([]);
-  const [vocabExerciseList, setVocabExerciseList] = useState([]);
+  const [vocabList, setVocabList] = useState<any[]>([]);
+  const [vocabExerciseList, setVocabExerciseList] = useState<any[]>([]);
+  
   useEffect(() => {
     async function fetchVocabByTopic() {
       try {
         console.log("topic_id", topicId);
-        if (topicId) {
+        if (topicId && typeof topicId === 'string') {
           const res = await vocabService.getVocabByTopic(topicId);
           console.log("res: ", res.data);
 
@@ -30,22 +31,6 @@ export default function VocabByTopic() {
       }
     }
 
-    async function fetchVocabExerciseByTopic() {
-        try {
-          console.log("topic_id", topicId);
-          if (topicId) {
-            const res = await vocabService.getExerciseByTopic(topicId);
-            console.log("res: ", res.data);
-  
-            setVocabList(res.data);
-          } else {
-            alert("check");
-          }
-        } catch (err) {
-          console.log("err: ", err);
-        }
-      }
-
     fetchVocabByTopic();
   }, [topicId]);
 
@@ -57,7 +42,7 @@ export default function VocabByTopic() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
         {vocabList.length >0 &&
-          vocabList.map((item, index) => {
+          vocabList.map((item: any, index: number) => {
             return (
               <div
                 key={item.id || index}
@@ -78,7 +63,7 @@ export default function VocabByTopic() {
 
       <div className="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
         {vocabExerciseList &&
-          vocabExerciseList.map((item, index) => {
+          vocabExerciseList.map((item: any, index: number) => {
             return (
               <div
                 key={item.id || index}

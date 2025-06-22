@@ -27,7 +27,7 @@ class PronunciationPracticeService extends BaseService<Lesson> {
       },
     });
   }
-  checkPronunciation(data) {
+  checkPronunciation(data:any) {
     return api.post("/pronunciation-exercises/check-pronunciation", data, {
       headers: {
         "Content-Type": "multipart/form-data",

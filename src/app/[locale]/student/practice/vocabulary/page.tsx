@@ -18,7 +18,8 @@ export default function VocabularyPractice() {
     async function fetchTopic() {
       try {
         // const keyword =
-        const res = await topicService.getAll(1, 10, keyword);
+        const res = await topicService.getAll({
+          keyword: searchTerm,});
         if (res.success) {
           setTopics(res.data);
         }

@@ -1,15 +1,13 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 // import { observer } from 'mobx-react-lite';
-import { usePromptStore } from '@/lib/store/promptStore';
+// import { usePromptStore } from '@/lib/store/promptStore';
 import AdvancedDataTable from '@/app/[locale]/components/table/AdvancedDataTable';
 
 const PromptManagementPage: React.FC = (() => {
-    const promptStore = usePromptStore();
+    // const promptStore = usePromptStore();
     const [page,setPage] = useState(1);
-    useEffect(() => {
-        promptStore.fetchPrompts();
-    }, []);
+ 
 
     return (
         <div>
@@ -17,7 +15,7 @@ const PromptManagementPage: React.FC = (() => {
             {/* <AdvancedDataTable
                 
             /> */}
-            <AdvancedDataTable
+            {/* <AdvancedDataTable
                 fields={promptStore.fields}
                 service={promptStore.service}
                 page={page}
@@ -37,7 +35,7 @@ const PromptManagementPage: React.FC = (() => {
                 // onEdit={promptStore.editPrompt}
                 // // onCreate={promptStore.createPrompt}
                 // onSuccess={promptStore.onSuccess}
-            />
+            /> */}
         </div>
     );
 });

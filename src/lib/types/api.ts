@@ -41,7 +41,7 @@ interface GetAllResponse<T> {
   data: T;
 }
 
- interface ErrorResponse {
+interface ErrorResponse {
   success: false;
   error: string;
   code?: string;

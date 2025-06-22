@@ -34,12 +34,12 @@ export default function MyClass() {
       try {
         setIsLoading(true);
         const res = await courseService.getAll({});
-        if (!("data" in res)) {
-          toast.error(res?.message || "Lỗi khi lấy danh sách khóa học");
+        if (!res.success) {
+          toast.error(res.error || "Lỗi khi lấy danh sách khóa học");
           return;
         }
         if (!Array.isArray(res.data)) {
-          toast.error(res.data);
+          toast.error("Dữ liệu không hợp lệ");
           return;
         }
         setCourses(res.data);
