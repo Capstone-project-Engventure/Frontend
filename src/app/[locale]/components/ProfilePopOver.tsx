@@ -6,7 +6,7 @@ import {
   Transition,
 } from "@headlessui/react";
 import Link from "next/link";
-import { Component, useState } from "react";
+import { useState } from "react";
 import { HiUserCircle } from "react-icons/hi";
 import Image from "next/image";
 import { MdArrowDropDown, MdArrowDropUp, MdLogout } from "react-icons/md";
@@ -49,9 +49,7 @@ export default function ProfilePopOVer() {
     router.push("/");
     toast.info("Đăng xuất thành công");
   };
-  const toggleProfile = () => {
-    setIsShowProfile(!isShowProfile);
-  };
+
   return (
     <div>
       <Popover className="relative text-black items-center">

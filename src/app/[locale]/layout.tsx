@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { Providers } from "./providers";
 // import { LocaleProvider } from "@/lib/context/LocaleContext";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";

@@ -1,10 +1,8 @@
-import { useApi } from "../Api";
-
-const api = useApi();
+import { axiosInstance } from "../Api";
 class UserService {
   async getOwnUser() {
     try {
-      const res = await api.get("/users/user_info");
+      const res = await axiosInstance.get("/users/user_info");
       return {
         success: true,
         data: res.data,

@@ -1,7 +1,6 @@
-import { useApi } from "../Api";
+import { axiosInstance } from "../Api";
 import { DeleteResult, GetAllResult, GetSingleResult, MutationResult } from "@/lib/types/api";
-// import { PaginatedResponse } from "../types/response";
-const api = useApi();
+
 const defaultConfig = {
     headers: {
       'Content-Type': 'application/json',
@@ -35,7 +34,7 @@ export abstract class BaseService<T> {
         Object.assign(params, filters);
       }
 
-      const res = await api.get(`${this.endpoint}`, { params });
+      const res = await axiosInstance.get(`${this.endpoint}`, { params });
 
       if (res.status == 200) {
         if (pageSize) {
@@ -73,29 +72,31 @@ export abstract class BaseService<T> {
   }
 
   public async getById(id: string | number): Promise<GetSingleResult<T>> {
-    const res = await api.get(`${this.endpoint}/${id}?type=reading_practice`);
-    if (res.status === 200) {
+    try {
+      const res = await axiosInstance.get(`${this.endpoint}/${id}?type=reading_practice`);
+      if (res.status === 200) {
+        return {
+          success: true,
+          data: res.data as T,
+        };
+      }
       return {
-        success: true,
-        data: res.data as T,
+        success: false,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
       };
     }
-    return {
-      success: false,
-      error: `HTTP Error: ${res.status}`,
-      code: res.status.toString(),
-    };
-  } catch (error: any) {
-    return {
-      success: false,
-      error: error.message || 'Unknown error occurred',
-      code: error.code,
-    };
   }
 
   public async create(data: Partial<T>, config: any = defaultConfig): Promise<MutationResult<T>> {
     try {
-      const res = await api.post(`${this.endpoint}`, data, config);
+      const res = await axiosInstance.post(`${this.endpoint}`, data, config);
       if (res.status === 201) {
         return {
           success: true,
@@ -122,7 +123,7 @@ export abstract class BaseService<T> {
     config: any= defaultConfig
   ): Promise<MutationResult<T>> {
     try {
-      const res = await api.put(`${this.endpoint}/${id}`, data, config);
+      const res = await axiosInstance.put(`${this.endpoint}/${id}`, data, config);
       if (res.status === 200) {
         return {
           success: true,
@@ -149,7 +150,7 @@ export abstract class BaseService<T> {
     config: any = defaultConfig
   ): Promise<MutationResult<T>> {
     try {
-      const res = await api.patch(`${this.endpoint}/${id}`, data, config);
+      const res = await axiosInstance.patch(`${this.endpoint}/${id}`, data, config);
       if (res.status === 200) {
         return {
           success: true,
@@ -171,7 +172,7 @@ export abstract class BaseService<T> {
 
   public async delete(id: number): Promise<DeleteResult> {
     try {
-      const res = await api.delete(`${this.endpoint}/${id}`);
+      const res = await axiosInstance.delete(`${this.endpoint}/${id}`);
       if (res.status === 204) {
         return {
           success: true,
@@ -196,7 +197,7 @@ export abstract class BaseService<T> {
     items: Array<number>
   ): Promise<DeleteResult> {
     try {
-      const res = await api.delete(`${this.endpoint}`, {
+      const res = await axiosInstance.delete(`${this.endpoint}`, {
         data: { ids: items },
       });
       if (res.status === 204) {
