@@ -1,3 +1,5 @@
+import React from 'react';
+
 export interface Field {
   key: string;
   label: string;
@@ -18,6 +20,8 @@ export interface Field {
   isNest?: boolean;
   default?: string | number;
   choices?: Array<string>;
+  maxLength?: number;
+  render?: (value: any, item?: any) => React.ReactNode;
 }
 
 

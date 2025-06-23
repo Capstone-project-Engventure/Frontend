@@ -23,8 +23,13 @@ export const TableCell: React.FC<TableCellProps> = ({
   const renderCellContent = () => {
     const value = item[field.key];
 
+    // Custom render function
+    if (field.render && typeof field.render === 'function') {
+      return field.render(value, item);
+    }
+
     // Key field with link
-    if ((field.key === "title" || field.type === "key") && linkBase && value) {
+    if ((field.key === "title" || field.key === "name" || field.type === "key") && linkBase && value) {
       return (
         <Link
           href={`${linkBase}/${item[keyField]}`}
@@ -32,6 +37,28 @@ export const TableCell: React.FC<TableCellProps> = ({
         >
           {value}
         </Link>
+      );
+    }
+
+    // Count field (display array length)
+    if (field.type === "count" && Array.isArray(value)) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {value.length}
+        </span>
+      );
+    }
+
+    // Excerpt field (truncate text)
+    if (field.type === "excerpt" && value) {
+      const maxLength = (field as any).maxLength || 100;
+      return (
+        <span className="text-gray-600 dark:text-gray-400">
+          {typeof value === 'string' && value.length > maxLength 
+            ? value.substring(0, maxLength) + '...'
+            : value
+          }
+        </span>
       );
     }
 
@@ -73,7 +100,38 @@ export const TableCell: React.FC<TableCellProps> = ({
 
     // Object field (nested path)
     if (typeof value === "object" && value !== null) {
-      return <span>{getValueByPath(item, field.key)}</span>;
+      // Handle arrays
+      if (Array.isArray(value)) {
+        if (value.length === 0) return <span>No items</span>;
+        
+        // Check if it's an array of objects with key/option structure (like MCQ options)
+        if (value.length > 0 && typeof value[0] === "object" && value[0]?.key && value[0]?.option) {
+          return (
+            <ul className="list-disc list-inside text-xs">
+              {value.map((opt: { key: string; option: string }, index: number) => (
+                <li key={opt.key || index}>
+                  <strong>{opt.key?.toUpperCase()}:</strong> {opt.option}
+                </li>
+              ))}
+            </ul>
+          );
+        }
+        
+        // For other arrays, join with comma
+        return <span>{value.join(", ")}</span>;
+      }
+      
+      // Handle objects
+      if (value.name) return <span>{value.name}</span>;
+      if (value.title) return <span>{value.title}</span>;
+      if (value.label) return <span>{value.label}</span>;
+      
+      // For other objects, show as JSON string (truncated if too long)
+      const jsonStr = JSON.stringify(value);
+      if (jsonStr.length > 100) {
+        return <span>{jsonStr.substring(0, 100)}...</span>;
+      }
+      return <span>{jsonStr}</span>;
     }
 
     // Default: simple value

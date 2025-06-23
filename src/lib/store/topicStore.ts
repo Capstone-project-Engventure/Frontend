@@ -88,7 +88,7 @@ export const useTopicStore = create<TopicState>()(
       fetchCategoryStats: async () => {
         try {
           const res = await topicService.getCategoryStats();
-          if (res.data) {
+          if (res.success && res.data) {
             set({ categoryCounts: res.data });
           }
         } catch (err) {

@@ -36,6 +36,7 @@
   },
   "Sidebar": {
     "exercises": "Exercises",
+    "practiceExercises": "Practice Exercises",
     "dashboard": "Dashboard",
     "learningCorner": "Learning Corner",
     "courses": "Courses",
@@ -63,6 +64,7 @@
   "PaginationTable": {
     "add": "Add new",
     "edit": "Edit",
+    "view": "View",
     "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
@@ -155,7 +157,8 @@
         "home": "Home",
         "writingExercises": "Exercises Writing",
         "grammarExercises": "Exercises Grammar",
-        "readingExercises": "Exercises Reading"
+        "readingExercises": "Exercises Reading",
+        "listeningExercises": "Exercises Listening"
       },
       "topic": "Topic",
       "lesson": "Lesson",
@@ -166,6 +169,7 @@
         "level": "Level",
         "answer": "Answer",
         "description": "Description",
+        "explanation": "Explanation",
         "skill": "Skill",
         "audio": "Audio",
         "questionType": "Question Type",
@@ -186,6 +190,41 @@
         "topic": "Select a topic"
       }
     },
+    "ReadingPassages": {
+      "breadcrumbs": {
+        "home": "Home",
+        "exercises": "Exercises",
+        "readingLessons": "Reading Lessons",
+        "readings": "Reading Passages",
+        "createReading": "Create Reading Passage"
+      },
+      "fields": {
+        "title": "Title",
+        "content": "Content",
+        "numberOfExercises": "Number of Exercises",
+        "lesson": "Lesson",
+        "description": "Description",
+        "excerpt": "Content Preview"
+      },
+      "actions": {
+        "viewExercises": "View Exercises",
+        "editContent": "Edit Content",
+        "addExercises": "Add Exercises",
+        "backToReadings": "Back to Reading Passages"
+      },
+      "messages": {
+        "fetchSuccess": "Reading passages loaded successfully",
+        "fetchError": "Failed to fetch reading passages",
+        "createSuccess": "Reading passage created successfully",
+        "createError": "Failed to create reading passage",
+        "updateSuccess": "Reading passage updated successfully",
+        "updateError": "Failed to update reading passage",
+        "deleteSuccess": "Reading passage deleted successfully",
+        "deleteError": "Failed to delete reading passage",
+        "duplicateTitle": "A reading passage with this title already exists in this lesson",
+        "loading": "Loading..."
+      }
+    },
     "Lessons": {
       "breadcrumbs": {
         "home": "Home",
@@ -196,8 +235,8 @@
         "level": "Level",
         "topic": "Topic",
         "description": "Description",
-        "types":"Type",
-        "type":{
+        "types": "Type",
+        "type": {
           "lesson": "Lesson",
           "practice": "Practice"
         }
@@ -289,8 +328,8 @@
         "updateSuccess": "Course updated successfully!",
         "deleteSuccess": "Course deleted successfully!",
         "error": "An error occurred. Please try again."
-             }
-     }
+      }
+    }
   },
   "Common": {
     "breadcrumbs": {
@@ -413,5 +452,5 @@
   "GrammarPractice": {
     "title": "Grammar Practice",
     "description": "Improve your grammar skills with these exercises."
-  } 
+  }
 }

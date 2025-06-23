@@ -13,11 +13,18 @@ export const FormField: React.FC<FormFieldProps> = ({
   onChange
 }) => {
   if (field.type === "hidden") {
+    // Ensure hidden field value is set in formData
+    React.useEffect(() => {
+      if (onChange && field.default !== undefined && formData[field.key] === undefined) {
+        onChange(field.key, field.default);
+      }
+    }, [field.default, field.key, formData, onChange]);
+
     return (
       <input
         key={field.key}
         type="hidden"
-        value={field.default || ""}
+        value={formData[field.key] || field.default || ""}
         name={field.key}
       />
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import SkillTabFilter from "@/app/[locale]/components/filter/SkillTabFilter";
 import PromptSelector from "@/app/[locale]/components/prompt/PromptSelector";
 import { useApi } from "@/lib/Api";

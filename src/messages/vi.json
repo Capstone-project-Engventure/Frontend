@@ -49,6 +49,7 @@
     "phonetics": "Ngữ âm",
     "allExercises": "Tất cả bài tập",
     "exercises": "Bài tập",
+    "practiceExercises": "Bài tập luyện tập",
     "reading": "Đọc",
     "grammar": "Ngữ pháp",
     "listening": "Nghe",
@@ -67,20 +68,22 @@
   "PaginationTable": {
     "add": "Thêm mới",
     "edit": "Chỉnh sửa",
+    "view": "Xem",
     "delete": "Xóa",
     "cancel": "Hủy",
     "save": "Lưu",
     "search": "Tìm kiếm",
+    "searchPlaceholder": "Tìm kiếm tại đây...",
     "noData": "Không có dữ liệu",
     "loading": "Đang tải...",
+    "importFile": "Import file",
+    "exportFile": "Export file",
+    "previous": "Trước",
+    "next": "Tiếp",
     "page": "Trang",
-    "importFile": "Nhập tệp",
-    "exportFile": "Xuất tệp",
-    "next": "Tiếp theo",
-    "previous": "Trước đó",
     "actions": "Hành động",
-    "confirmDelete": "Bạn có chắc chắn muốn xóa mục này không?",
-    "apiError": "Lỗi server, vui lòng thử lại sau"
+    "confirmDelete": "Bạn có chắc chắn muốn xóa mục này?",
+    "apiError": "Đã xảy ra lỗi khi tải dữ liệu từ máy chủ. Vui lòng thử lại sau."
   },
   "StudentWritingPractice": {
     "title": "Viết",
@@ -157,7 +160,9 @@
       "breadcrumbs": {
         "home": "Trang chủ",
         "writingExercises": "Bài tập Viết",
-        "grammarExercises": "Bài tập Ngữ pháp"
+        "grammarExercises": "Bài tập Ngữ pháp",
+        "readingExercises": "Bài tập Đọc hiểu",
+        "listeningExercises": "Bài tập Nghe hiểu"
       },
       "topic": "Chủ đề",
       "lesson": "Bài học",
@@ -168,6 +173,7 @@
         "level": "Trình độ",
         "answer": "Đáp án",
         "description": "Mô tả",
+        "explanation": "Giải thích",
         "skill": "Kỹ năng",
         "audio": "Âm thanh",
         "questionType": "Loại câu hỏi",
@@ -194,6 +200,41 @@
         "audioFile": "Chọn tệp âm thanh",
         "lesson": "Chọn bài học",
         "topic": "Chọn chủ đề"
+      }
+    },
+    "ReadingPassages": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "exercises": "Bài tập",
+        "readingLessons": "Bài học đọc hiểu",
+        "readings": "Đoạn văn đọc hiểu",
+        "createReading": "Tạo đoạn văn đọc hiểu"
+      },
+      "fields": {
+        "title": "Tiêu đề",
+        "content": "Nội dung",
+        "numberOfExercises": "Số lượng bài tập",
+        "lesson": "Bài học",
+        "description": "Mô tả",
+        "excerpt": "Xem trước nội dung"
+      },
+      "actions": {
+        "viewExercises": "Xem bài tập",
+        "editContent": "Chỉnh sửa nội dung",
+        "addExercises": "Thêm bài tập",
+        "backToReadings": "Quay lại danh sách đoạn văn"
+      },
+      "messages": {
+        "fetchSuccess": "Tải đoạn văn đọc hiểu thành công",
+        "fetchError": "Không thể tải đoạn văn đọc hiểu",
+        "createSuccess": "Tạo đoạn văn đọc hiểu thành công",
+        "createError": "Không thể tạo đoạn văn đọc hiểu",
+        "updateSuccess": "Cập nhật đoạn văn đọc hiểu thành công",
+        "updateError": "Không thể cập nhật đoạn văn đọc hiểu",
+        "deleteSuccess": "Xóa đoạn văn đọc hiểu thành công",
+        "deleteError": "Không thể xóa đoạn văn đọc hiểu",
+        "duplicateTitle": "Đã tồn tại đoạn văn với tiêu đề này trong bài học",
+        "loading": "Đang tải..."
       }
     },
     "Lessons": {

@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import FilterCard from "@/app/[locale]/components/card/FilterCard";
 import LessonCard from "@/app/[locale]/components/card/LessonCard";
 import PaginationCard from "@/app/[locale]/components/card/PaginationCard";

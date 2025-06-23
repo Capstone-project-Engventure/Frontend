@@ -1,7 +1,7 @@
 import React from 'react';
 import { TableCell } from './TableCell';
 import { Field } from '@/lib/types';
-import { HiPencil, HiTrash } from 'react-icons/hi';
+import { HiPencil, HiTrash, HiEye } from 'react-icons/hi';
 
 interface TableRowProps {
   item: any;
@@ -12,6 +12,7 @@ interface TableRowProps {
   onSelect: (id: string) => void;
   onEdit: (item: any) => void;
   onDelete: (id: string) => void;
+  onView?: (item: any) => void;
 }
 
 export const TableRow: React.FC<TableRowProps> = ({
@@ -22,7 +23,8 @@ export const TableRow: React.FC<TableRowProps> = ({
   isSelected,
   onSelect,
   onEdit,
-  onDelete
+  onDelete,
+  onView
 }) => {
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -58,6 +60,15 @@ export const TableRow: React.FC<TableRowProps> = ({
           >
             <HiTrash className="text-lg" />
           </button>
+          {onView && (
+            <button
+              onClick={() => onView(item)}
+              className="text-gray-600 hover:text-gray-800"
+              title="View"
+            >
+              <HiEye className="text-lg" />
+            </button>
+          )}
         </div>
       </td>
     </tr>

@@ -33,6 +33,7 @@ interface PaginationTableProps {
   onUpdate?: (id: string | number, data: any) => void;
   onDelete?: (id: string | number) => void;
   onEdit?: (item: any) => any;
+  onView?: (item: any) => void;
   onCreate?: () => void;
   onSuccess?: () => void;
 }
@@ -55,11 +56,10 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
   onUpdate,
   onDelete,
   onEdit,
+  onView,
   onCreate,
   onSuccess
 }) => {
-  console.log(123);
-
   // Search and filter state
   const [keyword, setKeyword] = useState("");
   const [sortKey, setSortKey] = useState<string>("");
@@ -97,21 +97,18 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
       onCreate();
       setIsModalOpen(true);
     } else {
-      console.log('Setting modal open for add');
       setFormData({});
       setIsModalOpen(true);
     }
   };
 
   const handleEdit = (item: any) => {
-    console.log('handleEdit called, item:', item, 'onEdit:', onEdit);
     if (onEdit) {
       const editData = onEdit(item);
       // Use returned data from onEdit or fallback to item
       setFormData(editData && typeof editData === 'object' ? editData : item);
       setIsModalOpen(true);
     } else {
-      console.log('Setting modal open for edit');
       setFormData(item);
       setIsModalOpen(true);
     }
@@ -122,7 +119,6 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
     
     // Get form data from the custom event if available, otherwise use current formData
     const submissionData = (e.target as any)?.formData || formData;
-    console.log('Form submitted:', submissionData);
 
     try {
       let response;
@@ -144,6 +140,21 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
       }
     } catch (error) {
       console.error('Error submitting form:', error);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = onDelete
+        ? await onDelete(id)
+        : await service?.delete(id);
+      
+      if (response?.success) {
+        refetch();
+        onSuccess?.();
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
     }
   };
 
@@ -188,7 +199,8 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
                   isSelected={selectedItems.includes(item.id)}
                   onSelect={handleCheckboxChange}
                   onEdit={handleEdit}
-                  onDelete={(id) => {/* Handle delete */}}
+                  onDelete={handleDelete}
+                  onView={onView}
                 />
               ))
             ) : (
@@ -210,11 +222,6 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
       />
 
       {/* Modal */}
-      {(() => {
-        console.log('Modal render check:', { isModalOpen, modalFields, formData });
-        return null;
-      })()}
-
       {isModalOpen && modalFields && (
         <FormModal
           fields={modalFields}
@@ -222,7 +229,6 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
           formData={formData}
           onSubmit={handleSubmit}
           onClose={() => {
-            console.log('Modal closing');
             setIsModalOpen(false);
             setFormData(null);
           }}

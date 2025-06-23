@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import ExerciseService from "@/lib/services/exercise.service";
 import { FetchArgs } from "@/lib/types/api";
 import { LevelOptions } from "@/lib/constants/level";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import SoundService from "@/lib/services/sound.service";
 import { Sound } from "@/lib/types/sound";
 import { toast } from "react-toastify";
@@ -89,21 +89,31 @@ const PhoneticExercisePage = () => {
   //     .finally(() => setLoading(false));
   // }, [id, t]);
 
-  const createPronunciationPractice =  useCallback(async (formData: any, config: any) => {
+  const createPronunciationPractice = useCallback(async (formData: any) => {
     if (!selectedSound?.id) {
       toast.error(t("error.noSoundSelected"));
       return;
     }
-    try{
-      formData.append("sound_id", selectedSound?.id || "");
-      const res = await pronunciationService.create(formData, config);
+    try {
+      const dataWithSound = {
+        ...formData,
+        sound_id: selectedSound.id
+      };
+      
+      const res = await pronunciationService.create(dataWithSound, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      
       if (res.success) {
         toast.info(t("create_successful"));
+        return res;
       } else {
         toast.error(t("create_unsuccessful"));
+        return res;
       }
     } catch (error) {
       toast.error(t("error.general"));
+      throw error;
     }
   }, [selectedSound?.id, t]);
 
@@ -233,28 +243,31 @@ const PhoneticExercisePage = () => {
         </div>
         
         <div className="p-6">
-          {/* <PaginationTable
+          <AdvancedDataTable 
+            fields={fields} 
+            page={page}
+            onPageChange={onPageChange}  
+            modalFields={modalFields}
             customObjects={exercises}
             customTotalPages={1}
-            hasCustomFetch
-            customFetch={customFetch}
-            filterArgs={filters}
-            fields={tableFields}
-            page={page}
-            onPageChange={onPageChange}
+            hasCustomFetch={true}
+            modalTitle="Phonetic Exercise"
             onAdd={createPronunciationPractice}
-            service={pronunciationService}
-            linkBase={`/${locale}/admin/data/sound`}
-            modalFields={modalFields}
-            onHandleFile={() => {}}
-            hasBreadcrumb={false}
-            config={{ 
-              headers: { "Content-Type": "multipart/form-data" } 
+            onSuccess={() => {
+              // Reload exercises after successful operations
+              if (id && typeof id === 'string') {
+                fetchExerciseBySymbol(id, t).then(exerciseData => {
+                  setExercises(
+                    Array.isArray(exerciseData)
+                      ? exerciseData
+                      : exerciseData && typeof exerciseData === "object"
+                      ? [exerciseData]
+                      : []
+                  );
+                });
+              }
             }}
-            className="border-0 shadow-none"
-          /> */}
-          <AdvancedDataTable fields={fields} page={page}
-            onPageChange={onPageChange}  modalFields={modalFields}/>
+          />
         </div>
       </div>
     </div>

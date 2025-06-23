@@ -8,7 +8,7 @@ import {
   HiChevronLeft,
   HiChevronRight,
 } from "react-icons/hi";
-import Breadcrumb from "../breadcumb";
+import Breadcrumb from "../breadcrumb";
 import { SearchInput } from "../SearchInput";
 import {
   Description,
@@ -44,6 +44,7 @@ interface Field {
   isNest?: boolean;
   default?: string | number;
   choices?: Array<string>;
+  maxLength?: number;
 }
 
 interface PaginationTableProps {
@@ -481,8 +482,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                           key={f.key}
                           className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300"
                         >
-                          {(f.key === "title" || f.type === "key") &&
-                          linkBase ? (
+                          {f.type === "key" && linkBase ? (
                             <Link
                               href={`${linkBase}/${item[keyField]}`}
                               className="text-blue-600 dark:text-blue-400 hover:underline"
@@ -499,6 +499,17 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
                             />
                           ) : f.type === "audio" && item[f.key] ? (
                             <AudioPlayer src={item[f.key]} />
+                          ) : f.type === "count" && Array.isArray(item[f.key]) ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {item[f.key].length}
+                            </span>
+                          ) : f.type === "excerpt" && item[f.key] ? (
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {typeof item[f.key] === 'string' && item[f.key].length > (f.maxLength || 100) 
+                                ? item[f.key].substring(0, f.maxLength || 100) + '...'
+                                : item[f.key]
+                              }
+                            </span>
                           ) : f.isNest && item[f.key] ? (
                             <span>{item[f.key]?.[f.nestKey!]}</span>
                           ) : f.type === "mcq" &&

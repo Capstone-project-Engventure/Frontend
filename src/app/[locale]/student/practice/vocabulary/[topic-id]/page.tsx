@@ -20,9 +20,12 @@ export default function VocabByTopic() {
         console.log("topic_id", topicId);
         if (topicId && typeof topicId === 'string') {
           const res = await vocabService.getVocabByTopic(topicId);
-          console.log("res: ", res.data);
-
-          setVocabList(res.data);
+          if (res.success && res.data) {
+            console.log("res: ", res.data);
+            setVocabList(res.data);
+          } else {
+            console.error("Failed to fetch vocabulary:", res.success ? "No data" : res.error);
+          }
         } else {
           alert("check");
         }

@@ -73,7 +73,7 @@ export abstract class BaseService<T> {
 
   public async getById(id: string | number): Promise<GetSingleResult<T>> {
     try {
-      const res = await axiosInstance.get(`${this.endpoint}/${id}?type=reading_practice`);
+      const res = await axiosInstance.get(`${this.endpoint}/${id}`);
       if (res.status === 200) {
         return {
           success: true,

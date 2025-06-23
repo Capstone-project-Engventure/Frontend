@@ -1,5 +1,5 @@
 "use client";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
 import TopicService from "@/lib/services/topic.service";
