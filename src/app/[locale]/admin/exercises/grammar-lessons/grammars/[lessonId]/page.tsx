@@ -68,7 +68,7 @@ export default function AdminGrammarExercises() {
     { label: t("breadcrumbs.home"), href: `${locale}/admin/home` },
     {
       label: t("breadcrumbs.grammarExercises"),
-      href: `${locale}/admin/exercises/grammar-lessons`,
+      href: `/${locale}/admin/exercises/grammar-lessons`,
     },
     {
       label: currentLesson?.title || `Lesson ${lessonId}`,
@@ -412,7 +412,6 @@ export default function AdminGrammarExercises() {
         customTotalPages={totalPage}
         page={page}
         onPageChange={onPageChange}
-        modalFields={modalFields}
         modalTitle="Grammar Exercise"
         hasCustomFetch={true}
         onCreate={onCreate}

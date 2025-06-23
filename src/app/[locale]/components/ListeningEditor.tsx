@@ -49,6 +49,18 @@ const ListeningEditor: React.FC<Props> = ({ initialData, onSubmit, header, isVie
     setExercises(newQuestions);
   };
 
+  const handleNameChange = (index: number, value: string) => {
+    const newQuestions = [...exercises];
+    newQuestions[index].name = value;
+    setExercises(newQuestions);
+  };
+
+  const handleExplanationChange = (index: number, value: string) => {
+    const newQuestions = [...exercises];
+    newQuestions[index].explanation = value;
+    setExercises(newQuestions);
+  };
+
   const handleOptionChange = (
     qIndex: number,
     oIndex: number,
@@ -87,8 +99,9 @@ const ListeningEditor: React.FC<Props> = ({ initialData, onSubmit, header, isVie
     if (!newQuestions[qIndex].options) {
       newQuestions[qIndex].options = [];
     }
+    const optionIndex = newQuestions[qIndex].options.length;
     const newOption: Option = {
-      key: "",
+      key: String.fromCharCode(65 + optionIndex), // A, B, C, D...
       option: "",
     };
     newQuestions[qIndex].options.push(newOption);
@@ -184,7 +197,7 @@ const ListeningEditor: React.FC<Props> = ({ initialData, onSubmit, header, isVie
 
     // Prepare data with audio files
     const exerciseData = exercises[0];
-    exerciseData.lesson = "14"; // This will be overridden by the parent component
+    // lesson will be set by the parent component, don't override here
     exerciseData.skill = "listening";
     exerciseData.generated_by = "admin";
 
@@ -274,6 +287,27 @@ const ListeningEditor: React.FC<Props> = ({ initialData, onSubmit, header, isVie
                       <FaTrash className="mr-1" />
                       Xóa
                     </button>
+                  )}
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tên câu hỏi:
+                  </label>
+                  {isViewOnly ? (
+                    <div className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 bg-gray-50 text-gray-800">
+                      {q.name || "Không có tên"}
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                      placeholder="Nhập tên câu hỏi..."
+                      value={q.name ?? ""}
+                      onChange={(e) =>
+                        handleNameChange(qIndex, e.target.value)
+                      }
+                    />
                   )}
                 </div>
 
@@ -447,6 +481,27 @@ const ListeningEditor: React.FC<Props> = ({ initialData, onSubmit, header, isVie
                     </span>
                   </div>
                 )}
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Giải thích đáp án:
+                  </label>
+                  {isViewOnly ? (
+                    <div className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 bg-gray-50 text-gray-800">
+                      {q.explanation || "Không có giải thích"}
+                    </div>
+                  ) : (
+                    <textarea
+                      className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors resize-none"
+                      rows={3}
+                      placeholder="Nhập giải thích cho đáp án đúng..."
+                      value={q.explanation ?? ""}
+                      onChange={(e) =>
+                        handleExplanationChange(qIndex, e.target.value)
+                      }
+                    />
+                  )}
+                </div>
               </div>
             ))}
 

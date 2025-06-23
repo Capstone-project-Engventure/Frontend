@@ -438,7 +438,6 @@ export default function AdminListeningExercises() {
         customTotalPages={totalPage}
         page={page}
         onPageChange={onPageChange}
-        modalFields={modalFields}
         modalTitle="Listening Exercise"
         hasCustomFetch={true}
         onCreate={onCreate}
