@@ -30,16 +30,25 @@ export const useTableData = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFetchData = async () => {
-    if (!service && !fetchFunction) return;
-    
     setIsLoading(true);
     try {
       if (hasCustomFetch) {
         if (customObjects && Array.isArray(customObjects)) {
+          console.log('Using custom objects:', customObjects);
+          
           setObjects(customObjects);
           setTotalPages(customTotalPages || 1);
           return;
         }
+      }
+
+      if (!service && !fetchFunction) {
+        // If no service or fetchFunction, but not using custom fetch, set empty array
+        if (!hasCustomFetch) {
+          setObjects([]);
+          setTotalPages(1);
+        }
+        return;
       }
 
       const fetchArgs = {

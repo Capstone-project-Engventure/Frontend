@@ -19,7 +19,7 @@ import PronunciationPracticeService from "@/lib/services/pronunciation-practice.
 import SoundService from "@/lib/services/sound.service";
 import { Exercise } from "@/lib/types/exercise";
 import { Sound } from "@/lib/types/sound";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 
 export default function StudentPronunciationPractice() {
   /* --------------------------------------------------- */

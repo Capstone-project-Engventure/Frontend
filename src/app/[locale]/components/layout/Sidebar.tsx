@@ -95,7 +95,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
       href: `${basePath}/${role === "admin" ? "topics" : "favorite-course"}`,
     },
     {
-      label: t(role === "admin" ? "exercises" : "practice"),
+      label: t(role === "admin" ? "practiceExercises" : "practice"),
       icon: TbNotes,
       children: [
         // ...(role === "admin"
@@ -124,7 +124,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
         {
           label: t("listening"),
           href: `${basePath}/${
-            role === "admin" ? "exercises/listening" : "practice/listening"
+            role === "admin" ? "exercises/listening-lessons" : "practice/listening"
           }`,
           icon: MdOutlineVolumeUp,
         },
@@ -140,7 +140,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
         {
           label: t("writing"),
           href: `${basePath}/${
-            role === "admin" ? "exercises/writing" : "practice/writing"
+            role === "admin" ? "exercises/writing-lessons" : "practice/writing"
           }`,
           icon: MdEditNote,
         },
@@ -148,7 +148,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
           label: t("speaking"),
           href: `${basePath}/${
             role === "admin"
-              ? "exercises/speaking"
+              ? "exercises/speaking-lessons"
               : "practice/speaking"
           }`,
           icon: MdOutlineRecordVoiceOver,

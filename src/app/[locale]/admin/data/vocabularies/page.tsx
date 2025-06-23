@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Transition } from "@headlessui/react";
 import VocabularyService from "@/lib/services/vocabulary.service";
 import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import { HiPlus, HiPencil, HiTrash, HiSearch, HiDownload, HiUpload, HiX } from "react-icons/hi";
 import debounce from "lodash.debounce";
 import TopicService from "@/lib/services/topic.service";

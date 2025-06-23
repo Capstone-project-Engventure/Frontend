@@ -8,7 +8,7 @@ interface HistoryCardProps {
 }
 
 export const HistoryCard: React.FC<HistoryCardProps> = ({ history, onSelect }) => {
-  const date = new Date(history.timestamp).toLocaleString();
+  const date = new Date(history.created_at).toLocaleString();
 
   return (
     <div

@@ -1,5 +1,5 @@
 "use client";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import { useApi } from "@/lib/Api";
 import CourseService from "@/lib/services/course.service";
 import { Course } from "@/lib/types/course";

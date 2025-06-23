@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import ExerciseCard from "@/app/[locale]/components/ExerciseCard";
 import { useHistoryGenerateStore } from "@/lib/store/historyGenerateStore";
 import { useApproveExercise } from "@/lib/hooks/useApproveExercise";

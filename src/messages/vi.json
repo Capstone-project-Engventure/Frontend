@@ -49,6 +49,7 @@
     "phonetics": "Ngữ âm",
     "allExercises": "Tất cả bài tập",
     "exercises": "Bài tập",
+    "practiceExercises": "Bài tập luyện tập",
     "reading": "Đọc",
     "grammar": "Ngữ pháp",
     "listening": "Nghe",
@@ -67,20 +68,22 @@
   "PaginationTable": {
     "add": "Thêm mới",
     "edit": "Chỉnh sửa",
+    "view": "Xem",
     "delete": "Xóa",
     "cancel": "Hủy",
     "save": "Lưu",
     "search": "Tìm kiếm",
+    "searchPlaceholder": "Tìm kiếm tại đây...",
     "noData": "Không có dữ liệu",
     "loading": "Đang tải...",
+    "importFile": "Import file",
+    "exportFile": "Export file",
+    "previous": "Trước",
+    "next": "Tiếp",
     "page": "Trang",
-    "importFile": "Nhập tệp",
-    "exportFile": "Xuất tệp",
-    "next": "Tiếp theo",
-    "previous": "Trước đó",
     "actions": "Hành động",
-    "confirmDelete": "Bạn có chắc chắn muốn xóa mục này không?",
-    "apiError": "Lỗi server, vui lòng thử lại sau"
+    "confirmDelete": "Bạn có chắc chắn muốn xóa mục này?",
+    "apiError": "Đã xảy ra lỗi khi tải dữ liệu từ máy chủ. Vui lòng thử lại sau."
   },
   "StudentWritingPractice": {
     "title": "Viết",
@@ -157,7 +160,9 @@
       "breadcrumbs": {
         "home": "Trang chủ",
         "writingExercises": "Bài tập Viết",
-        "grammarExercises": "Bài tập Ngữ pháp"
+        "grammarExercises": "Bài tập Ngữ pháp",
+        "readingExercises": "Bài tập Đọc hiểu",
+        "listeningExercises": "Bài tập Nghe hiểu"
       },
       "topic": "Chủ đề",
       "lesson": "Bài học",
@@ -168,6 +173,7 @@
         "level": "Trình độ",
         "answer": "Đáp án",
         "description": "Mô tả",
+        "explanation": "Giải thích",
         "skill": "Kỹ năng",
         "audio": "Âm thanh",
         "questionType": "Loại câu hỏi",
@@ -194,6 +200,171 @@
         "audioFile": "Chọn tệp âm thanh",
         "lesson": "Chọn bài học",
         "topic": "Chọn chủ đề"
+      }
+    },
+    "ReadingPassages": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "exercises": "Bài tập",
+        "readingLessons": "Bài học đọc hiểu",
+        "readings": "Đoạn văn đọc hiểu",
+        "createReading": "Tạo đoạn văn đọc hiểu"
+      },
+      "fields": {
+        "title": "Tiêu đề",
+        "content": "Nội dung",
+        "numberOfExercises": "Số lượng bài tập",
+        "lesson": "Bài học",
+        "description": "Mô tả",
+        "excerpt": "Xem trước nội dung"
+      },
+      "actions": {
+        "viewExercises": "Xem bài tập",
+        "editContent": "Chỉnh sửa nội dung",
+        "addExercises": "Thêm bài tập",
+        "backToReadings": "Quay lại danh sách đoạn văn"
+      },
+      "messages": {
+        "fetchSuccess": "Tải đoạn văn đọc hiểu thành công",
+        "fetchError": "Không thể tải đoạn văn đọc hiểu",
+        "createSuccess": "Tạo đoạn văn đọc hiểu thành công",
+        "createError": "Không thể tạo đoạn văn đọc hiểu",
+        "updateSuccess": "Cập nhật đoạn văn đọc hiểu thành công",
+        "updateError": "Không thể cập nhật đoạn văn đọc hiểu",
+        "deleteSuccess": "Xóa đoạn văn đọc hiểu thành công",
+        "deleteError": "Không thể xóa đoạn văn đọc hiểu",
+        "duplicateTitle": "Đã tồn tại đoạn văn với tiêu đề này trong bài học",
+        "loading": "Đang tải..."
+      }
+    },
+    "GrammarExercises": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "exercises": "Bài tập",
+        "grammarLessons": "Bài học Ngữ pháp",
+        "grammars": "Bài tập Ngữ pháp",
+        "createGrammar": "Tạo bài tập Ngữ pháp"
+      },
+      "messages": {
+        "createSuccess": "Tạo bài tập ngữ pháp thành công",
+        "createError": "Tạo bài tập ngữ pháp thất bại",
+        "loading": "Đang tải..."
+      },
+      "actions": {
+        "backToGrammars": "Quay lại bài tập Ngữ pháp"
+      }
+    },
+    "ListeningExercises": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "exercises": "Bài tập",
+        "listeningLessons": "Bài học Nghe hiểu",
+        "listenings": "Bài tập Nghe hiểu",
+        "createListening": "Tạo bài tập Nghe hiểu",
+        "editListening": "Chỉnh sửa bài tập Nghe hiểu"
+      },
+      "messages": {
+        "createSuccess": "Tạo bài tập nghe hiểu thành công",
+        "createError": "Tạo bài tập nghe hiểu thất bại, vui lòng thử lại!",
+        "updateSuccess": "Cập nhật bài tập nghe hiểu thành công",
+        "updateError": "Cập nhật bài tập nghe hiểu thất bại",
+        "fetchError": "Không thể tải bài tập",
+        "exerciseNotFound": "Không tìm thấy bài tập",
+        "loading": "Đang tải..."
+      },
+      "actions": {
+        "backToListenings": "Quay lại bài tập Nghe hiểu"
+      },
+      "headers": {
+        "addNew": "Thêm bài tập nghe hiểu mới",
+        "edit": "Chỉnh sửa bài tập nghe hiểu"
+      }
+    },
+    "WritingLessons": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "exercises": "Bài tập",
+        "writingLessons": "Bài học Viết",
+        "writings": "Bài tập Viết",
+        "createWriting": "Tạo bài tập Viết",
+        "editWriting": "Chỉnh sửa bài tập Viết"
+      },
+      "modalTitle": "Bài học Viết",
+      "messages": {
+        "createSuccess": "Tạo bài học viết thành công",
+        "createError": "Tạo bài học viết thất bại",
+        "updateSuccess": "Cập nhật bài học viết thành công",
+        "updateError": "Cập nhật bài học viết thất bại",
+        "deleteSuccess": "Xóa bài học viết thành công",
+        "deleteError": "Xóa bài học viết thất bại",
+        "fetchError": "Không thể tải bài học viết",
+        "fetchTopicsError": "Không thể tải chủ đề",
+        "fetchWritingTopicsError": "Không thể tải chủ đề viết",
+        "fetchLessonsError": "Không thể tải bài học",
+        "fetchExerciseTypesError": "Không thể tải loại bài tập",
+        "networkError": "Lỗi mạng",
+        "networkErrorWhileFetching": "Lỗi mạng khi tải bài học",
+        "networkErrorWhileCreating": "Lỗi mạng khi tạo bài học",
+        "networkErrorWhileUpdating": "Lỗi mạng khi cập nhật bài học",
+        "networkErrorWhileDeleting": "Lỗi mạng khi xóa bài học",
+        "createExerciseSuccess": "Tạo bài tập viết thành công",
+        "createExerciseError": "Tạo bài tập viết thất bại, vui lòng thử lại!",
+        "updateExerciseSuccess": "Cập nhật bài tập viết thành công",
+        "updateExerciseError": "Cập nhật bài tập viết thất bại, vui lòng thử lại!",
+        "deleteExerciseSuccess": "Xóa bài tập viết thành công",
+        "deleteExerciseError": "Xóa bài tập viết thất bại",
+        "fetchExerciseError": "Không thể tải bài tập",
+        "loading": "Đang tải..."
+      },
+      "actions": {
+        "backToWritings": "Quay lại bài tập Viết"
+      },
+      "headers": {
+        "addNew": "Thêm bài tập viết mới",
+        "edit": "Chỉnh sửa bài tập viết"
+      }
+    },
+    "SpeakingLessons": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "exercises": "Bài tập",
+        "speakingLessons": "Bài học Nói",
+        "speakings": "Bài tập Nói",
+        "createSpeaking": "Tạo bài tập Nói",
+        "editSpeaking": "Chỉnh sửa bài tập Nói"
+      },
+      "modalTitle": "Bài học Nói",
+      "messages": {
+        "createSuccess": "Tạo bài học nói thành công",
+        "createError": "Tạo bài học nói thất bại",
+        "updateSuccess": "Cập nhật bài học nói thành công",
+        "updateError": "Cập nhật bài học nói thất bại",
+        "deleteSuccess": "Xóa bài học nói thành công",
+        "deleteError": "Xóa bài học nói thất bại",
+        "fetchError": "Không thể tải bài học nói",
+        "fetchTopicsError": "Không thể tải chủ đề",
+        "fetchLessonsError": "Không thể tải bài học",
+        "fetchExerciseTypesError": "Không thể tải loại bài tập",
+        "networkError": "Lỗi mạng",
+        "networkErrorWhileFetching": "Lỗi mạng khi tải bài học",
+        "networkErrorWhileCreating": "Lỗi mạng khi tạo bài học",
+        "networkErrorWhileUpdating": "Lỗi mạng khi cập nhật bài học",
+        "networkErrorWhileDeleting": "Lỗi mạng khi xóa bài học",
+        "createExerciseSuccess": "Tạo bài tập nói thành công",
+        "createExerciseError": "Tạo bài tập nói thất bại, vui lòng thử lại!",
+        "updateExerciseSuccess": "Cập nhật bài tập nói thành công",
+        "updateExerciseError": "Cập nhật bài tập nói thất bại, vui lòng thử lại!",
+        "deleteExerciseSuccess": "Xóa bài tập nói thành công",
+        "deleteExerciseError": "Xóa bài tập nói thất bại",
+        "fetchExerciseError": "Không thể tải bài tập",
+        "loading": "Đang tải..."
+      },
+      "actions": {
+        "backToSpeakings": "Quay lại bài tập Nói"
+      },
+      "headers": {
+        "addNew": "Thêm bài tập nói mới",
+        "edit": "Chỉnh sửa bài tập nói"
       }
     },
     "Lessons": {

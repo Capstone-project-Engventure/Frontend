@@ -77,7 +77,7 @@ const CustomSelector = ({
     }
   };
 
-  // Custom styles
+  // Custom styles with dark mode support
   const customStyles: StylesConfig<OptionType, boolean> = {
     control: (base, state) => ({
       ...base,
@@ -86,7 +86,7 @@ const CustomSelector = ({
         ? '#ef4444' 
         : state.isFocused 
           ? '#3b82f6' 
-          : '#d1d5db',
+          : 'rgb(209, 213, 219)',
       borderRadius: '8px',
       boxShadow: state.isFocused 
         ? '0 0 0 3px rgba(59, 130, 246, 0.1)' 
@@ -94,8 +94,21 @@ const CustomSelector = ({
       '&:hover': {
         borderColor: state.isFocused ? '#3b82f6' : '#9ca3af',
       },
-      backgroundColor: disabled ? '#f9fafb' : 'white',
+      backgroundColor: disabled 
+        ? 'rgb(243, 244, 246)' 
+        : 'rgb(255, 255, 255)',
       cursor: disabled ? 'not-allowed' : 'default',
+      '@media (prefers-color-scheme: dark)': {
+        backgroundColor: disabled 
+          ? 'rgb(55, 65, 81)' 
+          : 'rgb(31, 41, 55)',
+        borderColor: error 
+          ? '#ef4444' 
+          : state.isFocused 
+            ? '#3b82f6' 
+            : 'rgb(75, 85, 99)',
+        color: 'rgb(243, 244, 246)',
+      },
     }),
     placeholder: (base) => ({
       ...base,
@@ -110,8 +123,13 @@ const CustomSelector = ({
       ...base,
       borderRadius: '8px',
       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-      border: '1px solid #e5e7eb',
+      border: '1px solid rgb(229, 231, 235)',
       zIndex: 50,
+      backgroundColor: 'rgb(255, 255, 255)',
+      '@media (prefers-color-scheme: dark)': {
+        backgroundColor: 'rgb(31, 41, 55)',
+        border: '1px solid rgb(75, 85, 99)',
+      },
     }),
     menuList: (base) => ({
       ...base,
@@ -207,7 +225,7 @@ const CustomSelector = ({
         loadingMessage={() => "Loading..."}
         // Performance optimizations
         filterOption={(option, inputValue) => {
-          return option.label.toLowerCase().includes(inputValue.toLowerCase());
+          return option.label?.toLowerCase()?.includes(inputValue.toLowerCase()) || false;
         }}
         // Accessibility improvements
         aria-label={placeholder}

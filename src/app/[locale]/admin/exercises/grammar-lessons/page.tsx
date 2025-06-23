@@ -1,6 +1,6 @@
 "use client";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
@@ -17,13 +17,24 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter, usePathname } from "next/navigation";
+import useAdminGrammarStore from "@/lib/store/adminGrammarStore";
 
-export default function AdminReading() {
+export default function AdminGrammarLessons() {
   const router = useRouter();
   const pathname = usePathname();
 
   /* ──────────────────────── state ──────────────────────── */
-  const [exercises, setExercises] = useState<Lesson[]>([]);
+  const { 
+    lessons: grammarLessons, 
+    setLessons: setGrammarLessons, 
+    hasFetched, 
+    setHasFetched,
+    hasHydrated,
+    addLesson,
+    updateLesson,
+    deleteLesson
+  } = useAdminGrammarStore();
+  
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPage, setTotalPage] = useState(1);
@@ -33,7 +44,7 @@ export default function AdminReading() {
   const [exerciseTypes, setExerciseTypes] = useState<OptionType[]>([]);
 
   const [topic, setTopic] = useState<OptionType | null>(null);
-  const [lesson, setLesson] = useState<OptionType | null>(null);
+  const [selectedLesson, setSelectedLesson] = useState<OptionType | null>(null);
 
   /* ──────────────────────── i18n / services ────────────── */
   const locale = useLocale();
@@ -50,6 +61,10 @@ export default function AdminReading() {
       label: t("breadcrumbs.grammarExercises"),
       href: `${locale}/admin/exercises/grammar-lessons`,
     },
+    {
+      label: "Grammar Practice Lessons",
+      href: "#",
+    },
   ];
 
   const fields = useMemo(
@@ -63,36 +78,24 @@ export default function AdminReading() {
 
   const modalFields = useMemo(
     () => [
-      { key: "name", label: t("fields.name"), type: "text" },
-      { key: "question", label: t("fields.question"), type: "text" },
-      {
-        key: "lesson",
-        label: t("fields.lesson"),
-        type: "select",
-        options: lessons || [],
-      },
-      {
-        key: "type",
-        label: t("fields.questionType"),
-        type: "select",
-        options: exerciseTypes || [],
-      },
+      { key: "title", label: t("fields.name"), type: "text", required: true },
+      { key: "description", label: t("fields.description"), type: "textarea" },
       {
         key: "level",
         label: t("fields.level"),
         type: "select",
         options: LevelOptions,
+        required: true
       },
-      { key: "description", label: t("fields.description"), type: "textarea" },
       {
-        key: "skill",
-        label: t("fields.skill"),
+        key: "topic",
+        label: t("fields.topic"),
         type: "select",
-        options: SkillOptions,
+        options: topics,
       },
-      // { key: "generated_by", type: "hidden", default: "system" },
+      { key: "type", label: "Type", type: "hidden", default: "grammar_practice" },
     ],
-    [t, lessons, exerciseTypes]
+    [t, topics]
   );
 
   const onPageChange = (page: number) => {
@@ -130,19 +133,33 @@ export default function AdminReading() {
     })();
   }, []);
 
-  const fetchLesson = useCallback(async () => {
+  const fetchLessons = useCallback(async () => {
+    if (!hasHydrated || hasFetched) return;
+    
     const filters: Record<string, unknown> = { type: "grammar_practice" };
-    if (lesson) filters.lesson = lesson.value;
-    const res = await lessonService.getAll({ page, pageSize: 10, filters });
-    if (res.success) {
-      setLesson(res.data);
-      setTotalPage(res.total_page);
-    } else {
-      toast.error("Failed to fetch lesson");
+    if (selectedLesson) filters.lesson = selectedLesson.value;
+    
+    try {
+      const res = await lessonService.getAll({ page, pageSize: 10, filters });
+      if (res.success) {
+        setGrammarLessons(res.data);
+        setTotalPage(res.pagination?.total_page || 1);
+      } else {
+        toast.error("Failed to fetch lessons");
+        setGrammarLessons([]);
+      }
+      setHasFetched(true);
+    } catch (error) {
+      console.error("Error fetching grammar lessons:", error);
+      toast.error("Network error while fetching lessons");
+      setGrammarLessons([]);
+      setHasFetched(true);
     }
-  }, [lesson, page]);
+  }, [hasHydrated, hasFetched, selectedLesson, page, lessonService, setGrammarLessons, setHasFetched]);
 
-  useEffect(() => void fetchLesson(), []);
+  useEffect(() => {
+    fetchLessons();
+  }, [fetchLessons]);
 
   /* ──────────────────────── derived data ───────────────── */
   const lessonOptions = useMemo(() => {
@@ -150,29 +167,17 @@ export default function AdminReading() {
     return lessons.filter((l) => l.value === topic.value);
   }, [lessons, topic]);
 
-  /* ──────────────────────── upload handler ─────────────── */
-  const onHandleFile = async (file: File | null) => {
-    if (!file) return toast.error("Please select a file to import");
-    try {
-      await exerciseService.importByFile(file);
-      toast.success("Import queued");
-      fetchLesson();
-    } catch {
-      toast.error("Error importing file");
-    }
-  };
-
   /* ──────────────────────── filter UI (passed down) ────── */
   const filterComponents = (
     <>
       <div className="min-w-[200px]">
         <label className="block text-sm font-medium">{t("fields.topic")}</label>
-        {/* <CustomSelector
+        <CustomSelector
           objects={topics}
           value={topic}
           onChange={setTopic}
           placeholder={t("placeholders.topic")}
-        /> */}
+        />
       </div>
       <div className="min-w-[200px]">
         <label className="block text-sm font-medium">
@@ -180,8 +185,8 @@ export default function AdminReading() {
         </label>
         <CustomSelector
           objects={lessonOptions}
-          value={lesson}
-          onChange={setLesson}
+          value={selectedLesson}
+          onChange={setSelectedLesson}
           placeholder={t("placeholders.lesson")}
         />
       </div>
@@ -189,30 +194,98 @@ export default function AdminReading() {
   );
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
-  const onEdit = useCallback(() => {
-    const newPath = `${pathname}/edit/123`;
+  const onEdit = useCallback((item: any) => {
+    const newPath = `${pathname}/grammars/${item.id}`;
     router.push(newPath);
+  }, [pathname, router]);
+
+  const onCreate = useCallback(() => {
+    // Handle create new lesson if needed
+    console.log("Create new grammar lesson");
   }, []);
+
+  const handleAdd = async (data: any) => {
+    try {
+      const response = await lessonService.create(data);
+      if (response.success) {
+        addLesson(response.data);
+        toast.success("Lesson created successfully");
+        return response;
+      } else {
+        toast.error("Failed to create lesson");
+        return response;
+      }
+    } catch (error) {
+      console.error("Error creating lesson:", error);
+      toast.error("Network error while creating lesson");
+      throw error;
+    }
+  };
+
+  const handleUpdate = async (id: string | number, data: any) => {
+    try {
+      const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+      const response = await lessonService.update(numericId, data);
+      if (response.success) {
+        updateLesson(numericId, data);
+        toast.success("Lesson updated successfully");
+        return response;
+      } else {
+        toast.error("Failed to update lesson");
+        return response;
+      }
+    } catch (error) {
+      console.error("Error updating lesson:", error);
+      toast.error("Network error while updating lesson");
+      throw error;
+    }
+  };
+
+  const handleDelete = async (id: string | number) => {
+    try {
+      const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+      const response = await lessonService.delete(numericId);
+      if (response.success) {
+        deleteLesson(numericId);
+        toast.success("Lesson deleted successfully");
+        return response;
+      } else {
+        toast.error("Failed to delete lesson");
+        return response;
+      }
+    } catch (error) {
+      console.error("Error deleting lesson:", error);
+      toast.error("Network error while deleting lesson");
+      throw error;
+    }
+  };
 
   /* ──────────────────────── render ─────────────────────── */
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
-      <PaginationTable
-        filterComponents={filterComponents}
-        customObjects={lesson}
-        customTotalPages={totalPage}
+      <AdvancedDataTable
         fields={fields}
+        customObjects={grammarLessons}
+        customTotalPages={totalPage}
         page={page}
         onPageChange={onPageChange}
-        service={exerciseService}
-        linkBase={`/${locale}/admin/exercises/reading-lessons/readings`}
-        breadcrumbs={breadcrumbs}
+        linkBase={`/${locale}/admin/exercises/grammar-lessons/grammars`}
         modalFields={modalFields}
-        onHandleFile={onHandleFile}
-        hasBreadcrumb={false}
+        modalTitle="Grammar Lesson"
         hasCustomFetch={true}
+        onCreate={onCreate}
         onEdit={onEdit}
+        onAdd={handleAdd}
+        onUpdate={handleUpdate}
+        onDelete={handleDelete}
+        onSuccess={() => {
+          // Refresh the current page data without full refetch
+          if (hasHydrated) {
+            setHasFetched(false);
+            fetchLessons();
+          }
+        }}
       />
     </div>
   );

@@ -21,4 +21,7 @@ export type Lesson = {
   readings: Reading[];
   image?: string;
   exercises?: Exercise[];
+  // status?: 'draft' | 'published' | 'archived'; // 🆕 NEW
+  created_at?: string;
+  updated_at?: string;
 };

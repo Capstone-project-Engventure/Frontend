@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import LessonCard from "@/app/[locale]/components/card/LessonCard";
 import PaginationCard from "@/app/[locale]/components/card/PaginationCard";
 import FilterCard from "@/app/[locale]/components/card/FilterCard";
@@ -11,6 +11,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import LessonService from "@/lib/services/lesson.service";
 import useLessonStore from "@/lib/store/lessonStore";
 import { useRouter } from "next/navigation";
+import useSpeakingStore from "@/lib/store/speakingStore";
 
 // Constants
 const ITEMS_PER_PAGE = 6;
@@ -34,7 +35,7 @@ const SpeakingPractice: React.FC = () => {
   const lessonService = new LessonService();
   const router = useRouter();
 
-  const { lessons, setLessons, hasFetched, setHasFetched } = useLessonStore();
+  const { lessons, setLessons, hasFetched, setHasFetched, hasHydrated } = useSpeakingStore();
   const [currentPages, setCurrentPages] = useState<PageMap>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -51,21 +52,22 @@ const SpeakingPractice: React.FC = () => {
   ];
 
   useEffect(() => {
+    if (!hasHydrated || hasFetched) return;
     const fetchLessons = async () => {
-      if (!hasFetched || lessons.length === 0) {
-        setIsLoading(true);
-        const result = await lessonService.getAllSpeakingLessons();
-        console.log("Fetched lessons:", result);
-        if (result.status == 200) {
-          setLessons(result.data);
-          setHasFetched(true);
-        }
-        setIsLoading(false);
+      setIsLoading(true);
+      const result = await lessonService.getAllSpeakingLessons();
+      console.log("Fetched lessons:", result);
+      if (result.status == 200) {
+        setLessons(result.data);
+      } else {
+        setLessons([]);
       }
+      setHasFetched(true);
+      setIsLoading(false);
     };
 
     fetchLessons();
-  }, [hasFetched, lessons, setHasFetched, setLessons]);
+  }, [hasHydrated, hasFetched, setHasFetched, setLessons]);
 
   // Get unique topics and levels from lessons
   const { uniqueTopics, uniqueLevels } = useMemo(() => {

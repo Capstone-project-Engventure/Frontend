@@ -1,13 +1,14 @@
 "use client";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import CustomSelector from "@/app/[locale]/components/CustomSelector";
-import PaginationTable from "@/app/[locale]/components/table/PaginationTable";
+import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
 import ExerciseService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
 import TopicService from "@/lib/services/topic.service";
+import ReadingService from "@/lib/services/reading.service";
 import { OptionType } from "@/lib/types/option";
 import { Reading } from "@/lib/types/reading";
 import { useLocale, useTranslations } from "next-intl";
@@ -34,31 +35,39 @@ export default function AdminReading() {
 
   const [topic, setTopic] = useState<OptionType | null>(null);
   const [lesson, setLesson] = useState<OptionType | null>(null);
+  const [currentLesson, setCurrentLesson] = useState<any>(null);
 
   /* ──────────────────────── i18n / services ────────────── */
   const locale = useLocale();
-  const t = useTranslations("Admin.Exercises");
+  const t = useTranslations("Admin.ReadingPassages");
   const exerciseService = new ExerciseService();
   const topicService = new TopicService();
   const lessonService = useMemo(() => new LessonService(), []);
   const exerciseTypeService = new ExerciseTypeService();
+  const readingService = new ReadingService();
 
   /* ──────────────────────── meta ───────────────────────── */
   const breadcrumbs = [
     { label: t("breadcrumbs.home"), href: `${locale}/admin/home` },
     {
-      label: t("breadcrumbs.readingExercises"),
-      href: `${locale}/admin/exercises/reading-lessons`,
+      label: t("breadcrumbs.exercises"),
+      href: `/${locale}/admin/exercises`,
+    },
+    {
+      label: t("breadcrumbs.readingLessons"),
+      href: `/${locale}/admin/exercises/reading-lessons`,
+    },
+    {
+      label: currentLesson?.title || t("breadcrumbs.readings"),
+      href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}`,
     },
   ];
 
   const fields = useMemo(
     () => [
-      { key: "title", label: t("fields.name") },
-      { key: "question", label: t("fields.question") },
-      { key: "options", label: t("fields.options"), type: "mcq" },
-      { key: "level", label: t("fields.level") },
-      { key: "system_answer", label: t("fields.answer") },
+      { key: "title", label: t("fields.title") },
+      { key: "content", label: t("fields.excerpt"), type: "excerpt", maxLength: 100 },
+      { key: "exercises", label: t("fields.numberOfExercises"), type: "count" },
       { key: "description", label: t("fields.description") },
     ],
     [t]
@@ -66,36 +75,18 @@ export default function AdminReading() {
 
   const modalFields = useMemo(
     () => [
-      { key: "name", label: t("fields.name"), type: "text" },
-      { key: "question", label: t("fields.question"), type: "text" },
+      { key: "title", label: t("fields.title"), type: "text", required: true },
+      { key: "content", label: t("fields.content"), type: "textarea", required: true },
+      { key: "description", label: t("fields.description"), type: "textarea" },
       {
         key: "lesson",
         label: t("fields.lesson"),
         type: "select",
         options: lessons || [],
+        default: lessonId as string
       },
-      {
-        key: "type",
-        label: t("fields.questionType"),
-        type: "select",
-        options: exerciseTypes || [],
-      },
-      {
-        key: "level",
-        label: t("fields.level"),
-        type: "select",
-        options: LevelOptions,
-      },
-      { key: "description", label: t("fields.description"), type: "textarea" },
-      {
-        key: "skill",
-        label: t("fields.skill"),
-        type: "select",
-        options: SkillOptions,
-      },
-      // { key: "generated_by", type: "hidden", default: "system" },
     ],
-    [t, lessons, exerciseTypes]
+    [t, lessons]
   );
 
   const onPageChange = (page: number) => {
@@ -138,8 +129,8 @@ export default function AdminReading() {
     try {
       const res = await lessonService.getById(lessonId as string);
       if (res.success) {
-        console.log(res);
         setReadings(res.data?.readings || []);
+        setCurrentLesson(res.data);
       } else {
         toast.error("Failed to fetch lesson");
       }
@@ -163,73 +154,126 @@ export default function AdminReading() {
     return lessons.filter((l) => l.value === topic.value);
   }, [lessons, topic]);
 
-  /* ──────────────────────── upload handler ─────────────── */
-  const onHandleFile = async (file: File | null) => {
-    if (!file) return toast.error("Please select a file to import");
-    try {
-      await exerciseService.importByFile(file);
-      toast.success("Import queued");
-      fetchLesson();
-    } catch {
-      toast.error("Error importing file");
-    }
-  };
-
   /* ──────────────────────── filter UI (passed down) ────── */
   const filterComponents = (
     <>
-      <div className="min-w-[200px]">
-        <label className="block text-sm font-medium">{t("fields.topic")}</label>
-        {/* <CustomSelector
-          objects={topics}
-          value={topic}
-          onChange={setTopic}
-          placeholder={t("placeholders.topic")}
-        /> */}
-      </div>
-      <div className="min-w-[200px]">
-        <label className="block text-sm font-medium">
-          {t("fields.lesson")}
-        </label>
-        <CustomSelector
-          objects={lessonOptions}
-          value={lesson}
-          onChange={setLesson}
-          placeholder={t("placeholders.lesson")}
-        />
-      </div>
     </>
   );
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
-  const onEdit = useCallback((id: string) => {
+  const onEdit = useCallback((item: any) => {
+    const id = item?.id || item;
     const newPath = `${pathname}/edit/${id}`;
     router.push(newPath);
-  }, []);
+  }, [pathname, router]);
 
   const onCreate = useCallback(() => {
     const newPath = `${pathname}/create`;
     router.push(newPath);
-  }, []);
+  }, [pathname, router]);
+
+  /* ──────────────────────── CRUD handlers ─────────────── */
+  const handleAdd = async (data: any) => {
+    try {
+      console.log('Adding reading:', data);
+      
+      const readingData = {
+        ...data,
+        lesson: Number(lessonId)
+      };
+      
+      const response = await readingService.create(readingData, {});
+      
+      if (response.success) {
+        toast.success(t("messages.createSuccess"));
+        fetchLesson();
+        return response;
+      } else {
+        toast.error(t("messages.createError"));
+        return response;
+      }
+    } catch (error: any) {
+      console.error("Error creating reading:", error);
+      if (error.response?.data?.title) {
+        if (error.response.data.title[0].includes('already exists')) {
+          toast.error(t("messages.duplicateTitle"));
+        } else {
+          toast.error(`Title: ${error.response.data.title[0]}`);
+        }
+      } else {
+        toast.error(t("messages.createError"));
+      }
+      throw error;
+    }
+  };
+
+  const handleUpdate = async (id: string | number, data: any) => {
+    try {
+      console.log('Updating reading:', data);
+      
+      const response = await readingService.update(Number(id), data, {});
+      
+      if (response.success) {
+        toast.success(t("messages.updateSuccess"));
+        fetchLesson();
+        return response;
+      } else {
+        toast.error(t("messages.updateError"));
+        return response;
+      }
+    } catch (error: any) {
+      console.error("Error updating reading:", error);
+      if (error.response?.data?.title) {
+        if (error.response.data.title[0].includes('already exists')) {
+          toast.error(t("messages.duplicateTitle"));
+        } else {
+          toast.error(`Title: ${error.response.data.title[0]}`);
+        }
+      } else {
+        toast.error(t("messages.updateError"));
+      }
+      throw error;
+    }
+  };
+
+  const handleDelete = async (id: string | number) => {
+    try {
+      const response = await readingService.delete(Number(id));
+      
+      if (response.success) {
+        toast.success(t("messages.deleteSuccess"));
+        fetchLesson();
+        return response;
+      } else {
+        toast.error(t("messages.deleteError"));
+        return response;
+      }
+    } catch (error) {
+      console.error("Error deleting reading:", error);
+      toast.error(t("messages.deleteError"));
+      throw error;
+    }
+  };
 
   /* ──────────────────────── render ─────────────────────── */
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
       <Breadcrumb items={breadcrumbs} />
-      <PaginationTable
-        filterComponents={filterComponents}
+      <AdvancedDataTable
+        fields={fields}
         customObjects={readings}
         customTotalPages={totalPage}
-        fields={fields}
         page={page}
         onPageChange={onPageChange}
-        service={exerciseService}
         modalFields={modalFields}
-        onHandleFile={onHandleFile}
-        hasBreadcrumb={false}
+        modalTitle="Reading Passage"
         hasCustomFetch={true}
-        onEdit={onEdit}
         onCreate={onCreate}
+        onEdit={onEdit}
+        onAdd={handleAdd}
+        onUpdate={handleUpdate}
+        onDelete={handleDelete}
+        onSuccess={fetchLesson}
       />
     </div>
   );

@@ -356,15 +356,20 @@ export default function SpeakingPracticeDetailPage() {
             audio: audioFile,
             exercise: currentExercise?.id || "",
           });
-          setResult(result.data);
-          setHistory((prev) => [
-            {
-              id: Date.now(), // hoặc response.id nếu backend trả về ID submission
-              audioBlob: blob,
-              result: result.data,
-            },
-            ...prev,
-          ]);
+          if (result.success) {
+            setResult(result.data);
+            setHistory((prev) => [
+              {
+                id: Date.now(), // hoặc response.id nếu backend trả về ID submission
+                audioBlob: blob,
+                result: result.data,
+              },
+              ...prev,
+            ]);
+          } else {
+            console.error("Pronunciation check failed:", result.error);
+            toast.error("Pronunciation check failed");
+          }
           console.log("Check result:", result); // hoặc set state để hiển thị kết quả
           // TODO: setState hoặc feedback cho UI
         } catch (error) {

@@ -1,5 +1,5 @@
 "use client";
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import AdminService from "@/lib/services/admin.service";
 import { useEffect, useState } from "react";
 import {
