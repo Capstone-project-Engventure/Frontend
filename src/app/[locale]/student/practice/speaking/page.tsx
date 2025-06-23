@@ -9,9 +9,8 @@ import { Lesson } from "@/lib/types/lesson";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useEffect, useState, useMemo } from "react";
 import LessonService from "@/lib/services/lesson.service";
-import useLessonStore from "@/lib/store/lessonStore";
-import { useRouter } from "next/navigation";
 import useSpeakingStore from "@/lib/store/speakingStore";
+import { useRouter } from "next/navigation";
 
 // Constants
 const ITEMS_PER_PAGE = 6;
@@ -53,12 +52,13 @@ const SpeakingPractice: React.FC = () => {
 
   useEffect(() => {
     if (!hasHydrated || hasFetched) return;
+
     const fetchLessons = async () => {
       setIsLoading(true);
       const result = await lessonService.getAllSpeakingLessons();
-      console.log("Fetched lessons:", result);
-      if (result.status == 200) {
-        setLessons(result.data);
+      if (result.success) {
+        const dataSpeaking = result.data;
+        setLessons(dataSpeaking);
       } else {
         setLessons([]);
       }

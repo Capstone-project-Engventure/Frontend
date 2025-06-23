@@ -6,4 +6,6 @@ class CourseService extends BaseService<Course> {
     super("courses");
   }
 }
-export default CourseService;
+
+const courseService = new CourseService()
+export default courseService;
