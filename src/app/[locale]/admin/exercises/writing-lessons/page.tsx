@@ -50,6 +50,7 @@ export default function AdminWritingLessons() {
   /* ──────────────────────── i18n / services ────────────── */
   const locale = useLocale();
   const t = useTranslations("Admin.Exercises");
+  const tWriting = useTranslations("Admin.WritingLessons");
   const exerciseService = new ExerciseService();
   const topicService = new TopicService();
   const lessonService = new LessonService();
@@ -59,7 +60,7 @@ export default function AdminWritingLessons() {
   const breadcrumbs = [
     { label: t("breadcrumbs.home"), href: `${locale}/admin/home` },
     {
-      label: "Writing Lessons",
+      label: tWriting("breadcrumbs.writingLessons"),
       href: `${locale}/admin/exercises/writing-lessons`,
     },
   ];
@@ -113,27 +114,27 @@ export default function AdminWritingLessons() {
           setTopics(
             tpRes.data.map((v: any) => ({ value: v.id, label: v.title }))
           );
-        } else toast.error("Failed to fetch topics");
+        } else toast.error(tWriting("messages.fetchTopicsError"));
 
         if (writingTpRes.success && writingTpRes.data) {
           setWritingTopics(
             writingTpRes.data.map((v: any) => ({ value: v.id, label: v.title }))
           );
-        } else toast.error(!writingTpRes.success ? writingTpRes.error || "Failed to fetch writing topics" : "Failed to fetch writing topics");
+        } else toast.error(!writingTpRes.success ? writingTpRes.error || tWriting("messages.fetchWritingTopicsError") : tWriting("messages.fetchWritingTopicsError"));
 
         if (lsRes.success) {
           setLessons(
             lsRes.data.map((v: any) => ({ value: v.id, label: v.title }))
           );
-        } else toast.error("Failed to fetch lessons");
+        } else toast.error(tWriting("messages.fetchLessonsError"));
         if (etRes.success) {
           setExerciseTypes(
             etRes.data.map((v: any) => ({ value: v.id, label: v.name }))
           );
-        } else toast.error("Failed to fetch exercise types");
-      } catch (e) {
+        } else toast.error(tWriting("messages.fetchExerciseTypesError"));
+              } catch (e) {
         console.error(e);
-        toast.error("Network error");
+        toast.error(tWriting("messages.networkError"));
       }
     })();
   }, []);
@@ -150,13 +151,13 @@ export default function AdminWritingLessons() {
         setWritingLessons(res.data);
         setTotalPage(res.pagination?.total_page || 1);
       } else {
-        toast.error("Failed to fetch lessons");
+        toast.error(tWriting("messages.fetchError"));
         setWritingLessons([]);
       }
       setHasFetched(true);
     } catch (error) {
       console.error("Error fetching writing lessons:", error);
-      toast.error("Network error while fetching lessons");
+      toast.error(tWriting("messages.networkErrorWhileFetching"));
       setWritingLessons([]);
       setHasFetched(true);
     }
@@ -220,15 +221,15 @@ export default function AdminWritingLessons() {
       const response = await lessonService.create(lessonData);
       if (response.success) {
         addLesson(response.data);
-        toast.success("Lesson created successfully");
+        toast.success(tWriting("messages.createSuccess"));
         return response;
       } else {
-        toast.error("Failed to create lesson");
+        toast.error(tWriting("messages.createError"));
         return response;
       }
     } catch (error) {
       console.error("Error creating lesson:", error);
-      toast.error("Network error while creating lesson");
+      toast.error(tWriting("messages.networkErrorWhileCreating"));
       throw error;
     }
   };
@@ -239,15 +240,15 @@ export default function AdminWritingLessons() {
       const response = await lessonService.update(numericId, data);
       if (response.success) {
         updateLesson(numericId, data);
-        toast.success("Lesson updated successfully");
+        toast.success(tWriting("messages.updateSuccess"));
         return response;
       } else {
-        toast.error("Failed to update lesson");
+        toast.error(tWriting("messages.updateError"));
         return response;
       }
     } catch (error) {
       console.error("Error updating lesson:", error);
-      toast.error("Network error while updating lesson");
+      toast.error(tWriting("messages.networkErrorWhileUpdating"));
       throw error;
     }
   };
@@ -258,15 +259,15 @@ export default function AdminWritingLessons() {
       const response = await lessonService.delete(numericId);
       if (response.success) {
         deleteLesson(numericId);
-        toast.success("Lesson deleted successfully");
+        toast.success(tWriting("messages.deleteSuccess"));
         return response;
       } else {
-        toast.error("Failed to delete lesson");
+        toast.error(tWriting("messages.deleteError"));
         return response;
       }
     } catch (error) {
       console.error("Error deleting lesson:", error);
-      toast.error("Network error while deleting lesson");
+      toast.error(tWriting("messages.networkErrorWhileDeleting"));
       throw error;
     }
   };
@@ -282,7 +283,8 @@ export default function AdminWritingLessons() {
         page={page}
         onPageChange={onPageChange}
         modalFields={modalFields}
-        modalTitle="Writing Lesson"
+        modalTitle={tWriting("modalTitle")}
+        linkBase={`/${locale}/admin/exercises/writing-lessons/writing`}
         hasCustomFetch={true}
         onCreate={onCreate}
         onEdit={onEdit}

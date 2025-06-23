@@ -49,6 +49,7 @@ export default function AdminSpeakingLessons() {
   /* ──────────────────────── i18n / services ────────────── */
   const locale = useLocale();
   const t = useTranslations("Admin.Exercises");
+  const tSpeaking = useTranslations("Admin.SpeakingLessons");
   const exerciseService = new ExerciseService();
   const topicService = new TopicService();
   const lessonService = new LessonService();
@@ -58,7 +59,7 @@ export default function AdminSpeakingLessons() {
   const breadcrumbs = [
     { label: t("breadcrumbs.home"), href: `${locale}/admin/home` },
     {
-      label: "Speaking Lessons",
+      label: tSpeaking("breadcrumbs.speakingLessons"),
       href: `${locale}/admin/exercises/speaking-lessons`,
     },
   ];
@@ -111,21 +112,21 @@ export default function AdminSpeakingLessons() {
           setTopics(
             tpRes.data.map((v: any) => ({ value: v.id, label: v.title }))
           );
-        } else toast.error("Failed to fetch topics");
+        } else toast.error(tSpeaking("messages.fetchTopicsError"));
 
         if (lsRes.success) {
           setLessons(
             lsRes.data.map((v: any) => ({ value: v.id, label: v.title }))
           );
-        } else toast.error("Failed to fetch lessons");
+        } else toast.error(tSpeaking("messages.fetchLessonsError"));
         if (etRes.success) {
           setExerciseTypes(
             etRes.data.map((v: any) => ({ value: v.id, label: v.name }))
           );
-        } else toast.error("Failed to fetch exercise types");
+        } else toast.error(tSpeaking("messages.fetchExerciseTypesError"));
       } catch (e) {
         console.error(e);
-        toast.error("Network error");
+        toast.error(tSpeaking("messages.networkError"));
       }
     })();
   }, []);
@@ -142,13 +143,13 @@ export default function AdminSpeakingLessons() {
         setSpeakingLessons(res.data);
         setTotalPage(res.pagination?.total_page || 1);
       } else {
-        toast.error("Failed to fetch lessons");
+        toast.error(tSpeaking("messages.fetchError"));
         setSpeakingLessons([]);
       }
       setHasFetched(true);
     } catch (error) {
       console.error("Error fetching speaking lessons:", error);
-      toast.error("Network error while fetching lessons");
+      toast.error(tSpeaking("messages.networkErrorWhileFetching"));
       setSpeakingLessons([]);
       setHasFetched(true);
     }
@@ -206,15 +207,15 @@ export default function AdminSpeakingLessons() {
       const response = await lessonService.create(data);
       if (response.success) {
         addLesson(response.data);
-        toast.success("Lesson created successfully");
+        toast.success(tSpeaking("messages.createSuccess"));
         return response;
       } else {
-        toast.error("Failed to create lesson");
+        toast.error(tSpeaking("messages.createError"));
         return response;
       }
     } catch (error) {
       console.error("Error creating lesson:", error);
-      toast.error("Network error while creating lesson");
+      toast.error(tSpeaking("messages.networkErrorWhileCreating"));
       throw error;
     }
   };
@@ -225,15 +226,15 @@ export default function AdminSpeakingLessons() {
       const response = await lessonService.update(numericId, data);
       if (response.success) {
         updateLesson(numericId, data);
-        toast.success("Lesson updated successfully");
+        toast.success(tSpeaking("messages.updateSuccess"));
         return response;
       } else {
-        toast.error("Failed to update lesson");
+        toast.error(tSpeaking("messages.updateError"));
         return response;
       }
     } catch (error) {
       console.error("Error updating lesson:", error);
-      toast.error("Network error while updating lesson");
+      toast.error(tSpeaking("messages.networkErrorWhileUpdating"));
       throw error;
     }
   };
@@ -244,15 +245,15 @@ export default function AdminSpeakingLessons() {
       const response = await lessonService.delete(numericId);
       if (response.success) {
         deleteLesson(numericId);
-        toast.success("Lesson deleted successfully");
+        toast.success(tSpeaking("messages.deleteSuccess"));
         return response;
       } else {
-        toast.error("Failed to delete lesson");
+        toast.error(tSpeaking("messages.deleteError"));
         return response;
       }
     } catch (error) {
       console.error("Error deleting lesson:", error);
-      toast.error("Network error while deleting lesson");
+      toast.error(tSpeaking("messages.networkErrorWhileDeleting"));
       throw error;
     }
   };
@@ -268,7 +269,8 @@ export default function AdminSpeakingLessons() {
         page={page}
         onPageChange={onPageChange}
         modalFields={modalFields}
-        modalTitle="Speaking Lesson"
+        modalTitle={tSpeaking("modalTitle")}
+        linkBase={`/${locale}/admin/exercises/speaking-lessons/speaking`}
         hasCustomFetch={true}
         onCreate={onCreate}
         onEdit={onEdit}

@@ -1,6 +1,6 @@
 "use client";
 
-import WritingEditor from "@/app/[locale]/components/WritingEditor";
+import SpeakingEditor from "@/app/[locale]/components/SpeakingEditor";
 import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import { Exercise } from "@/lib/types/exercise";
 import ExerciseService from "@/lib/services/exercise.service";
@@ -9,25 +9,25 @@ import { toast } from "react-toastify";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 
-const EditWritingPage = () => {
+const EditSpeakingPage = () => {
   const { id, lessonId } = useParams();
   const router = useRouter();
   const locale = useLocale();
   const [exercise, setExercise] = useState<Exercise>();
-  const tWriting = useTranslations("Admin.WritingLessons");
+  const tSpeaking = useTranslations("Admin.SpeakingLessons");
 
   const breadcrumbs = [
-    { label: tWriting("breadcrumbs.home"), href: `/${locale}/admin/home` },
-    { label: tWriting("breadcrumbs.exercises"), href: `/${locale}/admin/exercises` },
+    { label: tSpeaking("breadcrumbs.home"), href: `/${locale}/admin/home` },
+    { label: tSpeaking("breadcrumbs.exercises"), href: `/${locale}/admin/exercises` },
     { 
-      label: tWriting("breadcrumbs.writingLessons"), 
-      href: `/${locale}/admin/exercises/writing-lessons` 
+      label: tSpeaking("breadcrumbs.speakingLessons"), 
+      href: `/${locale}/admin/exercises/speaking-lessons` 
     },
     { 
-      label: tWriting("breadcrumbs.writings"), 
-      href: `/${locale}/admin/exercises/writing-lessons/writing/${lessonId}` 
+      label: tSpeaking("breadcrumbs.speakings"), 
+      href: `/${locale}/admin/exercises/speaking-lessons/speaking/${lessonId}` 
     },
-    { label: tWriting("breadcrumbs.editWriting") }
+    { label: tSpeaking("breadcrumbs.editSpeaking") }
   ];
 
   const handleSave = async (data: Exercise) => {
@@ -39,30 +39,30 @@ const EditWritingPage = () => {
     };
     try {
       await exerciseService.update(updatedExercise.id, updatedExercise, {});
-      toast.success(tWriting("messages.updateExerciseSuccess"));
+      toast.success(tSpeaking("messages.updateExerciseSuccess"));
       setExercise(updatedExercise);
       
-      // Navigate back to writing exercises list
-      router.push(`/${locale}/admin/exercises/writing-lessons/writing/${lessonId}`);
+      // Navigate back to speaking exercises list
+      router.push(`/${locale}/admin/exercises/speaking-lessons/speaking/${lessonId}`);
     } catch (error) {
-      toast.error(tWriting("messages.updateExerciseError"));
+      toast.error(tSpeaking("messages.updateExerciseError"));
     }
   };
 
-  const fetchWritingExercise = useCallback(async () => {
+  const fetchSpeakingExercise = useCallback(async () => {
     const exerciseService = new ExerciseService();
     const res = await exerciseService.getById(id as string);
     if (res.success) {
       setExercise(res?.data);
     } else {
-      toast.error(tWriting("messages.fetchExerciseError"));
+      toast.error(tSpeaking("messages.fetchExerciseError"));
     }
-  }, [id]);
+  }, [id, tSpeaking]);
 
-  useEffect(() => void fetchWritingExercise(), [fetchWritingExercise]);
+  useEffect(() => void fetchSpeakingExercise(), [fetchSpeakingExercise]);
 
-  // Convert Exercise to Writing format for the editor
-  const writingData = exercise
+  // Convert Exercise to Speaking format for the editor
+  const speakingData = exercise
     ? {
         ...exercise,
         exercises: [exercise], // Wrap single exercise in array for editor
@@ -76,13 +76,13 @@ const EditWritingPage = () => {
       <div className="mb-6">
         <Breadcrumb items={breadcrumbs} />
       </div>
-      <WritingEditor
-        header={tWriting("headers.edit")}
-        initialData={writingData}
+      <SpeakingEditor
+        header={tSpeaking("headers.edit")}
+        initialData={speakingData}
         onSubmit={handleSave}
       />
     </main>
   );
 };
 
-export default EditWritingPage; 
+export default EditSpeakingPage;

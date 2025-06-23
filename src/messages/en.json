@@ -242,6 +242,119 @@
         "backToGrammars": "Back to Grammar Exercises"
       }
     },
+    "ListeningExercises": {
+      "breadcrumbs": {
+        "home": "Home",
+        "exercises": "Exercises",
+        "listeningLessons": "Listening Lessons",
+        "listenings": "Listening Exercises",
+        "createListening": "Create Listening Exercise",
+        "editListening": "Edit Listening Exercise"
+      },
+      "messages": {
+        "createSuccess": "Listening exercise created successfully",
+        "createError": "Failed to create listening exercise, please try again!",
+        "updateSuccess": "Listening exercise updated successfully",
+        "updateError": "Failed to update listening exercise",
+        "fetchError": "Failed to fetch exercise",
+        "exerciseNotFound": "Exercise not found",
+        "loading": "Loading..."
+      },
+      "actions": {
+        "backToListenings": "Back to Listening Exercises"
+      },
+      "headers": {
+        "addNew": "Add new listening exercise",
+        "edit": "Edit listening exercise"
+      }
+    },
+    "WritingLessons": {
+      "breadcrumbs": {
+        "home": "Home",
+        "exercises": "Exercises",
+        "writingLessons": "Writing Lessons",
+        "writings": "Writing Exercises",
+        "createWriting": "Create Writing Exercise",
+        "editWriting": "Edit Writing Exercise"
+      },
+      "modalTitle": "Writing Lesson",
+      "messages": {
+        "createSuccess": "Writing lesson created successfully",
+        "createError": "Failed to create writing lesson",
+        "updateSuccess": "Writing lesson updated successfully",
+        "updateError": "Failed to update writing lesson",
+        "deleteSuccess": "Writing lesson deleted successfully",
+        "deleteError": "Failed to delete writing lesson",
+        "fetchError": "Failed to fetch writing lessons",
+        "fetchTopicsError": "Failed to fetch topics",
+        "fetchWritingTopicsError": "Failed to fetch writing topics",
+        "fetchLessonsError": "Failed to fetch lessons",
+        "fetchExerciseTypesError": "Failed to fetch exercise types",
+        "networkError": "Network error",
+        "networkErrorWhileFetching": "Network error while fetching lessons",
+        "networkErrorWhileCreating": "Network error while creating lesson",
+        "networkErrorWhileUpdating": "Network error while updating lesson",
+        "networkErrorWhileDeleting": "Network error while deleting lesson",
+        "createExerciseSuccess": "Writing exercise created successfully",
+        "createExerciseError": "Create writing exercise failure, please try again!",
+        "updateExerciseSuccess": "Writing exercise updated successfully",
+        "updateExerciseError": "Update writing exercise failure, please try again!",
+        "deleteExerciseSuccess": "Writing exercise deleted successfully",
+        "deleteExerciseError": "Failed to delete writing exercise",
+        "fetchExerciseError": "Failed to fetch exercise",
+        "loading": "Loading..."
+      },
+      "actions": {
+        "backToWritings": "Back to Writing Exercises"
+      },
+      "headers": {
+        "addNew": "Add new writing exercise",
+        "edit": "Edit writing exercise"
+      }
+    },
+    "SpeakingLessons": {
+      "breadcrumbs": {
+        "home": "Home",
+        "exercises": "Exercises",
+        "speakingLessons": "Speaking Lessons",
+        "speakings": "Speaking Exercises",
+        "createSpeaking": "Create Speaking Exercise",
+        "editSpeaking": "Edit Speaking Exercise"
+      },
+      "modalTitle": "Speaking Lesson",
+      "messages": {
+        "createSuccess": "Speaking lesson created successfully",
+        "createError": "Failed to create speaking lesson",
+        "updateSuccess": "Speaking lesson updated successfully",
+        "updateError": "Failed to update speaking lesson",
+        "deleteSuccess": "Speaking lesson deleted successfully",
+        "deleteError": "Failed to delete speaking lesson",
+        "fetchError": "Failed to fetch speaking lessons",
+        "fetchTopicsError": "Failed to fetch topics",
+        "fetchLessonsError": "Failed to fetch lessons",
+        "fetchExerciseTypesError": "Failed to fetch exercise types",
+        "networkError": "Network error",
+        "networkErrorWhileFetching": "Network error while fetching lessons",
+        "networkErrorWhileCreating": "Network error while creating lesson",
+        "networkErrorWhileUpdating": "Network error while updating lesson",
+        "networkErrorWhileDeleting": "Network error while deleting lesson",
+        "createExerciseSuccess": "Speaking exercise created successfully",
+        "createExerciseError": "Create speaking exercise failure, please try again!",
+        "updateExerciseSuccess": "Speaking exercise updated successfully",
+        "updateExerciseError": "Update speaking exercise failure, please try again!",
+        "deleteExerciseSuccess": "Speaking exercise deleted successfully",
+        "deleteExerciseError": "Failed to delete speaking exercise",
+        "fetchExerciseError": "Failed to fetch exercise",
+        "loading": "Loading..."
+      },
+      "actions": {
+        "backToSpeakings": "Back to Speaking Exercises"
+      },
+      "headers": {
+        "addNew": "Add new speaking exercise",
+        "edit": "Edit speaking exercise"
+      }
+    },
     "Lessons": {
       "breadcrumbs": {
         "home": "Home",
