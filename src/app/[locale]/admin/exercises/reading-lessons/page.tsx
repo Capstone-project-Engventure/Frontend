@@ -311,16 +311,6 @@ export default function AdminReadingLessons() {
   /* ──────────────────────── render ─────────────────────── */
   return (
     <div className="flex flex-col p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-black dark:text-white min-h-screen relative">
-      {/* Processing Overlay */}
-      {isProcessing && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span className="text-gray-700 dark:text-gray-300">Processing...</span>
-          </div>
-        </div>
-      )}
-      
       <div className="mb-6">
         <Breadcrumb items={breadcrumbs} />
       </div>

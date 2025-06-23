@@ -237,6 +237,23 @@
         "loading": "Đang tải..."
       }
     },
+    "GrammarExercises": {
+      "breadcrumbs": {
+        "home": "Trang chủ",
+        "exercises": "Bài tập",
+        "grammarLessons": "Bài học Ngữ pháp",
+        "grammars": "Bài tập Ngữ pháp",
+        "createGrammar": "Tạo bài tập Ngữ pháp"
+      },
+      "messages": {
+        "createSuccess": "Tạo bài tập ngữ pháp thành công",
+        "createError": "Tạo bài tập ngữ pháp thất bại",
+        "loading": "Đang tải..."
+      },
+      "actions": {
+        "backToGrammars": "Quay lại bài tập Ngữ pháp"
+      }
+    },
     "Lessons": {
       "breadcrumbs": {
         "home": "Trang chủ",

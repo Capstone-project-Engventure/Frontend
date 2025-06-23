@@ -225,6 +225,23 @@
         "loading": "Loading..."
       }
     },
+    "GrammarExercises": {
+      "breadcrumbs": {
+        "home": "Home",
+        "exercises": "Exercises",
+        "grammarLessons": "Grammar Lessons",
+        "grammars": "Grammar Exercises",
+        "createGrammar": "Create Grammar Exercise"
+      },
+      "messages": {
+        "createSuccess": "Grammar exercise created successfully",
+        "createError": "Failed to create grammar exercise",
+        "loading": "Loading..."
+      },
+      "actions": {
+        "backToGrammars": "Back to Grammar Exercises"
+      }
+    },
     "Lessons": {
       "breadcrumbs": {
         "home": "Home",
