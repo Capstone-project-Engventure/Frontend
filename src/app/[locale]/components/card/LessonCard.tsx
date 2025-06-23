@@ -47,17 +47,7 @@ const LessonCard: FC<LessonCardProps> = ({ lesson }) => {
                 ...commonData,
                 readings: lesson.readings || [],
             };
-        } else if (practiceType === 'grammar') {
-            lessonData = {
-                ...commonData,
-                exercises: lesson.exercises || [],
-            };
-        } else if (practiceType === 'listening') {
-            lessonData = {
-                ...commonData,
-                exercises: lesson.exercises || [],
-            };
-        } else if (practiceType === 'speaking') {
+        } else if (['grammar', 'listening', 'speaking'].includes(practiceType)) {
             lessonData = {
                 ...commonData,
                 exercises: lesson.exercises || [],

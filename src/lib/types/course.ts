@@ -1,11 +1,18 @@
-import { Lesson } from "./lesson";
+import { Lesson, Topic } from "./lesson";
+
+export type Section = {
+  id: number,
+  name: string,
+  topic?: Topic | null;
+  lessons: Lesson[];
+}
 
 export type Course = {
   id: string;
   name: string;
   scope: string;
   description: string;
-  lessons: Lesson[];
+  sections: Section[];
   teacher?: string;
   begin: Date;
   end: Date;
