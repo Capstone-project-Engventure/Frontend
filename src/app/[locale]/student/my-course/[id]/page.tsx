@@ -1,3 +1,4 @@
+// src\app\[locale]\student\my-course\[id]\page.tsx
 "use client";
 
 import Breadcrumb from "@/app/[locale]/components/breadcrumb";
@@ -160,7 +161,7 @@ export default function CourseDetailPage() {
 
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [completedLessons, setCompletedLessons] = useState<number[]>([1, 3, 7, 8, 9, 10]); // Mock completed lessons
+  const [completedLessons, setCompletedLessons] = useState<number[]>([1, 3, 7, 8, 9, 10]);
 
   const breadcrumbs = [
     { label: "Home", href: `/${locale}/student` },

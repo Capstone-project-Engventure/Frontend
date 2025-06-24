@@ -6,7 +6,7 @@ import { Lesson } from "@/lib/types/lesson";
 import { useLocale } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { FaBook, FaCheckCircle, FaPlay, FaStar, FaTrophy } from "react-icons/fa";
+import { FaBook, FaCheckCircle, FaPlay, FaStar, FaTrophy, FaPuzzlePiece } from "react-icons/fa";
 
 interface SectionCardProps {
     section: Section;
@@ -44,10 +44,12 @@ const SectionCard: React.FC<SectionCardProps> = ({
         if (lesson.type === 'lesson') {
             // Điều hướng đến trang chi tiết lesson
             router.push(`/${locale}/student/my-course/${courseId}/lesson/${lesson.id}`);
+        } else if (lesson.type === 'exercise') {
+            // Điều hướng đến trang exercise
+            router.push(`/${locale}/student/my-course/${courseId}/exercise/${lesson.id}`);
         } else {
-            // Có thể thêm logic khác cho exercise
-            console.log('Exercise clicked:', lesson);
-            // Ví dụ: hiển thị modal hoặc điều hướng đến trang exercise
+            // Có thể thêm logic khác cho các type khác
+            console.log('Other lesson type clicked:', lesson);
         }
     };
 
@@ -97,7 +99,7 @@ const SectionCard: React.FC<SectionCardProps> = ({
                 <div className="border-t border-gray-100">
                     {section.lessons.map((lesson, lessonIndex) => {
                         const isLessonCompleted = completedLessons.includes(lesson.id);
-                        const isClickable = lesson.type === 'lesson';
+                        const isClickable = lesson.type === 'lesson' || lesson.type === 'exercise';
 
                         return (
                             <div
@@ -108,7 +110,9 @@ const SectionCard: React.FC<SectionCardProps> = ({
                                     }`}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleLessonClick(lesson);
+                                    if (isClickable) {
+                                        handleLessonClick(lesson);
+                                    }
                                 }}
                             >
                                 <div className="flex items-center space-x-3">
@@ -127,8 +131,12 @@ const SectionCard: React.FC<SectionCardProps> = ({
                                                 {lesson.title}
                                             </h4>
                                             {isClickable && (
-                                                <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
-                                                    Click để xem
+                                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                                    lesson.type === 'exercise' 
+                                                        ? 'bg-blue-100 text-blue-600' 
+                                                        : 'bg-green-100 text-green-600'
+                                                }`}>
+                                                    {lesson.type === 'exercise' ? 'Bài tập' : 'Video'}
                                                 </span>
                                             )}
                                         </div>

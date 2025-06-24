@@ -225,8 +225,8 @@ export default function GrammarPracticeDetailPage() {
               currentExercise.options.map((option, index) => (
                 <div
                   key={index}
-                  className={getOptionStyle(option.key)}
-                  onClick={() => handleOptionSelect(option.key)}
+                  className={getOptionStyle(option.option)}
+                  onClick={() => handleOptionSelect(option.option)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -235,7 +235,7 @@ export default function GrammarPracticeDetailPage() {
                       </span>
                       <span className="text-gray-800">{option.option}</span>
                     </div>
-                    {getOptionIcon(option.key)}
+                    {getOptionIcon(option.option)}
                   </div>
                 </div>
               ))}
@@ -310,7 +310,7 @@ export default function GrammarPracticeDetailPage() {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-6">
       <Button
         variant="destructive"
-        onClick={() => router.push(`/${locale}/student/practice/grammar`)}
+        onClick={() => router.back()}
         className="mb-6"
       >
         <svg
