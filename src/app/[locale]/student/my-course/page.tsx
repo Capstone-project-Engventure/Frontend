@@ -3,7 +3,7 @@
 
 import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import CourseCard from "@/app/[locale]/components/card/CourseCard";
-import courseService from "@/lib/services/course.service";
+import CourseService from "@/lib/services/course.service";
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { FaBook } from "react-icons/fa";
@@ -13,6 +13,7 @@ import useCourseStore from "@/lib/store/courseStore";
 
 export default function MyClass() {
   const locale = useLocale();
+  const courseService = new CourseService();
 
   const breadcrumbs = [
     { label: "Home", href: `/${locale}/student` },

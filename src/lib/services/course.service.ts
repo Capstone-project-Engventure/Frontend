@@ -7,5 +7,4 @@ class CourseService extends BaseService<Course> {
   }
 }
 
-const courseService = new CourseService()
-export default courseService;
+export default CourseService;
