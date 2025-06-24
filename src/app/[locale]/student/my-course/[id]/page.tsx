@@ -1,7 +1,7 @@
 // src\app\[locale]\student\my-course\[id]\page.tsx
 "use client";
 
-import Breadcrumb from "@/app/[locale]/components/breadcumb";
+import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import SectionCard from "@/app/[locale]/components/card/SectionCard";
 import { Course } from "@/lib/types/course";
 import { useLocale } from "next-intl";

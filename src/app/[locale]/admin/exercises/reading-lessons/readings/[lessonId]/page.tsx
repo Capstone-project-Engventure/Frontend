@@ -265,8 +265,6 @@ export default function AdminReading() {
         customTotalPages={totalPage}
         page={page}
         onPageChange={onPageChange}
-        modalFields={modalFields}
-        modalTitle="Reading Passage"
         hasCustomFetch={true}
         onCreate={onCreate}
         onEdit={onEdit}
