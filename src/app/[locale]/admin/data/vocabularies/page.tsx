@@ -323,7 +323,7 @@ export default function AdminVocabulary() {
       );
       if (!res.success) throw new Error("Failed to fetch vocabulary");
       setVocab(res.data || []);
-      setTotalPages(res.total_page || 1);
+      setTotalPages(res.pagination?.total_page || 1);
     } catch (err) {
       setError("Error loading vocabulary");
     } finally {
@@ -400,7 +400,7 @@ export default function AdminVocabulary() {
   const handleImportFile = async (file: File) => {
     try {
       const res = await vocabularyService.importVocabByFile(file);
-      if (res.status === 200) {
+      if (res.success) {
         toast.success("File imported successfully", {
           position: "top-right",
         });

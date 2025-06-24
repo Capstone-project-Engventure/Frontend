@@ -44,7 +44,7 @@ const CreateReadingPage = () => {
         if (lessonId) {
             fetchLesson();
         }
-    }, [lessonId, lessonService, router]);
+    }, [lessonId]);
 
     const breadcrumbs = [
         { label: t("breadcrumbs.home"), href: `/${locale}/admin/home` },

@@ -153,7 +153,7 @@ export default function AdminSpeakingLessons() {
       setSpeakingLessons([]);
       setHasFetched(true);
     }
-  }, [hasHydrated, hasFetched, selectedLesson, page, lessonService, setSpeakingLessons, setHasFetched]);
+  }, [hasHydrated, hasFetched, selectedLesson, page, setSpeakingLessons, setHasFetched]);
 
   useEffect(() => {
     fetchLessons();

@@ -110,7 +110,7 @@ export default function AdminTopic() {
     formData.append("file", file);
     try {
       const res = await lessonService.importByFile(file);
-      if (res.status === 200) {
+      if (res.success) {
         toast.success("Import file thành công");
         fetchLessonData();
       } else {

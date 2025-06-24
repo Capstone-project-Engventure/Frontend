@@ -152,7 +152,7 @@ export default function AdminListeningLessons() {
       setListeningLessons([]);
       setHasFetched(true);
     }
-  }, [hasHydrated, hasFetched, selectedLesson, page, lessonService, setListeningLessons, setHasFetched]);
+  }, [hasHydrated, hasFetched, selectedLesson, page, setListeningLessons, setHasFetched]);
 
   useEffect(() => {
     fetchLessons();

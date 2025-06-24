@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa";
 type Props = {
   initialData?: Grammar;
-  onSubmit: (data: Exercise) => void; // chỉ truyền 1 obj
+  onSubmit: (data: Exercise[]) => void; // chỉ truyền 1 obj
   header: string;
 };
 
@@ -53,6 +53,13 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
     }
   };
 
+  // Kiểm tra xem có options trùng lặp không
+  const hasDuplicateOptions = (options: Option[]) => {
+    const optionValues = options.map(opt => opt.option.trim().toLowerCase()).filter(val => val !== '');
+    const uniqueOptions = new Set(optionValues);
+    return uniqueOptions.size !== optionValues.length;
+  };
+
   const addQuestion = () => {
     const newExercise: Exercise = {
       id: Date.now(), // hoặc một cách sinh id tạm thời
@@ -82,7 +89,7 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
       newQuestions[qIndex].options = [];
     }
     const newOption: Option = {
-      key: "",
+      key: String.fromCharCode(65 + newQuestions[qIndex].options.length), // A, B, C, D...
       option: "",
     };
     newQuestions[qIndex].options.push(newOption);
@@ -97,8 +104,24 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
     const newQuestions = [...exercises];
     if (newQuestions[qIndex] && newQuestions[qIndex].options) {
       newQuestions[qIndex].options.splice(oIndex, 1);
+      // Reassign keys after removing
+      newQuestions[qIndex].options.forEach((opt, index) => {
+        opt.key = String.fromCharCode(65 + index);
+      });
       setExercises(newQuestions);
     }
+  };
+
+  const handleNameChange = (index: number, value: string) => {
+    const newQuestions = [...exercises];
+    newQuestions[index].name = value;
+    setExercises(newQuestions);
+  };
+
+  const handleExplanationChange = (index: number, value: string) => {
+    const newQuestions = [...exercises];
+    newQuestions[index].explanation = value;
+    setExercises(newQuestions);
   };
 
   const handleSubmit = () => {
@@ -110,6 +133,10 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
 
     for (let i = 0; i < exercises.length; i++) {
       const ex = exercises[i];
+      if (!(ex.name?.trim() ?? "")) {
+        alert(`Vui lòng nhập tên cho câu hỏi ${i + 1}!`);
+        return;
+      }
       if (!(ex.question?.trim() ?? "")) {
         alert(`Vui lòng nhập câu hỏi ${i + 1}!`);
         return;
@@ -122,15 +149,33 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
         alert(`Vui lòng điền đầy đủ các lựa chọn cho câu hỏi ${i + 1}!`);
         return;
       }
+      
+      // Kiểm tra các câu trả lời phải khác nhau
+      const optionValues = ex.options.map(opt => opt.option.trim().toLowerCase());
+      const uniqueOptions = new Set(optionValues);
+      if (uniqueOptions.size !== optionValues.length) {
+        alert(`Câu hỏi ${i + 1} có các lựa chọn trùng lặp. Vui lòng đảm bảo các lựa chọn khác nhau!`);
+        return;
+      }
+      
+      // Kiểm tra có ít nhất 2 options khác nhau
+      if (uniqueOptions.size < 2) {
+        alert(`Câu hỏi ${i + 1} cần ít nhất 2 lựa chọn khác nhau!`);
+        return;
+      }
+      
       if (!ex.system_answer) {
         alert(`Vui lòng chọn đáp án đúng cho câu hỏi ${i + 1}!`);
         return;
       }
+      if (!(ex.explanation?.trim() ?? "")) {
+        alert(`Vui lòng nhập giải thích cho câu hỏi ${i + 1}!`);
+        return;
+      }
     }
 
-    exercises.forEach((ex) => (ex.lesson = "14"));
     const grammarData: Exercise[] = exercises;
-    onSubmit(grammarData[0]);
+    onSubmit(grammarData);
   };
 
   const handleCorrectAnswerChange = (qIndex: number, correctIndex: number) => {
@@ -199,6 +244,21 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tên bài tập: <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                    placeholder="Nhập tên bài tập..."
+                    value={q.name ?? ""}
+                    onChange={(e) =>
+                      handleNameChange(qIndex, e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nội dung câu hỏi: <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -221,6 +281,19 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
                       Chọn đáp án đúng bằng cách click vào nút radio
                     </span>
                   </div>
+
+                  {hasDuplicateOptions(q.options || []) && (
+                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-sm font-medium text-yellow-800">
+                          Cảnh báo: Có các lựa chọn trùng lặp. Vui lòng đảm bảo các lựa chọn khác nhau.
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   {(q.options || []).map((opt, oIndex) => (
                     <div
@@ -280,6 +353,21 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
                     </span>
                   </div>
                 )}
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Giải thích: <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors resize-none"
+                    rows={3}
+                    placeholder="Nhập giải thích cho câu trả lời đúng..."
+                    value={q.explanation ?? ""}
+                    onChange={(e) =>
+                      handleExplanationChange(qIndex, e.target.value)
+                    }
+                  />
+                </div>
               </div>
             ))}
 

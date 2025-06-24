@@ -1,4 +1,3 @@
-// src\app\[locale]\student\my-course\[id]\page.tsx
 "use client";
 
 import Breadcrumb from "@/app/[locale]/components/breadcrumb";
