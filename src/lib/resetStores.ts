@@ -5,6 +5,12 @@ import useSpeakingStore from "@/lib/store/speakingStore";
 import useCourseStore from '@/lib/store/courseStore';
 
 const resetAllStores = () => {
+    localStorage.removeItem("current-lesson");
+    localStorage.removeItem("ReadingPractice-storage");
+    localStorage.removeItem("GrammarPractice-storage");
+    localStorage.removeItem("ListeningPractice-storage");
+    localStorage.removeItem("SpeakingPractice-storage");
+
     const stores = [
         useReadingStore,
         useGrammarStore,
@@ -14,7 +20,6 @@ const resetAllStores = () => {
     ];
 
     stores.forEach((store) => store.getState().reset());
-    localStorage.removeItem("current-lesson");
 };
 
 export default resetAllStores;

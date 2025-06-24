@@ -1,3 +1,5 @@
+// src\app\[locale]\components\layout\Sidebar.tsx
+
 "use client";
 // import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -52,17 +54,18 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
     }
   }, []);
 
-  // Helper function to check if current path exactly matches or is a child of the given path
-  const isActiveLink = (linkHref: string, hasChildren: boolean = false) => {
+
+  // const isActiveLink = (linkHref: string, hasChildren: boolean = false) => {
+  //   if (!pathname) return false;
+  //   if (!hasChildren) {
+  //     return pathname === linkHref;
+  //   }
+  //   return pathname === linkHref;
+  // };
+
+  const isActiveLink = (linkHref: string, exactMatch = false) => {
     if (!pathname) return false;
-    
-    // For exact match without children
-    if (!hasChildren) {
-      return pathname === linkHref;
-    }
-    
-    // For parent items with children, only active if exactly matches
-    return pathname === linkHref;
+    return exactMatch ? pathname === linkHref : pathname.startsWith(linkHref);
   };
 
   // Helper function to check if any child is active
@@ -74,7 +77,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
     {
       label: t("dashboard"),
       icon: MdOutlineBarChart,
-      href: `${basePath}/${role === "admin" ? "home" : ""}`,
+      href: `${basePath}/${role === "admin" ? "home" : "dashboard"}`,
     },
     {
       label: t(role === "admin" ? "courses" : "myCourses"),
@@ -84,16 +87,16 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
   ];
 
   const learnNavItems = [
-    {
-      label: t(role === "admin" ? "lessons" : "myLessons"),
-      icon: MdOutlineBarChart,
-      href: `${basePath}/${role === "admin" ? "lessons" : "my-lesson"}`,
-    },
-    {
-      label: t(role === "admin" ? "topics" : "favoriteLessons"),
-      icon: TbNotes,
-      href: `${basePath}/${role === "admin" ? "topics" : "favorite-course"}`,
-    },
+    // {
+    //   label: t(role === "admin" ? "lessons" : "myLessons"),
+    //   icon: MdOutlineBarChart,
+    //   href: `${basePath}/${role === "admin" ? "lessons" : "my-lesson"}`,
+    // },
+    // {
+    //   label: t(role === "admin" ? "topics" : "favoriteLessons"),
+    //   icon: TbNotes,
+    //   href: `${basePath}/${role === "admin" ? "topics" : "favorite-course"}`,
+    // },
     {
       label: t(role === "admin" ? "practiceExercises" : "practice"),
       icon: TbNotes,
@@ -109,23 +112,20 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
         //   : []),
         {
           label: t("reading"),
-          href: `${basePath}/${
-            role === "admin" ? "exercises/reading-lessons" : "practice/reading"
-          }`,
+          href: `${basePath}/${role === "admin" ? "exercises/reading-lessons" : "practice/reading"
+            }`,
           icon: MdLibraryBooks,
         },
         {
           label: t("grammar"),
-          href: `${basePath}/${
-            role === "admin" ? "exercises/grammar-lessons" : "practice/grammar"
-          }`,
+          href: `${basePath}/${role === "admin" ? "exercises/grammar-lessons" : "practice/grammar"
+            }`,
           icon: GiSpellBook,
         },
         {
           label: t("listening"),
-          href: `${basePath}/${
-            role === "admin" ? "exercises/listening-lessons" : "practice/listening"
-          }`,
+          href: `${basePath}/${role === "admin" ? "exercises/listening-lessons" : "practice/listening"
+            }`,
           icon: MdOutlineVolumeUp,
         },
         // {
@@ -139,51 +139,49 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
         // },
         {
           label: t("writing"),
-          href: `${basePath}/${
-            role === "admin" ? "exercises/writing-lessons" : "practice/writing"
-          }`,
+          href: `${basePath}/${role === "admin" ? "exercises/writing-lessons" : "practice/writing"
+            }`,
           icon: MdEditNote,
         },
         {
           label: t("speaking"),
-          href: `${basePath}/${
-            role === "admin"
-              ? "exercises/speaking-lessons"
-              : "practice/speaking"
-          }`,
+          href: `${basePath}/${role === "admin"
+            ? "exercises/speaking-lessons"
+            : "practice/speaking"
+            }`,
           icon: MdOutlineRecordVoiceOver,
         }
       ],
     },
     ...(role === "admin"
       ? [
-          {
-            label: t("data"),
-            icon: TbNotes,
-            children: [
-              {
-                label: t("vocabulary"),
-                href: `${basePath}/${"data/vocabularies"}`,
-                icon: MdLibraryBooks,
-              },
-              {
-                label: t("phonetics"),
-                href: `${basePath}/${"data/phonetics"}`,
-                icon: MdOutlineRecordVoiceOver,
-              },
-            ],
-          },
-          {
-            label: t("generate"),
-            icon: FaRegLightbulb,
-            href: `${basePath}/generate`,
-          },
-          {
-            label: t("types"),
-            icon: BiCategory,
-            href: `${basePath}/exercises/types`,
-          },
-        ]
+        {
+          label: t("data"),
+          icon: TbNotes,
+          children: [
+            {
+              label: t("vocabulary"),
+              href: `${basePath}/${"data/vocabularies"}`,
+              icon: MdLibraryBooks,
+            },
+            {
+              label: t("phonetics"),
+              href: `${basePath}/${"data/phonetics"}`,
+              icon: MdOutlineRecordVoiceOver,
+            },
+          ],
+        },
+        {
+          label: t("generate"),
+          icon: FaRegLightbulb,
+          href: `${basePath}/generate`,
+        },
+        {
+          label: t("types"),
+          icon: BiCategory,
+          href: `${basePath}/exercises/types`,
+        },
+      ]
       : []),
     {
       label: t("flashcard"),
@@ -196,7 +194,7 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
       href: `${basePath}/my-note`,
     },
   ];
-  
+
   useEffect(() => {
     console.log("pathname: ", pathname);
   }, [pathname]);
@@ -204,9 +202,8 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
   return (
     <div>
       <aside
-        className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 h-full ${
-          toggleSidebar ? "w-72" : "w-20"
-        }`}
+        className={`bg-white shadow-lg border-r border-gray-200 transition-all duration-300 h-full ${toggleSidebar ? "w-72" : "w-20"
+          }`}
       >
         <nav className="flex flex-col h-full">
           {/* Header */}
@@ -220,9 +217,8 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
                 className="shrink-0"
               />
               <span
-                className={`text-lg font-bold text-amber-500 transition-opacity duration-300 ${
-                  toggleSidebar ? "opacity-100" : "opacity-0 w-0"
-                }`}
+                className={`text-lg font-bold text-amber-500 transition-opacity duration-300 ${toggleSidebar ? "opacity-100" : "opacity-0 w-0"
+                  }`}
               >
                 EngVenture
               </span>
@@ -242,8 +238,8 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
             {/* Admin Dashboard Link */}
             {isAdmin && (
               <div className="px-4 mb-4">
-                <Link 
-                  href="/admin/home"
+                <Link
+                  href="/admin/dashboard"
                   className="flex items-center justify-center p-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors duration-200"
                 >
                   <span className={toggleSidebar ? "" : "hidden"}>Admin Dashboard</span>
@@ -256,16 +252,15 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
             <div className="space-y-1 px-3">
               {mainNavItems.map((item, index) => {
                 const Icon = item.icon;
-                const isActive = isActiveLink(item.href);
+                const isActive = isActiveLink(item.href, true);
                 return (
                   <div key={index}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                        isActive 
-                          ? "bg-blue-100 text-blue-700 font-medium shadow-sm" 
-                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      }`}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${isActive
+                        ? "bg-blue-100 text-blue-700 font-medium shadow-sm"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        }`}
                     >
                       <Icon className={`shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'}`} size={20} />
                       <span className={`transition-opacity duration-300 ${toggleSidebar ? "opacity-100" : "opacity-0 w-0"}`}>
@@ -284,23 +279,22 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
                   Learning Corner
                 </h3>
               </div>
-              
+
               <div className="space-y-1 px-3 mt-3">
                 {learnNavItems.map((item: any, index) => {
                   const Icon = item.icon;
                   const isActive = item.href ? isActiveLink(item.href) : hasActiveChild(item.children);
-                  
+
                   return (
                     <div key={index}>
                       {/* Parent item */}
                       {item.href ? (
                         <Link
                           href={item.href}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                            isActive 
-                              ? "bg-blue-100 text-blue-700 font-medium shadow-sm" 
-                              : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                          }`}
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${isActive
+                            ? "bg-blue-100 text-blue-700 font-medium shadow-sm"
+                            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                            }`}
                         >
                           <Icon className={`shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'}`} size={20} />
                           <span className={`transition-opacity duration-300 ${toggleSidebar ? "opacity-100" : "opacity-0 w-0"}`}>
@@ -310,11 +304,10 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
                       ) : (
                         <div>
                           <button
-                            className={`flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                              isActive 
-                                ? "bg-blue-50 text-blue-700" 
-                                : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                            }`}
+                            className={`flex items-center justify-between w-full gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${isActive
+                              ? "bg-blue-50 text-blue-700"
+                              : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                              }`}
                             onClick={() => setIsPracticeOpen((prev) => !prev)}
                           >
                             <div className="flex items-center gap-3">
@@ -340,11 +333,10 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
                                   <Link
                                     key={childIndex}
                                     href={child.href}
-                                    className={`flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg transition-all duration-200 group ${
-                                      isChildActive
-                                        ? "bg-blue-100 text-blue-700 font-medium shadow-sm"
-                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                    }`}
+                                    className={`flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg transition-all duration-200 group ${isChildActive
+                                      ? "bg-blue-100 text-blue-700 font-medium shadow-sm"
+                                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                      }`}
                                   >
                                     <ChildIcon className={`shrink-0 ${isChildActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} size={16} />
                                     <span className="text-sm">{child.label}</span>

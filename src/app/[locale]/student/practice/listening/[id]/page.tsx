@@ -3,14 +3,12 @@
 import { Button } from "@/app/[locale]/components/ui/Button";
 import listeningPracticeService from "@/lib/services/student/listening-practice.service";
 import { Exercise } from "@/lib/types/exercise";
-import { useLocale } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function ListeningPracticeDetailPage() {
   const router = useRouter();
-  const locale = useLocale();
   const { id } = useParams();
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -250,7 +248,7 @@ export default function ListeningPracticeDetailPage() {
 
           {/* Options */}
           <div className="space-y-4 mb-6">
-            {currentExercise.options.map((option, index) => (
+            {Array.isArray(currentExercise.options) && currentExercise.options.map((option, index) => (
               <button
                 key={index}
                 onClick={() => handleOptionSelect(option.key)}

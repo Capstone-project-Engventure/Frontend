@@ -193,9 +193,11 @@ export default function AdminSpeakingLessons() {
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
   const onEdit = useCallback((item: any) => {
-    const newPath = `${pathname}/speaking/${item.id}`;
-    router.push(newPath);
-  }, [pathname, router]);
+    // const newPath = `${pathname}/speaking/${item.id}`;
+    // router.push(newPath);
+
+    return item;
+  }, []);
 
   const onCreate = useCallback(() => {
     // Handle create new lesson if needed

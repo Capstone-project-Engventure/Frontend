@@ -225,8 +225,8 @@ export default function GrammarPracticeDetailPage() {
               currentExercise.options.map((option, index) => (
                 <div
                   key={index}
-                  className={getOptionStyle(option.option)}
-                  onClick={() => handleOptionSelect(option.option)}
+                  className={getOptionStyle(option.key)}
+                  onClick={() => handleOptionSelect(option.key)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -235,7 +235,7 @@ export default function GrammarPracticeDetailPage() {
                       </span>
                       <span className="text-gray-800">{option.option}</span>
                     </div>
-                    {getOptionIcon(option.option)}
+                    {getOptionIcon(option.key)}
                   </div>
                 </div>
               ))}

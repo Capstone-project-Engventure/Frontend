@@ -13,7 +13,7 @@ export type Exercise = {
     id: number;
     name: string;
     question?: string | null;
-    system_answer?: string;
+    system_answer?: string | null;
     type_id?: number;
     type?: ExerciseType;
     level?: string;
@@ -21,7 +21,7 @@ export type Exercise = {
     image?: string | null;
     lesson?: string | null;
     generated_by?: string;
-    description?: string;
+    description?: string | null;
     audio_file?: string;
     audio_file_url?: string | null;
     options: ExerciseOption[] | any[];
@@ -30,5 +30,5 @@ export type Exercise = {
         title: string;
         content: string;
     };
-    exercises ?: any[];
+    // exercises?: any[];
 };
