@@ -100,7 +100,7 @@ export default function ReadingPracticePage() {
     <div className="min-h-screen bg-gray-100 p-6 rounded-2xl">
       <Button
         variant="destructive"
-        onClick={() => router.push(`/${locale}/student/practice/reading`)}
+        onClick={() => router.back()}
       >
         <svg
           className="w-4 h-3 text-white mr-2"

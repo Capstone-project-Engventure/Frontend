@@ -271,8 +271,6 @@ export default function AdminGrammarLessons() {
         page={page}
         onPageChange={onPageChange}
         linkBase={`/${locale}/admin/exercises/grammar-lessons/grammars`}
-        modalFields={modalFields}
-        modalTitle="Grammar Lesson"
         hasCustomFetch={true}
         onCreate={onCreate}
         onEdit={onEdit}

@@ -412,7 +412,6 @@ export default function AdminGrammarExercises() {
         customTotalPages={totalPage}
         page={page}
         onPageChange={onPageChange}
-        modalTitle="Grammar Exercise"
         hasCustomFetch={true}
         onCreate={onCreate}
         onEdit={onEdit}

@@ -174,7 +174,7 @@ export default function ListeningPracticeDetailPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <Button
         variant="destructive"
-        onClick={() => router.push(`/${locale}/student/practice/listening`)}
+        onClick={() => router.back()}
         className="mb-6"
       >
         <svg
@@ -234,13 +234,13 @@ export default function ListeningPracticeDetailPage() {
           <div className="mb-8 p-4 bg-gray-50 rounded-xl">
             <audio
               ref={audioRef}
-              src={`${process.env.NEXT_PUBLIC_GCS_BASE_URL}${currentExercise.audio_file_url}`}
+              src={`${process.env.NEXT_PUBLIC_GCS_BASE_URL}/${currentExercise.audio_file_url}`}
               className="hidden"
             />
             <div className="text-center">
               <button
                 onClick={handlePlay}
-                className={`px-6 py-3 rounded-full text-white font-medium transition transform hover:scale-105 shadow-lg
+                className={`cursor-pointer px-6 py-3 rounded-full text-white font-medium transition transform hover:scale-105 shadow-lg
                   ${isPlaying ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"}`}
               >
                 {isPlaying ? "⏸️ Pause Audio" : "🔊 Play Audio"}
