@@ -192,6 +192,31 @@ class ExerciseService extends BaseService<Exercise> {
       };
     }
   }
+
+  // Bulk create multiple exercises
+  async bulkCreate(exercises: Partial<Exercise>[]): Promise<MutationResult<any>> {
+    try {
+      const res = await axiosInstance.post("exercises/bulk-create", { exercises });
+      if (res.status === 200 || res.status === 201 || res.status === 207) {
+        return {
+          success: true,
+          data: res.data,
+        };
+      }
+      return {
+        success: false,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
+      };
+    } catch (error: any) {
+      console.error("Error bulk creating exercises:", error);
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
+      };
+    }
+  }
 }
 
 export default ExerciseService;

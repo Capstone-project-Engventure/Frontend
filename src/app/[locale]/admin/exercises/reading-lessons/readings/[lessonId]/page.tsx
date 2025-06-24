@@ -141,12 +141,10 @@ export default function AdminReading() {
   };
 
   useEffect(() => {
-    
-
     if (lessonId) {
       fetchLesson();
     }
-  }, [lessonId, lessonService]);
+  }, [lessonId]);
 
   /* ──────────────────────── derived data ───────────────── */
   const lessonOptions = useMemo(() => {

@@ -155,7 +155,7 @@ export default function AdminGrammarLessons() {
       setGrammarLessons([]);
       setHasFetched(true);
     }
-  }, [hasHydrated, hasFetched, selectedLesson, page, lessonService, setGrammarLessons, setHasFetched]);
+  }, [hasHydrated, hasFetched, selectedLesson, page, setGrammarLessons, setHasFetched]);
 
   useEffect(() => {
     fetchLessons();

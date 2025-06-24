@@ -4,6 +4,7 @@ import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import GrammarEditor from "@/app/[locale]/components/GrammarEditor";
 import GrammarService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
+import { Exercise } from "@/lib/types/exercise";
 import { useParams, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "react-toastify";
@@ -43,7 +44,7 @@ const CreateGrammarPage = () => {
     if (lessonId) {
       fetchLesson();
     }
-  }, [lessonId, lessonService, router]);
+  }, [lessonId]);
 
   const breadcrumbs = [
     { label: t("breadcrumbs.home"), href: `/${locale}/admin/home` },
@@ -59,25 +60,32 @@ const CreateGrammarPage = () => {
     },
   ];
 
-  const handleSave = async (data: Partial<any>) => {
+  const handleSave = async (data: Exercise[]) => {
     console.log("Grammar submitted: ", data);
     try {
-      data.lesson = Number(lessonId);
-      const response = await grammarService.create(data, {});
+      // Prepare exercises data for bulk create
+      const exercisesData = data.map(exercise => ({
+        ...exercise,
+        lesson: lessonId as string,
+        generated_by: "admin"
+      }));
+
+      const response = await grammarService.bulkCreate(exercisesData);
       if (response.success) {
-        toast.success(t("messages.createSuccess"));
+        toast.success(`Successfully created ${response.data.created_count} exercises`);
         router.push(`/${locale}/admin/exercises/grammar-lessons/grammars/${lessonId}`);
       } else {
         toast.error(t("messages.createError"));
       }
     } catch (error: any) {
-      console.error("Error creating grammar exercise:", error);
-      if (error.response?.data?.name) {
-        if (error.response.data.name[0].includes('already exists')) {
-          toast.error("Exercise with this name already exists");
-        } else {
-          toast.error(`Name: ${error.response.data.name[0]}`);
-        }
+      console.error("Error creating grammar exercises:", error);
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else if (error.response?.data?.errors) {
+        // Handle partial success case
+        const errorCount = error.response.data.errors.length;
+        const successCount = error.response.data.created_count;
+        toast.error(`Created ${successCount} exercises, ${errorCount} failed`);
       } else {
         toast.error(t("messages.createError"));
       }
