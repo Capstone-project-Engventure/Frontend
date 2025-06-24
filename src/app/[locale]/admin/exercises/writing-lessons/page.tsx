@@ -161,7 +161,7 @@ export default function AdminWritingLessons() {
       setWritingLessons([]);
       setHasFetched(true);
     }
-  }, [hasHydrated, hasFetched, selectedLesson, page, lessonService, setWritingLessons, setHasFetched]);
+  }, [hasHydrated, hasFetched, selectedLesson, page, setWritingLessons, setHasFetched]);
 
   useEffect(() => {
     fetchLessons();

@@ -51,7 +51,7 @@ const EditGrammarPage = () => {
       console.error("Error fetching lesson:", error);
       toast.error("An error occurred while fetching lesson");
     }
-  }, [lessonId, lessonService]);
+  }, [lessonId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,12 +79,13 @@ const EditGrammarPage = () => {
     },
   ];
 
-  const handleSave = async (data: Exercise) => {
-    if (!exercise) return;
+  const handleSave = async (data: Exercise[]) => {
+    if (!exercise || data.length === 0) return;
     
+    // For edit page, we only update the first exercise
     const updatedExercise = {
       ...exercise,
-      ...data,
+      ...data[0],
       lesson: lessonId as string,
     };
     
