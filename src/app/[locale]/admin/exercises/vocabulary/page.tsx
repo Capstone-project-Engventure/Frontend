@@ -247,7 +247,7 @@ export default function AdminVocabulary() {
       );
       if (!res.success) throw new Error("Failed to fetch");
       setVocab(res.data || []);
-      setTotalPages(res.total_page || 1);
+      setTotalPages(res.pagination?.total_page || 1);
     } catch (err) {
       setError("Error loading vocabulary");
     } finally {
