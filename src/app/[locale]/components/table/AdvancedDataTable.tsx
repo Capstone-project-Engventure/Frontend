@@ -32,6 +32,7 @@ interface PaginationTableProps {
   onAdd?: (data: any) => void;
   onUpdate?: (id: string | number, data: any) => void;
   onDelete?: (id: string | number) => void;
+  onBulkDelete?: (ids: (string | number)[]) => Promise<any>;
   onEdit?: (item: any) => any;
   onView?: (item: any) => void;
   onCreate?: () => void;
@@ -55,6 +56,7 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
   onAdd,
   onUpdate,
   onDelete,
+  onBulkDelete,
   onEdit,
   onView,
   onCreate,
@@ -158,6 +160,44 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedItems.length === 0) return;
+    
+    try {
+      if (onBulkDelete) {
+        // Use custom bulk delete handler
+        await onBulkDelete(selectedItems);
+        clearSelection();
+        refetch();
+        onSuccess?.();
+      } else if (service?.bulkDelete) {
+        // Use service bulk delete method
+        const response = await service.bulkDelete(selectedItems);
+        if (response?.success) {
+          clearSelection();
+          refetch();
+          onSuccess?.();
+        }
+      } else if (onDelete || service?.delete) {
+        // Fallback: delete items one by one
+        const deletePromises = selectedItems.map(id => 
+          onDelete ? onDelete(id) : service?.delete(id)
+        );
+        
+        const responses = await Promise.all(deletePromises);
+        const allSuccessful = responses.every(response => response?.success);
+        
+        if (allSuccessful) {
+          clearSelection();
+          refetch();
+          onSuccess?.();
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting items:', error);
+    }
+  };
+
   // Render simplified JSX
   return (
     <div className="relative overflow-x-auto shadow-xl sm:rounded-lg w-full">
@@ -167,7 +207,7 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
         <TableActions
           selectedCount={selectedItems.length}
           onAdd={handleAdd}
-          onDeleteSelected={() => {/* Handle bulk delete */}}
+          onDeleteSelected={handleBulkDelete}
           onExport={() => {/* Handle export */}}
           onImport={() => {/* Handle import */}}
           hasImport={hasImport}
@@ -222,16 +262,16 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
       />
 
       {/* Modal */}
-      {isModalOpen && modalFields && (
+      {isModalOpen && (
         <FormModal
-          fields={modalFields}
-          title={modalTitle}
-          formData={formData}
-          onSubmit={handleSubmit}
           onClose={() => {
             setIsModalOpen(false);
             setFormData(null);
           }}
+          onSubmit={handleSubmit}
+          fields={modalFields ?? []}
+          formData={formData}
+          title={modalTitle}
           isLoading={isLoading}
         />
       )}

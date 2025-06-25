@@ -3,7 +3,6 @@ import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable
 import CourseService from "@/lib/services/course.service";
 import { Course } from "@/lib/types/course";
 import { useState, useMemo } from "react";
-import { toast } from "react-toastify";
 import { useLocale, useTranslations } from "next-intl";
 
 export default function AdminCourse() {
@@ -58,10 +57,10 @@ export default function AdminCourse() {
   const handleAdd = async (data: Course) => {
     const result = await courseService.create(data);
     if (result.success) {
-      toast.success(t("messages.addSuccess"));
+      console.log(t("messages.addSuccess"));
       return result;
     } else {
-      toast.error(t("messages.error"));
+      console.error(t("messages.error"));
       throw new Error(result.error);
     }
   };
@@ -69,10 +68,10 @@ export default function AdminCourse() {
   const handleUpdate = async (id: string | number, data: Course) => {
     const result = await courseService.update(id, data);
     if (result.success) {
-      toast.success(t("messages.updateSuccess"));
+      console.log(t("messages.updateSuccess"));
       return result;
     } else {
-      toast.error(t("messages.error"));
+      console.error(t("messages.error"));
       throw new Error(result.error);
     }
   };

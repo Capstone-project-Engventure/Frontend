@@ -401,10 +401,10 @@ export default function StudentWritingPracticePage() {
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  <div className="p-4 text-black outline-none border-0 h-[384px]">
+                  <div className="p-4 text-black outline-none border-0 h-[384px] overflow-y-auto">
                     <EditorContent
                       editor={editor}
-                      className="prose prose-sm max-w-none outline-none h-[384px]"
+                      className="prose prose-sm max-w-none outline-none"
                     />
                   </div>
                 </div>
@@ -484,48 +484,63 @@ export default function StudentWritingPracticePage() {
                 <LuCheck className="h-5 w-5 mr-2 text-green-600" />
                 Kiểm tra ngữ pháp
               </h3>
-              
-              {grammarErrors.length > 0 ? (
+
+              {isSubmitting ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <span className="ml-3 text-gray-600">
+                      Đang kiểm tra...
+                    </span>
+                  </div>
+                </div>
+              ) : grammarErrors.length > 0 ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-red-600">
-                      {grammarErrors.length} lỗi ngữ pháp
+                      {grammarErrors.length} lỗi được tìm thấy
                     </span>
                     <LuTriangle className="h-4 w-4 text-red-500" />
                   </div>
-                  <div className="max-h-64 overflow-y-auto space-y-2">
+                  <div className="max-h-96 overflow-y-auto space-y-2 p-1">
                     {grammarErrors.map((error, index) => (
-                      <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-3">
-                        <div className="flex items-start space-x-2">
-                          <div className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-red-800">
-                              {(error as any)?.message || "Lỗi ngữ pháp"}
-                            </p>
-                            {(error as any).suggestion && (
-                              <p className="text-xs text-red-600 mt-1">
-                                Gợi ý: {(error as any).suggestion}
-                              </p>
-                            )}
-                            {(error as any).context && (
-                              <p className="text-xs text-gray-600 mt-1">
-                                Ngữ cảnh: "{(error as any).context}"
-                              </p>
-                            )}
-                          </div>
+                      <div
+                        key={index}
+                        className="text-sm p-3 rounded-lg border bg-white shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                      >
+                        <p className="font-semibold text-gray-800 mb-2">
+                          {error.message}
+                        </p>
+                        <div className="flex items-center space-x-2 my-1">
+                          <span className="text-red-600 line-through bg-red-50 px-1 rounded">
+                            {error.orig}
+                          </span>
+                          <span className="text-xl font-light text-gray-400">
+                            →
+                          </span>
+                          <span className="text-green-600 font-bold bg-green-50 px-1 rounded">
+                            {error.corrected}
+                          </span>
                         </div>
+                        {error.explanation && (
+                          <p className="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded border border-gray-200">
+                            {error.explanation}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="bg-green-50 rounded-lg p-4 text-center">
-                  <LuCheck className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-sm text-green-700 font-medium mb-1">
+                <div className="bg-green-50 rounded-lg p-4 text-center border border-green-200">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                    <LuCheck className="h-8 w-8 text-green-500" />
+                  </div>
+                  <p className="font-semibold text-green-800">
                     Không có lỗi ngữ pháp
                   </p>
-                  <p className="text-xs text-green-600">
-                    Văn bản của bạn đã được kiểm tra
+                  <p className="text-sm text-green-700 mt-1">
+                    Văn bản của bạn đã được kiểm tra.
                   </p>
                 </div>
               )}

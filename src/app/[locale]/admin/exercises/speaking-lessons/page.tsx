@@ -193,9 +193,6 @@ export default function AdminSpeakingLessons() {
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
   const onEdit = useCallback((item: any) => {
-    // const newPath = `${pathname}/speaking/${item.id}`;
-    // router.push(newPath);
-
     return item;
   }, []);
 
@@ -227,7 +224,7 @@ export default function AdminSpeakingLessons() {
       const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
       const response = await lessonService.update(numericId, data);
       if (response.success) {
-        updateLesson(numericId, data);
+        updateLesson(numericId, response.data);
         toast.success(tSpeaking("messages.updateSuccess"));
         return response;
       } else {

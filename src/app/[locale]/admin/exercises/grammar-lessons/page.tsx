@@ -46,6 +46,8 @@ export default function AdminGrammarLessons() {
   const [topic, setTopic] = useState<OptionType | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<OptionType | null>(null);
 
+
+
   /* ──────────────────────── i18n / services ────────────── */
   const locale = useLocale();
   const t = useTranslations("Admin.Exercises");
@@ -195,9 +197,12 @@ export default function AdminGrammarLessons() {
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
   const onEdit = useCallback((item: any) => {
+<<<<<<< HEAD
     // const newPath = `${pathname}/grammars/${item.id}`;
     // router.push(newPath);
 
+=======
+>>>>>>> main
     return item;
   }, []);
 
@@ -229,7 +234,7 @@ export default function AdminGrammarLessons() {
       const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
       const response = await lessonService.update(numericId, data);
       if (response.success) {
-        updateLesson(numericId, data);
+        updateLesson(numericId, response.data);
         toast.success("Lesson updated successfully");
         return response;
       } else {
@@ -262,6 +267,37 @@ export default function AdminGrammarLessons() {
     }
   };
 
+  const handleBulkDelete = async (ids: (string | number)[]) => {
+    try {
+      const numericIds = ids.map(id => typeof id === 'string' ? parseInt(id, 10) : id);
+      
+      // Delete lessons one by one (since we don't have bulk delete API)
+      const deletePromises = numericIds.map(id => lessonService.delete(id));
+      const responses = await Promise.all(deletePromises);
+      
+      const successfulIds = responses
+        .map((response, index) => response.success ? numericIds[index] : null)
+        .filter(id => id !== null) as number[];
+      
+      if (successfulIds.length > 0) {
+        // Update store by removing successful deletions
+        successfulIds.forEach(id => deleteLesson(id));
+        toast.success(`Successfully deleted ${successfulIds.length} lesson(s)`);
+      }
+      
+      const failedCount = numericIds.length - successfulIds.length;
+      if (failedCount > 0) {
+        toast.error(`Failed to delete ${failedCount} lesson(s)`);
+      }
+      
+      return { success: successfulIds.length > 0 };
+    } catch (error) {
+      console.error("Error bulk deleting lessons:", error);
+      toast.error("Network error while deleting lessons");
+      throw error;
+    }
+  };
+
   /* ──────────────────────── render ─────────────────────── */
   return (
     <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
@@ -281,6 +317,7 @@ export default function AdminGrammarLessons() {
         onAdd={handleAdd}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
+        onBulkDelete={handleBulkDelete}
         onSuccess={() => {
           // Refresh the current page data without full refetch
           if (hasHydrated) {
