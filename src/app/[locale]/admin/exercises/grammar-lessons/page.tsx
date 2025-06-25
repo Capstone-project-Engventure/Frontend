@@ -197,12 +197,6 @@ export default function AdminGrammarLessons() {
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
   const onEdit = useCallback((item: any) => {
-<<<<<<< HEAD
-    // const newPath = `${pathname}/grammars/${item.id}`;
-    // router.push(newPath);
-
-=======
->>>>>>> main
     return item;
   }, []);
 
