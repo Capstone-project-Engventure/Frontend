@@ -121,7 +121,9 @@ class ExerciseService extends BaseService<Exercise> {
   // Approve service - approve and save exercise to database
   async approveExercise(exerciseData: Exercise): Promise<MutationResult<Exercise>> {
     try {
-      const res = await axiosInstance.post("exercises/approve", exerciseData);
+      const res = await axiosInstance.post("exercises/approve-single", { 
+        exercise_data: exerciseData 
+      });
       if (res.status === 200 || res.status === 201) {
         return {
           success: true,
@@ -210,6 +212,144 @@ class ExerciseService extends BaseService<Exercise> {
       };
     } catch (error: any) {
       console.error("Error bulk creating exercises:", error);
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
+      };
+    }
+  }
+
+  // Deploy service - publish approved exercises to make them available for students
+  async publishExercises(exerciseIds: number[]): Promise<MutationResult<any>> {
+    try {
+      const res = await axiosInstance.post("exercises/publish", { 
+        exercise_ids: exerciseIds 
+      });
+      if (res.status === 200 || res.status === 201) {
+        return {
+          success: true,
+          data: res.data,
+        };
+      }
+      return {
+        success: false,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
+      };
+    } catch (error: any) {
+      console.error("Error publishing exercises:", error);
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
+      };
+    }
+  }
+
+  // Deploy service - unpublish exercises (remove from student access)
+  async unpublishExercises(exerciseIds: number[]): Promise<MutationResult<any>> {
+    try {
+      const res = await axiosInstance.post("exercises/unpublish", { 
+        exercise_ids: exerciseIds 
+      });
+      if (res.status === 200 || res.status === 201) {
+        return {
+          success: true,
+          data: res.data,
+        };
+      }
+      return {
+        success: false,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
+      };
+    } catch (error: any) {
+      console.error("Error unpublishing exercises:", error);
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
+      };
+    }
+  }
+
+  // Deploy service - assign exercises to specific lessons
+  async assignExercisesToLesson(exerciseIds: number[], lessonId: number): Promise<MutationResult<any>> {
+    try {
+      const res = await axiosInstance.post("exercises/assign-to-lesson", { 
+        exercise_ids: exerciseIds,
+        lesson_id: lessonId
+      });
+      if (res.status === 200 || res.status === 201) {
+        return {
+          success: true,
+          data: res.data,
+        };
+      }
+      return {
+        success: false,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
+      };
+    } catch (error: any) {
+      console.error("Error assigning exercises to lesson:", error);
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
+      };
+    }
+  }
+
+  // Deploy service - get published exercises available for students
+  async getPublishedExercises(filters?: any): Promise<GetAllResult<Exercise>> {
+    try {
+      const params = {
+        status: 'approved',
+        is_published: true,
+        ...filters
+      };
+      const res = await axiosInstance.get("exercises/published", { params });
+      if (res.status === 200) {
+        return {
+          success: true,
+          data: Array.isArray(res.data.results) ? res.data.results : [res.data],
+          pagination: res.data.pagination
+        };
+      }
+      return {
+        success: false,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
+      };
+    } catch (error: any) {
+      console.error("Error fetching published exercises:", error);
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+        code: error.code,
+      };
+    }
+  }
+
+  // Deploy service - get deployment statistics
+  async getDeploymentStats(): Promise<GetSingleResult<any>> {
+    try {
+      const res = await axiosInstance.get("exercises/deployment-stats");
+      if (res.status === 200) {
+        return {
+          success: true,
+          data: res.data,
+        };
+      }
+      return {
+        success: false,
+        error: `HTTP Error: ${res.status}`,
+        code: res.status.toString(),
+      };
+    } catch (error: any) {
+      console.error("Error fetching deployment stats:", error);
       return {
         success: false,
         error: error.message || 'Unknown error occurred',

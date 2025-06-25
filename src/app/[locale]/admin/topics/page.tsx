@@ -11,7 +11,6 @@ import { useEffect, useState, useMemo } from "react";
 import {
   HiPlus,
 } from "react-icons/hi";
-import { toast } from "react-toastify";
 
 export default function AdminTopic() {
   const topicService = new TopicService();
@@ -76,11 +75,11 @@ export default function AdminTopic() {
       if (response.success && response.data) {
         setAllTopics(response.data);
       } else {
-        toast.error("Failed to fetch topics");
+        console.error("Failed to fetch topics");
       }
     } catch (error) {
       console.error("Error fetching topics:", error);
-      toast.error("Error loading topics");
+      console.error("Error loading topics");
     } finally {
       setIsLoading(false);
     }
@@ -111,14 +110,14 @@ export default function AdminTopic() {
     try {
       const res = await lessonService.importByFile(file);
       if (res.success) {
-        toast.success("Import file thành công");
+        console.log("Import file thành công");
         fetchLessonData();
       } else {
-        toast.error("Import file thất bại");
+        console.error("Import file thất bại");
       }
     } catch (error) {
       console.error("Error importing file:", error);
-      toast.error("Import file thất bại");
+      console.error("Import file thất bại");
     }
   };
 

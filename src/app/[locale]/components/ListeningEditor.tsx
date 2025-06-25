@@ -223,7 +223,7 @@ const ListeningEditor: React.FC<Props> = ({ initialData, onSubmit, header, isVie
     const newQuestions = [...exercises];
     if (newQuestions[qIndex] && newQuestions[qIndex].options && newQuestions[qIndex].options[correctIndex]) {
       newQuestions[qIndex].system_answer =
-        newQuestions[qIndex].options[correctIndex].option;
+        newQuestions[qIndex].options[correctIndex].key;
       setExercises(newQuestions);
     }
   };

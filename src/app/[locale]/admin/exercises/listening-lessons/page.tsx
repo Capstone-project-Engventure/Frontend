@@ -192,9 +192,8 @@ export default function AdminListeningLessons() {
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
   const onEdit = useCallback((item: any) => {
-    const newPath = `${pathname}/listening/${item.id}`;
-    router.push(newPath);
-  }, [pathname, router]);
+    return item;
+  }, []);
 
   const onCreate = useCallback(() => {
     // Handle create new lesson if needed
@@ -224,7 +223,7 @@ export default function AdminListeningLessons() {
       const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
       const response = await lessonService.update(numericId, data);
       if (response.success) {
-        updateLesson(numericId, data);
+        updateLesson(numericId, response.data);
         toast.success("Lesson updated successfully");
         return response;
       } else {
