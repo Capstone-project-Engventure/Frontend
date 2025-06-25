@@ -85,7 +85,7 @@ export default function LoginForm() {
         ) {
           router.push(`/${locale}/admin/home`);
         } else {
-          router.push(`/${locale}/student`);
+          router.push(`/${locale}/student/dashboard`);
         }
 
         toast(locale === 'vi' ? 'Đăng nhập thành công' : 'Login successful');

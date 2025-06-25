@@ -1,272 +1,292 @@
-'use client';
+"use client";
 
-import { Button } from '@/app/[locale]/components/ui/Button';
-import type { Exercise } from '@/lib/types/exercise';
-import MediaThemeTailwindAudio from 'player.style/tailwind-audio/react';
-import { useEffect, useState } from 'react';
+import { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { toast } from "react-toastify";
+import { Exercise } from "@/lib/types/exercise";
 
-interface AudioWithQuestionsProps {
+type Props = {
     exercises: Exercise[];
-    // lessonTitle: string;
-    // lessonDescription: string;
-}
+};
 
-const AudioWithQuestions = ({ exercises }: AudioWithQuestionsProps) => {
-    const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
-    const [answers, setAnswers] = useState<{ [exerciseId: number]: string }>({});
-    const [selectedOptionKey, setSelectedOptionKey] = useState<string>('');
-    const [isCompleted, setIsCompleted] = useState(false);
-    const [results, setResults] = useState<{ correct: number; total: number; score: number }>({ correct: 0, total: 0, score: 0 });
+export default function AudioWithQuestions({ exercises }: Props) {
+    const audioRef = useRef<HTMLAudioElement>(null);
 
-    const currentExercise = exercises[currentExerciseIndex];
-    const isFirstExercise = currentExerciseIndex === 0;
-    const isLastExercise = currentExerciseIndex === exercises.length - 1;
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [showResult, setShowResult] = useState(false);
+    const [isCorrect, setIsCorrect] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [showExplanation, setShowExplanation] = useState(false);
+    const [hearts, setHearts] = useState(5);
+    const [completedCount, setCompletedCount] = useState(0);
 
-    const handleOptionChange = (key: string) => {
-        setSelectedOptionKey(key);
+    const currentExercise = exercises[currentIndex];
+    const totalExercises = exercises.length;
+
+    const progress = useMemo(() => (totalExercises > 0 ? (completedCount / totalExercises) * 100 : 0), [
+        completedCount,
+        totalExercises,
+    ]);
+
+    // Audio control
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        const updatePlaying = () => setIsPlaying(!audio.paused);
+
+        audio.addEventListener("play", updatePlaying);
+        audio.addEventListener("pause", updatePlaying);
+        audio.addEventListener("ended", () => setIsPlaying(false));
+
+        return () => {
+            audio.removeEventListener("play", updatePlaying);
+            audio.removeEventListener("pause", updatePlaying);
+            audio.removeEventListener("ended", () => setIsPlaying(false));
+        };
+    }, [currentIndex]);
+
+    const handlePlay = useCallback(() => {
+        const audio = audioRef.current;
+        if (audio) isPlaying ? audio.pause() : audio.play();
+    }, [isPlaying]);
+
+    const handleOptionSelect = (key: string) => {
+        if (!showResult) setSelectedOption(key);
+    };
+
+    const handleExercise = () => {
+        if (!selectedOption) return toast.warning("Please select an answer first!");
+
+        const correct = selectedOption === currentExercise.system_answer;
+        setIsCorrect(correct);
+        setShowResult(true);
+        setShowExplanation(true);
+        setCompletedCount((c) => c + 1);
+
+        if (correct) {
+            toast.success("Correct!");
+        } else {
+            setHearts((h) => Math.max(0, h - 1));
+            toast.error("Incorrect.");
+        }
+    };
+
+    const resetQuestion = (shouldDecrementProgress: boolean = false) => {
+        if (showResult && shouldDecrementProgress) {
+            setCompletedCount((c) => Math.max(0, c - 1));
+        }
+
+        setSelectedOption(null);
+        setShowResult(false);
+        setIsCorrect(false);
+        setShowExplanation(false);
+        setIsPlaying(false);
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }
     };
 
     const handleNext = () => {
-        if (!isLastExercise) {
-            if (selectedOptionKey) {
-                setAnswers(prev => ({ ...prev, [currentExercise.id]: selectedOptionKey }));
-            }
-            setCurrentExerciseIndex(prev => prev + 1);
+        if (currentIndex < totalExercises - 1) {
+            setCurrentIndex((i) => i + 1);
+            resetQuestion(false);
+        } else {
+            toast.success("Congratulations! You completed all exercises!");
         }
     };
 
     const handlePrevious = () => {
-        if (!isFirstExercise) {
-            if (selectedOptionKey) {
-                setAnswers(prev => ({ ...prev, [currentExercise.id]: selectedOptionKey }));
-            }
-            setCurrentExerciseIndex(prev => prev - 1);
+        if (currentIndex > 0) {
+            setCompletedCount((c) => Math.max(0, c - 1));
+            setCurrentIndex((i) => i - 1);
+            resetQuestion(true);
         }
     };
 
-    const handleSubmit = () => {
-        const finalAnswers = selectedOptionKey ? { ...answers, [currentExercise.id]: selectedOptionKey } : answers;
-
-        let correctCount = 0;
-        exercises.forEach(exercise => {
-            if (finalAnswers[exercise.id] === exercise.system_answer) {
-                correctCount++;
-            }
-        });
-
-        const totalQuestions = exercises.length;
-        const scorePercent = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
-
-        setResults({
-            correct: correctCount,
-            total: totalQuestions,
-            score: scorePercent
-        });
-
-        setAnswers(finalAnswers);
-        setIsCompleted(true);
-    };
-
-    const handleRestart = () => {
-        setIsCompleted(false);
-        setCurrentExerciseIndex(0);
-        setAnswers({});
-        setSelectedOptionKey('');
-        setResults({ correct: 0, total: 0, score: 0 });
-    };
-
-    useEffect(() => {
-        if (!isCompleted) {
-            setSelectedOptionKey(answers[currentExercise?.id] || '');
+    const getOptionStyle = (key: string) => {
+        const base = "w-full p-4 text-left border-2 rounded-xl font-medium transition-all";
+        if (!showResult) {
+            return `${base} ${selectedOption === key ? "border-blue-500 bg-blue-50 text-blue-700 shadow-md" : "border-gray-200 hover:bg-gray-50"
+                }`;
         }
-    }, [currentExerciseIndex, answers, currentExercise?.id, isCompleted]);
+        if (key === currentExercise.system_answer) return `${base} border-green-500 bg-green-50 text-green-800`;
+        if (key === selectedOption && !isCorrect) return `${base} border-red-500 bg-red-50 text-red-800`;
+        return `${base} border-gray-200 bg-gray-100 text-gray-500`;
+    };
 
-    if (!currentExercise) {
-        return <div className="text-center p-6 text-gray-600">Không có bài tập nào.</div>;
-    }
-
-    if (isCompleted) {
-        return (
-            <div className="max-w-7xl mx-auto p-8 bg-white shadow-xl rounded-2xl mt-4 space-y-4">
-                {/* <h1 className="text-2xl font-bold text-center text-gray-800">{lessonTitle}</h1> */}
-                {/* <p className="text-gray-700 text-center leading-relaxed whitespace-pre-line border-l-4 border-blue-500 pl-4">
-                    {lessonDescription}
-                </p> */}
-
-                {/* Results Header */}
-                <div className="text-center bg-gray-50 p-6 rounded-lg">
-                    <div className="text-4xl mb-4">🚀</div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Bài tập đã hoàn thành!</h2>
-                    <p className="text-lg text-gray-600 mb-2">Số câu đúng: {results.correct}/{results.total}.</p>
-                    <p className="text-lg text-gray-600 mb-4">Điểm của bạn là {results.score}%.</p>
-                    <p className="text-gray-600">Kiểm tra lại đáp án của bạn bên dưới:</p>
-                </div>
-
-                {/* Detailed Results */}
-                <div className="space-y-6">
-                    {exercises.map((exercise, index) => {
-                        const userAnswer = answers[exercise.id];
-                        const isCorrect = userAnswer === exercise.system_answer;
-
-                        return (
-                            <div key={exercise.id} className="border rounded-lg p-6">
-                                <div className="flex items-start mb-4">
-                                    <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                                        <span className="text-white text-sm font-bold">{index + 1}</span>
-                                    </div>
-                                    <p className="font-semibold text-gray-800 text-lg">{exercise.question}</p>
-                                </div>
-
-                                <div className="space-y-3 ml-11">
-                                    {(exercise.options ?? []).map((option:any) => {
-                                        const isUserSelected = option.key === userAnswer;
-                                        const isSystemCorrect = option.key === exercise.system_answer;
-
-                                        let optionClass = "p-3 rounded-lg border ";
-                                        if (isSystemCorrect) {
-                                            optionClass += "bg-green-100 border-green-300 text-green-800";
-                                        } else if (isUserSelected && !isCorrect) {
-                                            optionClass += "bg-red-100 border-red-300 text-red-800";
-                                        } else {
-                                            optionClass += "bg-gray-50 border-gray-200 text-gray-700";
-                                        }
-
-                                        return (
-                                            <div key={option.key} className={optionClass}>
-                                                <div className="flex items-center space-x-2">
-                                                    <span className="font-bold">{option.key}.</span>
-                                                    <span>{option.option}</span>
-                                                    {isSystemCorrect && <span className="ml-2 text-green-600">✓</span>}
-                                                    {isUserSelected && !isCorrect && <span className="ml-2 text-red-600">✗</span>}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-
-                                <div className={`mt-4 ml-11 p-4 rounded-r-lg border-l-4 ${exercise.explanation
-                                    ? 'bg-blue-50 border-blue-400 text-blue-800'
-                                    : 'bg-gray-50 border-gray-300 text-gray-600'
-                                    }`}>
-                                    <p className="text-sm italic">
-                                        {exercise.explanation
-                                            ? <> <strong>Giải thích:</strong> {exercise.explanation} </>
-                                            : 'Không có giải thích cho câu hỏi này.'}
-                                    </p>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {/* Restart Button */}
-                <div className="flex justify-center pt-6">
-                    <Button variant="default" onClick={handleRestart}>
-                        Làm lại bài tập
-                    </Button>
-                </div>
-            </div>
-        );
-    }
+    const getOptionIcon = (key: string) => {
+        if (!showResult) return null;
+        if (key === currentExercise.system_answer) return <span className="text-green-600 font-bold">✓</span>;
+        if (key === selectedOption && !isCorrect) return <span className="text-red-600 font-bold">✗</span>;
+        return null;
+    };
 
     return (
-        <div className="max-w-7xl mx-auto p-8 bg-white shadow-xl rounded-2xl mt-4 space-y-4">
-            {/* <h1 className="text-2xl font-bold text-center text-gray-800">{currentExercise.name}</h1>
-            <p className="text-gray-700 text-center leading-relaxed whitespace-pre-line border-l-4 border-blue-500 pl-4">
-                {currentExercise.description}
-            </p> */}
+        <div>
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm mb-6">
+                <div className="flex-1 mx-6">
+                    <div className="flex justify-between text-sm mb-1 text-gray-600">
+                        <span>Question {currentIndex + 1} of {totalExercises}</span>
+                        <span>{Math.round(progress)}%</span>
+                    </div>
+                    <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-green-400 to-green-600 transition-[width] duration-200"
+                            style={{ width: `${progress}%` }} />
+                    </div>
+                </div>
 
-            {/* Progress indicator */}
-            <div className="flex justify-center items-center space-x-2 py-4">
-                <span className="text-sm text-gray-600">
-                    Câu hỏi {currentExerciseIndex + 1} / {exercises.length}
-                </span>
-                <div className="w-64 bg-gray-200 rounded-full h-2">
-                    <div
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${((currentExerciseIndex + 1) / exercises.length) * 100}%` }}
+                <div className="flex items-center text-red-500">
+                    <span className="text-2xl">❤️</span>
+                    <span className="font-bold text-lg ml-1">{hearts}</span>
+                </div>
+            </div>
+
+            {/* Question */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <div className="flex justify-between mb-4">
+                    <div className="flex space-x-3">
+                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">{currentExercise.level}</span>
+                        <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">{currentExercise.skill}</span>
+                    </div>
+                    <span className="text-sm text-gray-500">{currentExercise.name}</span>
+                </div>
+
+                {/* Audio */}
+                {/* <div className="mb-8 p-4 bg-gray-50 rounded-xl">
+                    <audio
+                        ref={audioRef}
+                        src={`${process.env.NEXT_PUBLIC_GCS_BASE_URL}/${currentExercise.audio_file_url}`}
+                        className="hidden"
                     />
-                </div>
-            </div>
-
-            {/* Current question block */}
-            <div className="p-6 border rounded-lg bg-gray-50">
-                <div className="justify-start">
-                    <MediaThemeTailwindAudio style={{ width: "100%", }}>
+                    <div className="text-center">
+                        <button
+                            onClick={handlePlay}
+                            className={`cursor-pointer px-6 py-3 rounded-full text-white font-medium transition transform hover:scale-105 shadow-lg
+                                    ${isPlaying ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"}`}
+                        >
+                            {isPlaying ? "⏸️ Pause Audio" : "🔊 Play Audio"}
+                        </button>
+                    </div>
+                </div> */}
+                <div className="mb-8 p-4 bg-gray-50 rounded-xl">
+                    <div className="flex flex-col items-center space-y-4">
                         <audio
-                            slot="media"
-                            src={`${process.env.NEXT_PUBLIC_GCS_BASE_URL}/${currentExercise.audio_file_url}`}
-                            playsInline
-                            crossOrigin="anonymous"
+                            ref={audioRef}
                             controls
-                            className="w-full"
+                            className="w-full max-w-md"
+                            src={`${process.env.NEXT_PUBLIC_GCS_BASE_URL}/${currentExercise.audio_file_url}`}
                         />
-                    </MediaThemeTailwindAudio>
-                </div>
-                <div className="flex items-start my-4">
-                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                        <span className="text-white text-sm font-bold">{currentExerciseIndex + 1}</span>
-                    </div>
-                    <div>
-                        <p className="font-semibold text-gray-800 text-lg leading-8">{currentExercise.question}</p>
+
+                        {/* <div className="flex items-center space-x-3">
+                            <label htmlFor="speed" className="text-sm font-medium text-gray-700">
+                                Speed:
+                            </label>
+                            <select
+                                id="speed"
+                                onChange={(e) => {
+                                    if (audioRef.current) {
+                                        audioRef.current.playbackRate = parseFloat(e.target.value);
+                                    }
+                                }}
+                                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                                defaultValue="1"
+                            >
+                                <option value="0.5">0.5x</option>
+                                <option value="0.75">0.75x</option>
+                                <option value="1">1x</option>
+                                <option value="1.25">1.25x</option>
+                                <option value="1.5">1.5x</option>
+                                <option value="2">2x</option>
+                            </select>
+                        </div> */}
                     </div>
                 </div>
 
-                <ul className="space-y-3 mx-2">
-                    {currentExercise && currentExercise.options && currentExercise.options.map((opt:any) => (
-                        <li key={opt.key} className="flex items-center space-x-3">
-                            <input
-                                type="radio"
-                                name={`exercise-${currentExercise.id}`}
-                                id={`opt-${opt.key}`}
-                                value={opt.key}
-                                onChange={() => handleOptionChange(opt.key)}
-                                checked={selectedOptionKey === opt.key}
-                                className="w-4 h-4 text-blue-600"
-                            />
-                            <label
-                                htmlFor={`opt-${opt.key}`}
-                                className={`flex items-center cursor-pointer space-x-2 p-2 rounded-lg transition-colors ${selectedOptionKey === opt.key
-                                    ? 'bg-blue-200 text-blue-800'
-                                    : 'hover:bg-gray-200'
-                                    }`}
-                            >
-                                <span className="font-bold text-gray-600">{opt.key}.</span>
-                                <span className="text-gray-700">{opt.option}</span>
-                            </label>
-                        </li>
+
+                {/* Options */}
+                <div className="space-y-4 mb-6">
+                    {currentExercise.options.map((option, index) => (
+                        <button
+                            key={index}
+                            onClick={() => handleOptionSelect(option.key)}
+                            disabled={showResult}
+                            className={getOptionStyle(option.key)}
+                        >
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-3">
+                                    <span className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center font-bold">
+                                        {option.key}
+                                    </span>
+                                    <span className="text-gray-800">{option.option}</span>
+                                </div>
+                                {getOptionIcon(option.key)}
+                            </div>
+                        </button>
                     ))}
-                </ul>
+                </div>
+
+                {/* Explanation */}
+                {showExplanation && currentExercise.explanation && (
+                    <div className={`p-4 rounded-xl border-l-4 ${isCorrect ? "bg-green-50 border-green-400" : "bg-red-50 border-red-400"}`}>
+                        <h3 className="font-semibold mb-2 text-gray-800">Explanation:</h3>
+                        <p className="text-gray-700">{currentExercise.explanation}</p>
+                    </div>
+                )}
             </div>
 
+            {/* Navigation */}
+            <div className="flex justify-between items-center">
+                <div className="flex space-x-3">
+                    <button
+                        onClick={handlePrevious}
+                        disabled={currentIndex === 0}
+                        className="px-4 py-2 border rounded-full text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                    >
+                        ← Previous
+                    </button>
+                    <button className="px-4 py-2 border rounded-full text-gray-700 hover:bg-gray-100">
+                        Can't listen now
+                    </button>
+                </div>
 
-            {/* Navigation buttons */}
-            <div className="flex justify-center items-center pt-4 gap-2">
-                {!isFirstExercise && (
-                    <Button variant="outline" onClick={handlePrevious}>
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Trước
-                    </Button>
-                )}
-
-                {isLastExercise ? (
-                    <Button variant="default" onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
-                        Nộp bài
-                    </Button>
-                ) : (
-                    <Button variant="default" onClick={handleNext}>
-                        Tiếp theo
-                        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Button>
-                )}
+                <div className="flex space-x-3">
+                    {!showResult ? (
+                        <button
+                            onClick={handleExercise}
+                            className="px-8 py-3 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transform hover:scale-105"
+                        >
+                            Check Answer
+                        </button>
+                    ) : (
+                        <>
+                            {!isCorrect && (
+                                <button
+                                    onClick={() => resetQuestion(true)}
+                                    className="px-6 py-3 bg-orange-500 text-white rounded-full hover:bg-orange-600"
+                                >
+                                    Try Again
+                                </button>
+                            )}
+                            {currentIndex < totalExercises - 1 ? (
+                                <button
+                                    onClick={handleNext}
+                                    className="px-8 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transform hover:scale-105"
+                                >
+                                    Next Question →
+                                </button>
+                            ) : (
+                                <button className="px-8 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700">
+                                    Complete! 🎉
+                                </button>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
-};
-
-
-export default AudioWithQuestions;
+}

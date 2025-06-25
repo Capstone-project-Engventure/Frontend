@@ -69,7 +69,7 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
     const newQuestions = [...exercises];
     const optionKeys = ["A", "B", "C", "D", "E", "F"];
     const nextKey = optionKeys[newQuestions[qIndex].options.length] || `Option ${newQuestions[qIndex].options.length + 1}`;
-    
+
     const newOption: Option = {
       key: nextKey,
       option: "",
@@ -100,8 +100,7 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
 
   const handleCorrectAnswerChange = (qIndex: number, correctIndex: number) => {
     const newQuestions = [...exercises];
-    newQuestions[qIndex].system_answer =
-      newQuestions[qIndex].options[correctIndex].key;
+    newQuestions[qIndex].system_answer = newQuestions[qIndex].options[correctIndex].key;
     setExercises(newQuestions);
   };
 
@@ -163,13 +162,6 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
                 <HelpCircle className="w-5 h-5 text-gray-600" />
                 <h2 className="text-lg font-semibold text-gray-700">Comprehension Questions</h2>
               </div>
-              <button
-                onClick={addQuestion}
-                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Add Question
-              </button>
             </div>
 
             <div className="space-y-6">
@@ -249,6 +241,14 @@ const ReadingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
                   </button>
                 </div>
               ))}
+
+              <button
+                onClick={addQuestion}
+                className="cursor-pointer flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Add Question
+              </button>
 
               {exercises.length === 0 && (
                 <div className="text-center py-12 text-gray-500">

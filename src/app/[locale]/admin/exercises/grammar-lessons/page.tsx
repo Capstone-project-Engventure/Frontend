@@ -24,17 +24,17 @@ export default function AdminGrammarLessons() {
   const pathname = usePathname();
 
   /* ──────────────────────── state ──────────────────────── */
-  const { 
-    lessons: grammarLessons, 
-    setLessons: setGrammarLessons, 
-    hasFetched, 
+  const {
+    lessons: grammarLessons,
+    setLessons: setGrammarLessons,
+    hasFetched,
     setHasFetched,
     hasHydrated,
     addLesson,
     updateLesson,
     deleteLesson
   } = useAdminGrammarStore();
-  
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPage, setTotalPage] = useState(1);
@@ -137,10 +137,10 @@ export default function AdminGrammarLessons() {
 
   const fetchLessons = useCallback(async () => {
     if (!hasHydrated || hasFetched) return;
-    
+
     const filters: Record<string, unknown> = { type: "grammar_practice" };
     if (selectedLesson) filters.lesson = selectedLesson.value;
-    
+
     try {
       const res = await lessonService.getAll({ page, pageSize: 10, filters });
       if (res.success) {
@@ -197,6 +197,12 @@ export default function AdminGrammarLessons() {
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
   const onEdit = useCallback((item: any) => {
+<<<<<<< HEAD
+    // const newPath = `${pathname}/grammars/${item.id}`;
+    // router.push(newPath);
+
+=======
+>>>>>>> main
     return item;
   }, []);
 
@@ -303,6 +309,8 @@ export default function AdminGrammarLessons() {
         page={page}
         onPageChange={onPageChange}
         linkBase={`/${locale}/admin/exercises/grammar-lessons/grammars`}
+        modalFields={modalFields}
+        modalTitle="Grammar Lesson"
         hasCustomFetch={true}
         onCreate={onCreate}
         onEdit={onEdit}

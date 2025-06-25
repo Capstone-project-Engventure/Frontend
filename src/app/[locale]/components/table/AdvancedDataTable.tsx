@@ -200,10 +200,10 @@ const AdvancedDataTable: React.FC<PaginationTableProps> = ({
 
   // Render simplified JSX
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg w-full">
+    <div className="relative overflow-x-auto shadow-xl sm:rounded-lg w-full">
       {/* Search and Actions */}
       <div className="mb-4">
-        <SearchInput keyword={keyword} onChange={setKeyword} />
+        {/* <SearchInput keyword={keyword} onChange={setKeyword} /> */}
         <TableActions
           selectedCount={selectedItems.length}
           onAdd={handleAdd}

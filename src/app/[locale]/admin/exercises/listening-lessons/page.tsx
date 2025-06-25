@@ -24,17 +24,17 @@ export default function AdminListeningLessons() {
   const pathname = usePathname();
 
   /* ──────────────────────── state ──────────────────────── */
-  const { 
-    lessons: listeningLessons, 
-    setLessons: setListeningLessons, 
-    hasFetched, 
+  const {
+    lessons: listeningLessons,
+    setLessons: setListeningLessons,
+    hasFetched,
     setHasFetched,
     hasHydrated,
     addLesson,
     updateLesson,
     deleteLesson
   } = useAdminListeningStore();
-  
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPage, setTotalPage] = useState(1);
@@ -97,7 +97,7 @@ export default function AdminListeningLessons() {
   const onPageChange = (page: number) => {
     setPage(page);
   };
-  
+
   /* ──────────────────────── data fetches ───────────────── */
   useEffect(() => {
     (async () => {
@@ -132,10 +132,10 @@ export default function AdminListeningLessons() {
 
   const fetchLessons = useCallback(async () => {
     if (!hasHydrated || hasFetched) return;
-    
+
     const filters: Record<string, unknown> = { type: "listening_practice" };
     if (selectedLesson) filters.lesson = selectedLesson.value;
-    
+
     try {
       const res = await lessonService.getAll({ page, pageSize: 10, filters });
       if (res.success) {
@@ -276,7 +276,7 @@ export default function AdminListeningLessons() {
         onAdd={handleAdd}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
-        
+
         onSuccess={() => {
           // Refresh the current page data without full refetch
           if (hasHydrated) {

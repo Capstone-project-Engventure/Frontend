@@ -2,7 +2,6 @@ import Cookies from "js-cookie";
 import { useApi } from "../Api";
 import { User } from "../types/user";
 import { saveTokenCookies } from "../utils/jwt";
-import resetAllStores from "@/lib/resetStores";
 
 
 type LoginResponse = {
@@ -66,8 +65,6 @@ class OAuthService {
 
       // If the response is successful, clear cookies
       if (response.status === 200) {
-        resetAllStores();
-
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         Cookies.remove("email");

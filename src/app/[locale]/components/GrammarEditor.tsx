@@ -318,7 +318,7 @@ const GrammarEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
                         <input
                           type="radio"
                           name={`correct-answer-${qIndex}`}
-                          checked={q.system_answer === opt.option}
+                          checked={q.system_answer === opt.key}
                           onChange={() =>
                             handleCorrectAnswerChange(qIndex, oIndex)
                           }

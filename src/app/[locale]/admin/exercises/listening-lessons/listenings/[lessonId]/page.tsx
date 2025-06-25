@@ -1,7 +1,7 @@
 "use client";
+
 import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
-import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
@@ -11,12 +11,11 @@ import TopicService from "@/lib/services/topic.service";
 import { Exercise } from "@/lib/types/exercise";
 import { Lesson } from "@/lib/types/lesson";
 import { OptionType } from "@/lib/types/option";
-import { Topic } from "@/lib/types/topic";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { useRouter, usePathname, useParams } from "next/navigation";
 
 export default function AdminListeningExercises() {
   const router = useRouter();
@@ -33,7 +32,7 @@ export default function AdminListeningExercises() {
     // Handle arrays
     if (Array.isArray(value)) {
       if (value.length === 0) return "No items";
-      
+
       // Check if it's an array of objects with key/option structure (like MCQ options)
       if (value.length > 0 && typeof value[0] === "object" && value[0]?.key && value[0]?.option) {
         return (
@@ -46,18 +45,18 @@ export default function AdminListeningExercises() {
           </ul>
         );
       }
-      
+
       // For other arrays, join with comma
       return value.join(", ");
     }
-    
+
     // Handle objects
     if (typeof value === "object") {
       // Handle specific object types
       if (value.name) return value.name;
       if (value.title) return value.title;
       if (value.label) return value.label;
-      
+
       // For other objects, show as JSON string (truncated if too long)
       const jsonStr = JSON.stringify(value);
       if (jsonStr.length > 100) {
@@ -65,7 +64,7 @@ export default function AdminListeningExercises() {
       }
       return jsonStr;
     }
-    
+
     return String(value);
   };
 
@@ -96,7 +95,7 @@ export default function AdminListeningExercises() {
     { label: t("breadcrumbs.home"), href: `${locale}/admin/home` },
     {
       label: t("breadcrumbs.listeningExercises"),
-      href: `${locale}/admin/exercises/listening-lessons`,
+      href: `/${locale}/admin/exercises/listening-lessons`,
     },
     {
       label: currentLesson?.title || `Lesson ${lessonId}`,
@@ -427,8 +426,7 @@ export default function AdminListeningExercises() {
           {currentLesson?.title || `Lesson ${lessonId}`} - Listening Exercises
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          {currentLesson?.description ||
-            "Manage listening exercises for this lesson"}
+          {currentLesson?.description || "Manage listening exercises for this lesson"}
         </p>
       </div>
 

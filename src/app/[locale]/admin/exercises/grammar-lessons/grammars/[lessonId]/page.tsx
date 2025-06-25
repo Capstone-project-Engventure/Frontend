@@ -1,7 +1,6 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcrumb";
 import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
-import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import { LevelOptions } from "@/lib/constants/level";
 import { SkillOptions } from "@/lib/constants/skill";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
@@ -11,12 +10,10 @@ import TopicService from "@/lib/services/topic.service";
 import { Exercise } from "@/lib/types/exercise";
 import { Lesson } from "@/lib/types/lesson";
 import { OptionType } from "@/lib/types/option";
-import { Topic } from "@/lib/types/topic";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { useRouter, usePathname, useParams } from "next/navigation";
 
 export default function AdminGrammarExercises() {
   const router = useRouter();

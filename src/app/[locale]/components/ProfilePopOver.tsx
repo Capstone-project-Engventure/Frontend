@@ -1,20 +1,17 @@
 "use client";
-import {
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-  Transition,
-} from "@headlessui/react";
+
+import resetAllStores from "@/lib/resetStores";
+import OAuthService from "@/lib/services/oauth.service";
+import { Popover, PopoverButton, PopoverPanel, Transition } from "@headlessui/react";
+import { useLocale } from "next-intl";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HiUserCircle } from "react-icons/hi";
-import Image from "next/image";
 import { MdArrowDropDown, MdArrowDropUp, MdLogout } from "react-icons/md";
-import { useAuth } from "@/lib/context/AuthContext";
-import { useRouter } from "next/navigation";
-import OAuthService from "@/lib/services/oauth.service";
 import { toast } from "react-toastify";
-import { useLocale, useTranslations } from "next-intl";
+
 export default function ProfilePopOVer() {
   const router = useRouter();
   const oauthService = new OAuthService();
@@ -45,6 +42,7 @@ export default function ProfilePopOVer() {
   const [isShowProfile, setIsShowProfile] = useState(false);
   const handleLogout = async () => {
     await oauthService.logout();
+    await resetAllStores();
     localStorage.removeItem("user");
     router.push("/");
     toast.info("Đăng xuất thành công");

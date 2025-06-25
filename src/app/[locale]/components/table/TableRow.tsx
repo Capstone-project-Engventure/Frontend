@@ -48,14 +48,14 @@ export const TableRow: React.FC<TableRowProps> = ({
         <div className="flex gap-4">
           <button
             onClick={() => onEdit(item)}
-            className="border-2 border-gray-300 rounded-sm p-0.5 text-indigo-600 hover:text-indigo-800"
+            className="cursor-pointer border-2 border-gray-300 rounded-sm p-0.5 text-indigo-600 hover:text-indigo-800"
             title="Edit"
           >
             <HiPencil className="text-lg" />
           </button>
           <button
             onClick={() => onDelete(item.id)}
-            className="text-red-600 hover:text-red-800"
+            className="cursor-pointer text-red-600 hover:text-red-800"
             title="Delete"
           >
             <HiTrash className="text-lg" />
@@ -63,7 +63,7 @@ export const TableRow: React.FC<TableRowProps> = ({
           {onView && (
             <button
               onClick={() => onView(item)}
-              className="text-gray-600 hover:text-gray-800"
+              className="cursor-pointer text-gray-600 hover:text-gray-800"
               title="View"
             >
               <HiEye className="text-lg" />

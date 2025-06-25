@@ -17,7 +17,7 @@ const CreateReadingPage = () => {
     const router = useRouter();
     const locale = useLocale();
     const t = useTranslations("Admin.ReadingPassages");
-    
+
     const lessonId = params.lessonId;
     const [currentLesson, setCurrentLesson] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -50,13 +50,13 @@ const CreateReadingPage = () => {
         { label: t("breadcrumbs.home"), href: `/${locale}/admin/home` },
         { label: t("breadcrumbs.exercises"), href: `/${locale}/admin/exercises` },
         { label: t("breadcrumbs.readingLessons"), href: `/${locale}/admin/exercises/reading-lessons` },
-        { 
-            label: currentLesson?.title || t("breadcrumbs.readings"), 
-            href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}` 
+        {
+            label: currentLesson?.title || t("breadcrumbs.readings"),
+            href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}`
         },
-        { 
-            label: t("breadcrumbs.createReading"), 
-            href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}/create` 
+        {
+            label: t("breadcrumbs.createReading"),
+            href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}/create`
         },
     ];
 
@@ -85,10 +85,6 @@ const CreateReadingPage = () => {
         }
     };
 
-    const handleBack = () => {
-        router.push(`/${locale}/admin/exercises/reading-lessons/readings/${lessonId}`);
-    };
-
     if (isLoading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
@@ -100,11 +96,11 @@ const CreateReadingPage = () => {
     return (
         <div className="flex flex-col p-4 bg-white dark:bg-black text-black dark:text-white min-h-screen">
             <Breadcrumb items={breadcrumbs} />
-            
-            <div className="mb-4">
+
+            <div className="mt-4 mb-2">
                 <button
-                    onClick={handleBack}
-                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
+                    onClick={() => router.back()}
+                    className="cursor-pointer flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
                 >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -114,9 +110,9 @@ const CreateReadingPage = () => {
             </div>
 
             <main className="flex-1 bg-gray-100 dark:bg-gray-900 p-6 rounded-lg">
-                <ReadingEditor 
-                    header={`Add new reading passage${currentLesson ? ` for ${currentLesson.title}` : ''}`} 
-                    onSubmit={handleSave} 
+                <ReadingEditor
+                    header={`Add new reading passage${currentLesson ? ` for ${currentLesson.title}` : ''}`}
+                    onSubmit={handleSave}
                 />
             </main>
         </div>

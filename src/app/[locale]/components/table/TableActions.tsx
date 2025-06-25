@@ -22,7 +22,7 @@ export const TableActions: React.FC<TableActionsProps> = ({
   isLoading
 }) => {
   return (
-    <div className="flex justify-between mb-4 px-2">
+    <div className="flex justify-between my-3 px-4">
       <div className="flex items-center gap-4">
         {selectedCount > 0 && (
           <div className="flex items-center gap-2">
@@ -31,7 +31,7 @@ export const TableActions: React.FC<TableActionsProps> = ({
             </span>
             <button
               onClick={onDeleteSelected}
-              className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+              className="cursor-pointer bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
               disabled={isLoading}
             >
               Delete {selectedCount}
@@ -39,12 +39,12 @@ export const TableActions: React.FC<TableActionsProps> = ({
           </div>
         )}
       </div>
-      
+
       <div className="flex gap-2 items-center">
         {customActions}
         <button
           onClick={onAdd}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
+          className="cursor-pointer flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
         >
           <HiPlus className="text-lg" />
           Add
@@ -53,13 +53,13 @@ export const TableActions: React.FC<TableActionsProps> = ({
           <>
             <button
               onClick={onExport}
-              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition text-sm"
+              className="cursor-pointer flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition text-sm"
             >
               Export
             </button>
             <button
               onClick={onImport}
-              className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition text-sm"
+              className="cursor-pointer flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition text-sm"
             >
               Import
             </button>

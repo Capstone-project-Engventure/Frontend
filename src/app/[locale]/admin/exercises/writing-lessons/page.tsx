@@ -211,9 +211,11 @@ export default function AdminWritingLessons() {
 
   /* ──────────────────────── handle event in actions ────────────────────────*/
   const onEdit = useCallback((item: any) => {
-    const newPath = `${pathname}/writing/${item.id}`;
-    router.push(newPath);
-  }, [pathname, router]);
+    // const newPath = `${pathname}/writing/${item.id}`;
+    // router.push(newPath);
+
+    return item;
+  }, []);
 
   const onCreate = useCallback(() => {
     setShowExerciseSelector(true);
