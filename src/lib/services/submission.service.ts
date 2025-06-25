@@ -40,6 +40,31 @@ class SubmissionService extends BaseService<Lesson> {
       };
     }
   }
+
+  public async getSubmissionsByExercise(
+    exerciseId: string
+  ): Promise<ApiResponse<SubmissionResponse[]>> {
+    try {
+      const res = await api.get(`${this.endpoint}?exercise=${exerciseId}`);
+      if (res.status === 200) {
+        return {
+          success: true,
+          data: res.data.results as SubmissionResponse[],
+        };
+      } else {
+        return {
+          success: false,
+          data: `Unexpected status code: ${res.status}`,
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: error instanceof Error ? error.message : "An error occurred",
+      };
+    }
+  }
+
   public async submitWritingExercise(
     exerciseId: string,
     content: string
