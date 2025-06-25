@@ -1,5 +1,3 @@
-// src\app\[locale]\components\layout\Sidebar.tsx
-
 "use client";
 // import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -97,6 +95,12 @@ export default function Sidebar({ role }: { role: "admin" | "student" }) {
     //   icon: TbNotes,
     //   href: `${basePath}/${role === "admin" ? "topics" : "favorite-course"}`,
     // },
+    ...(role === "admin"
+      ? [
+        { label: t("lessons"), icon: MdOutlineBarChart, href: `${basePath}/lessons` },
+        { label: t("topics"), icon: TbNotes, href: `${basePath}/topics` },
+      ]
+      : []),
     {
       label: t(role === "admin" ? "practiceExercises" : "practice"),
       icon: TbNotes,
