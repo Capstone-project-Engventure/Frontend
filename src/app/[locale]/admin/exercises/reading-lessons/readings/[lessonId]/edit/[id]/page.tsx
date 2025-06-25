@@ -9,6 +9,8 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { Button } from "@/app/[locale]/components/ui/Button";
+import { FaArrowLeft } from "react-icons/fa";
 
 const EditReadingPage = () => {
     const readingService = new ReadingService();
@@ -17,10 +19,10 @@ const EditReadingPage = () => {
     const router = useRouter();
     const locale = useLocale();
     const t = useTranslations("Admin.ReadingPassages");
-    
+
     const id = params.id;
     const lessonId = params.lessonId;
-    
+
     const [reading, setReading] = useState<Reading | null>(null);
     const [currentLesson, setCurrentLesson] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -29,13 +31,13 @@ const EditReadingPage = () => {
         { label: t("breadcrumbs.home"), href: `/${locale}/admin/home` },
         { label: t("breadcrumbs.exercises"), href: `/${locale}/admin/exercises` },
         { label: t("breadcrumbs.readingLessons"), href: `/${locale}/admin/exercises/reading-lessons` },
-        { 
-            label: currentLesson?.title || t("breadcrumbs.readings"), 
-            href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}` 
+        {
+            label: currentLesson?.title || t("breadcrumbs.readings"),
+            href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}`
         },
-        { 
-            label: `Edit: ${reading?.title || 'Loading...'}`, 
-            href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}/edit/${id}` 
+        {
+            label: `Edit: ${reading?.title || 'Loading...'}`,
+            href: `/${locale}/admin/exercises/reading-lessons/readings/${lessonId}/edit/${id}`
         },
     ];
 
@@ -71,13 +73,13 @@ const EditReadingPage = () => {
                 readingService.getById(id as string),
                 lessonService.getById(lessonId as string)
             ]);
-            
+
             if (readingRes.success) {
                 setReading(readingRes.data);
             } else {
                 toast.error("Failed to fetch reading");
             }
-            
+
             if (lessonRes.success) {
                 setCurrentLesson(lessonRes.data);
             } else {
@@ -117,25 +119,23 @@ const EditReadingPage = () => {
         <div className="flex flex-col min-h-screen bg-white dark:bg-black text-black dark:text-white">
             <div className="p-4">
                 <Breadcrumb items={breadcrumbs} />
-                
-                <div className="mb-4">
-                    <button
+
+                <div className="mt-3">
+                    <Button
                         onClick={() => router.back()}
                         className="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                     >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        {t("actions.backToReadings")}
-                    </button>
+                        <FaArrowLeft />
+                        <span>Back</span>
+                    </Button>
                 </div>
             </div>
 
             <main className="flex-1 bg-gray-100 dark:bg-gray-900 p-6 rounded-lg">
-                <ReadingEditor 
+                <ReadingEditor
                     header={`Edit reading: ${reading.title}`}
-                    initialData={reading} 
-                    onSubmit={handleSave} 
+                    initialData={reading}
+                    onSubmit={handleSave}
                 />
             </main>
         </div>

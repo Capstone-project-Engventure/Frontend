@@ -208,7 +208,7 @@ const SpeakingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
                   </div>
                   <button
                     onClick={() => removeExercise(index)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded-lg transition-colors text-sm font-medium flex items-center"
+                    className="cursor-pointer text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded-lg transition-colors text-sm font-medium flex items-center"
                   >
                     <FaTrash className="mr-1" />
                     Xóa
@@ -329,14 +329,14 @@ const SpeakingEditor: React.FC<Props> = ({ initialData, onSubmit, header }) => {
         <div className="flex justify-center space-x-4 pt-6 border-t">
           <button
             onClick={addExercise}
-            className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center font-medium"
+            className="cursor-pointer bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center font-medium"
           >
             <FaPlus className="mr-2" />
             Thêm bài tập mới
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center font-medium"
+            className="cursor-pointer bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center font-medium"
           >
             <FaSave className="mr-2" />
             Lưu bài tập

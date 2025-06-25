@@ -1,14 +1,11 @@
 "use client";
 import Breadcrumb from "@/app/[locale]/components/breadcrumb";
-import CustomSelector from "@/app/[locale]/components/CustomSelector";
 import AdvancedDataTable from "@/app/[locale]/components/table/AdvancedDataTable";
-import { LevelOptions } from "@/lib/constants/level";
-import { SkillOptions } from "@/lib/constants/skill";
 import ExerciseTypeService from "@/lib/services/exercise-types.service";
 import ExerciseService from "@/lib/services/exercise.service";
 import LessonService from "@/lib/services/lesson.service";
-import TopicService from "@/lib/services/topic.service";
 import ReadingService from "@/lib/services/reading.service";
+import TopicService from "@/lib/services/topic.service";
 import { OptionType } from "@/lib/types/option";
 import { Reading } from "@/lib/types/reading";
 import { useLocale, useTranslations } from "next-intl";
@@ -17,8 +14,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function AdminReading() {
-  console.log(1200);
-
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
@@ -174,14 +169,14 @@ export default function AdminReading() {
   const handleAdd = async (data: any) => {
     try {
       console.log('Adding reading:', data);
-      
+
       const readingData = {
         ...data,
         lesson: Number(lessonId)
       };
-      
+
       const response = await readingService.create(readingData, {});
-      
+
       if (response.success) {
         toast.success(t("messages.createSuccess"));
         fetchLesson();
@@ -208,9 +203,9 @@ export default function AdminReading() {
   const handleUpdate = async (id: string | number, data: any) => {
     try {
       console.log('Updating reading:', data);
-      
+
       const response = await readingService.update(Number(id), data, {});
-      
+
       if (response.success) {
         toast.success(t("messages.updateSuccess"));
         fetchLesson();
@@ -237,7 +232,7 @@ export default function AdminReading() {
   const handleDelete = async (id: string | number) => {
     try {
       const response = await readingService.delete(Number(id));
-      
+
       if (response.success) {
         toast.success(t("messages.deleteSuccess"));
         fetchLesson();
