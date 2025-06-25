@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useApi } from '@/lib/Api';
-import { toast } from 'react-toastify';
 
 // Define the shape of each history record
 export interface GenerateHistory {
@@ -48,7 +47,7 @@ export const useHistoryGenerateStore = create<HistoryState>()(
           const errorMessage = err.response?.data?.detail || err.message || 'Failed to fetch history';
           console.error('Failed to fetch history:', err);
           set({ error: errorMessage, loading: false });
-          toast.error('Failed to load generation history');
+          console.error('Failed to load generation history');
         }
       },
 

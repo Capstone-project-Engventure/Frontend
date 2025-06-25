@@ -17,7 +17,6 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { has, set } from "lodash";
-import { toast } from "react-toastify";
 import ImportModal from "../ImportModal";
 import { ExportFile } from "@/lib/export-json";
 import AudioPlayer from "../AudioPlayer";
@@ -169,7 +168,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
 
 
       if (!res.success || !Array.isArray(res.data)) {
-        toast.error(res.message || t("apiError"));
+        console.error(res.message || t("apiError"));
         return;
       }
       if (isMounted.current) {
@@ -183,7 +182,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       }
     } catch (err) {
       console.log("Error: ", err);
-      toast.error(t("networkError"));
+      console.error(t("networkError"));
     }
   };
 
@@ -212,10 +211,10 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       const response = await service.delete(id);
       if (response.success) {
         onSuccess?.();
-        toast.info(`Đã xóa chủ đề ${selectedItem} thành công!`);
+        console.info(`Đã xóa chủ đề ${selectedItem} thành công!`);
         handleFetchData();
       } else {
-        toast.error("Failed to delete item");
+        console.error("Failed to delete item");
       }
     } catch (error) {
       alert("Error deleting item");
@@ -248,7 +247,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
       if (response.success) {
         setSelectedItems([]);
         onSuccess?.();
-        toast.info(`Đã xóa ${selectedItems.length} chủ đề thành công!`);
+        console.info(`Đã xóa ${selectedItems.length} chủ đề thành công!`);
         handleFetchData();
       } else {
         alert("Failed to delete items");
@@ -307,10 +306,10 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
         handleFetchData();
         await onSuccess?.();
       } else {
-        toast.error("Failed to save item");
+        console.error("Failed to save item");
       }
     } catch (error) {
-      toast.error("Error saving item");
+      console.error("Error saving item");
     } finally {
       setIsLoading(false);
     }

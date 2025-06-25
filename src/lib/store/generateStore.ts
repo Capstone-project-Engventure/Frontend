@@ -3,7 +3,6 @@ import PromptService from '@/lib/services/prompt.service';
 import { useApi } from '@/lib/Api';
 import { useTopicStore } from './topicStore';
 import { useExerciseTypeStore } from './exerciseTypeStore';
-import { toast } from 'react-toastify';
 
 interface GenerateState {
   number: number;
@@ -94,39 +93,71 @@ export const useGenerateStore = create<GenerateState>((set, get) => ({
       const mode = get().mode;
       const healthResult = await promptService.checkLLMHealth(mode);
       
+      // Log đầy đủ response từ health check
+      console.log('=== HEALTH CHECK RESPONSE ===');
+      console.log('Success:', healthResult.success);
+      console.log('Full response data:', JSON.stringify(healthResult.data, null, 2));
+      if (healthResult.error) {
+        console.log('Error:', healthResult.error);
+      }
+      console.log('=============================');
+      
       if (healthResult.success) {
         set({ healthStatus: healthResult.data });
         
+        // Log chi tiết từng component
+        console.log('=== DETAILED COMPONENT STATUS ===');
+        console.log('Overall health:', healthResult.data.overall);
+        console.log('Database:', healthResult.data.database);
+        console.log('LLM API:', healthResult.data.llm_api);
+        console.log('LLM (specific mode):', healthResult.data.llm);
+        console.log('Chain:', healthResult.data.chain);
+        console.log('Mode:', healthResult.data.mode);
+        console.log('Components details:', JSON.stringify(healthResult.data.components, null, 2));
+        console.log('=================================');
+        
         if (!healthResult.data.overall) {
-          toast.error(`Hệ thống không khỏe mạnh. Mode: ${mode}`);
+          console.error(`❌ Hệ thống không khỏe mạnh. Mode: ${mode}`);
+          console.error('Reason: Overall health check failed');
           return false;
         }
         
         if (!healthResult.data.database) {
-          toast.error('Kết nối database không khả dụng');
+          console.error('❌ Kết nối database không khả dụng');
+          console.error('Database status:', healthResult.data.components?.database);
           return false;
         }
         
         if (!healthResult.data.llm_api) {
-          toast.error('LLM API không khả dụng');
+          console.error('❌ LLM API không khả dụng');
+          console.error('LLM API status:', healthResult.data.components?.llm_api);
           return false;
         }
         
         if (!healthResult.data.llm) {
-          toast.error(`LLM không khả dụng cho mode: ${mode}`);
+          console.error(`❌ LLM không khả dụng cho mode: ${mode}`);
+          console.error(`LLM status for ${mode}:`, healthResult.data.components?.[`${mode}_llm`]);
           return false;
         }
         
-        toast.success(`Hệ thống khỏe mạnh. Mode: ${mode}`);
+        console.log(`✅ Hệ thống khỏe mạnh. Mode: ${mode}`);
+        console.log('All components are working properly');
         return true;
       } else {
         set({ healthStatus: healthResult.data });
-        toast.error(`Health check thất bại: ${healthResult.error}`);
+        console.error('=== HEALTH CHECK FAILED ===');
+        console.error(`Health check thất bại: ${healthResult.error}`);
+        console.error('Response data:', JSON.stringify(healthResult.data, null, 2));
+        console.error('===========================');
         return false;
       }
     } catch (error: any) {
+      console.error('=== HEALTH CHECK ERROR ===');
       console.error('Health check error:', error);
-      toast.error('Không thể kiểm tra health của hệ thống');
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      console.error('Không thể kiểm tra health của hệ thống');
+      console.error('==========================');
       return false;
     } finally {
       set({ healthLoading: false });
@@ -163,7 +194,7 @@ export const useGenerateStore = create<GenerateState>((set, get) => ({
     } catch (err: any) {
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to generate exercise.';
       set({ error: errorMessage });
-      toast.error(errorMessage);
+      console.error(errorMessage);
     } finally {
       set({ loading: false });
     }

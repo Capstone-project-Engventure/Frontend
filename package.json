@@ -27,6 +27,7 @@
     "dayjs": "^1.11.13",
     "export-from-json": "^1.7.4",
     "from": "^0.1.7",
+    "geist": "^1.4.2",
     "immer": "^10.1.1",
     "import": "^0.0.6",
     "jose": "^6.0.11",
@@ -51,7 +52,6 @@
     "react-toastify": "^11.0.5",
     "react-tooltip": "^5.28.1",
     "recharts": "^2.15.3",
-    "xlsx": "^0.18.5",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

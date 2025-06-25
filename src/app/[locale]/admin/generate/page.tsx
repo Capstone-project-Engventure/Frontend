@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { useApproveExercise } from "@/lib/hooks/useApproveExercise";
 import ExerciseApprovalCard from "@/app/[locale]/components/ExerciseApprovalCard";
 import { useLLMModeValidator } from "@/lib/utils/llmModeValidator";
+import LessonService from "@/lib/services/lesson.service";
 // import OrbitProgress from "react-loading-indicator"; // Đảm bảo bạn đã cài đặt thư viện này
 
 
@@ -268,12 +269,19 @@ export default function ExerciseGenerate() {
   const [showSampleExercises, setShowSampleExercises] = useState(false);
   const [exerciseStatuses, setExerciseStatuses] = useState<{[key: string]: 'pending' | 'approved' | 'rejected' | 'exists'}>({});
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+  const [showCreateLessonModal, setShowCreateLessonModal] = useState(false);
+  const [lessonCreating, setLessonCreating] = useState(false);
+  const [lessonTitle, setLessonTitle] = useState('');
+  const [lessonDescription, setLessonDescription] = useState('');
 
   // Prompt Store
   const promptStore = usePromptStore();
   
   // LLM Mode Validator
   const { validateAndWarn, showWarning } = useLLMModeValidator();
+
+  // Lesson Service
+  const lessonService = new LessonService();
 
   // Filter topics based on selected skill
   const availableTopics = useMemo(() => {
@@ -437,20 +445,86 @@ export default function ExerciseGenerate() {
   }, [mode]);
 
   // Validate mode when health status changes
-  useEffect(() => {
-    if (healthStatus) {
-      const validation = validateAndWarn(mode, healthStatus);
-      if (!validation.isValid) {
-        showWarning(mode, healthStatus);
-      }
-    }
-  }, [healthStatus, mode, validateAndWarn, showWarning]);
+  // useEffect(() => {
+  //   if (healthStatus) {
+  //     const validation = validateAndWarn(mode, healthStatus);
+  //     if (!validation.isValid) {
+  //       showWarning(mode, healthStatus);
+  //     }
+  //   }
+  // }, [healthStatus, mode, validateAndWarn, showWarning]);
 
   const t = useTranslations("GenerateExercise");
   const isFormValid = skill && level && topicId && typeId && prompt;
   const isSystemHealthy = healthStatus?.overall || false;
   const canGenerate = isFormValid && isSystemHealthy && !loading;
   const hasResults = results && results.length > 0;
+
+  const handleCreateLesson = async () => {
+    if (!hasResults || !lessonTitle.trim()) {
+      toast.error("Please enter lesson title and ensure you have exercises to add");
+      return;
+    }
+
+    setLessonCreating(true);
+    try {
+      // First, create the lesson
+      const lessonData = {
+        title: lessonTitle.trim(),
+        description: lessonDescription.trim() || `Generated lesson with ${results.length} exercises`,
+        level: level,
+        topic_id: topicId,
+        type: `${skill}_practice` // e.g., "listening_practice", "reading_practice"
+      };
+
+      const lessonResponse = await lessonService.create(lessonData);
+      
+      if (!lessonResponse.success) {
+        toast.error(lessonResponse.error || "Failed to create lesson");
+        return;
+      }
+
+      const createdLesson = lessonResponse.data;
+      console.log('Created lesson:', createdLesson);
+
+      // Then, assign all exercises to this lesson
+      const exerciseIds = results.map(ex => ex.id).filter(id => id != null);
+      
+      if (exerciseIds.length > 0) {
+        // Call the existing assign API via axiosInstance
+        const { axiosInstance } = await import('@/lib/Api');
+        const assignResponse = await axiosInstance.post('/exercises/assign-to-lesson', {
+          exercise_ids: exerciseIds,
+          lesson_id: createdLesson.id
+        });
+
+        if (assignResponse.status === 200 || assignResponse.status === 201) {
+          toast.success(`Lesson "${lessonTitle}" created successfully with ${exerciseIds.length} exercises!`);
+          setShowCreateLessonModal(false);
+          setLessonTitle('');
+          setLessonDescription('');
+          
+          // Optionally redirect to the lesson management page
+          setTimeout(() => {
+            router.push(`/${locale}/admin/exercises/${skill}-lessons`);
+          }, 2000);
+        } else {
+          toast.error(`Lesson created but failed to assign exercises: ${assignResponse.data?.error || 'Unknown error'}`);
+        }
+      } else {
+        toast.warning("Lesson created but no exercises to assign");
+        setShowCreateLessonModal(false);
+        setLessonTitle('');
+        setLessonDescription('');
+      }
+
+    } catch (error) {
+      console.error("Error creating lesson:", error);
+      toast.error("An error occurred while creating the lesson");
+    } finally {
+      setLessonCreating(false);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -464,7 +538,7 @@ export default function ExerciseGenerate() {
           </h2>
           
           {/* System Status Indicator */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {healthLoading ? (
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
@@ -489,6 +563,27 @@ export default function ExerciseGenerate() {
                 <span className="text-xs font-medium">Status Unknown</span>
               </div>
             )}
+            
+            {/* Manual Health Check Button */}
+            <button
+              onClick={checkHealth}
+              disabled={healthLoading}
+              className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                healthLoading
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800'
+              }`}
+              title="Manual health check"
+            >
+              {healthLoading ? (
+                <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              )}
+              Check Health
+            </button>
           </div>
         </div>
         
@@ -821,6 +916,17 @@ export default function ExerciseGenerate() {
             </h3>
             <div className="flex gap-2">
               <button
+                onClick={() => setShowCreateLessonModal(true)}
+                disabled={!canGenerate}
+                className={`px-4 py-2 rounded-lg font-medium text-white transition-colors ${
+                  canGenerate
+                    ? 'bg-purple-600 hover:bg-purple-700'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
+              >
+                Create Lesson
+              </button>
+              <button
                 onClick={exportResults}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
               >
@@ -837,6 +943,96 @@ export default function ExerciseGenerate() {
                 index={index}
               />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Create Lesson Modal */}
+      {showCreateLessonModal && (
+        <div className="fixed inset-0 bg-gray-300/70 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Create New Lesson
+              </h3>
+              <button
+                onClick={() => setShowCreateLessonModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Lesson Title *
+                </label>
+                <input
+                  type="text"
+                  value={lessonTitle}
+                  onChange={(e) => setLessonTitle(e.target.value)}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Enter lesson title..."
+                  maxLength={50}
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  {lessonTitle.length}/50 characters
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Description (Optional)
+                </label>
+                <textarea
+                  value={lessonDescription}
+                  onChange={(e) => setLessonDescription(e.target.value)}
+                  rows={3}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="Enter lesson description..."
+                />
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900 p-3 rounded-lg">
+                <div className="text-sm text-blue-800 dark:text-blue-200">
+                  <div className="font-medium mb-1">Lesson Details:</div>
+                  <div>• Skill: {skill}</div>
+                  <div>• Level: {level}</div>
+                  <div>• Topic: {availableTopics.find(t => t.id.toString() === topicId)?.title || 'Unknown'}</div>
+                  <div>• Exercises: {results.length}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowCreateLessonModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateLesson}
+                disabled={!lessonTitle.trim() || lessonCreating}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium text-white transition-colors ${
+                  lessonTitle.trim() && !lessonCreating
+                    ? 'bg-purple-600 hover:bg-purple-700'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
+              >
+                {lessonCreating ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Creating...
+                  </div>
+                ) : (
+                  'Create Lesson'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
