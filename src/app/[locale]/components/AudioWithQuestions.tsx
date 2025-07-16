@@ -4,6 +4,25 @@ import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import { Exercise } from "@/lib/types/exercise";
 
+const getAudioUrl = (path: string | null | undefined) => {
+    if (!path) return "";
+    
+    // If path already starts with http, return as is
+    if (path.startsWith("http")) {
+        return path;
+    }
+    
+    // Try GCS first if GCS_BASE_URL is available
+    const gcsBaseUrl = process.env.NEXT_PUBLIC_GCS_BASE_URL;
+    if (gcsBaseUrl) {
+        return `${gcsBaseUrl}/${path}`;
+    }
+    
+    // Fallback to local media URL
+    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8000/media";
+    return `${mediaUrl}/${path}`;
+};
+
 type Props = {
     exercises: Exercise[];
 };
@@ -178,7 +197,7 @@ export default function AudioWithQuestions({ exercises }: Props) {
                             ref={audioRef}
                             controls
                             className="w-full max-w-md"
-                            src={`${process.env.NEXT_PUBLIC_GCS_BASE_URL}/${currentExercise.audio_file_url}`}
+                            src={getAudioUrl(currentExercise.audio_file_url)}
                         />
 
                         {/* <div className="flex items-center space-x-3">

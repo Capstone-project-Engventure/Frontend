@@ -115,9 +115,21 @@ export default function StudentPronunciationPractice() {
   /* --------------------------------------------------- */
   const buildUrl = (path: string | null) => {
     if (!path) return "";
-    return path.startsWith("http")
-      ? path
-      : `${process.env.NEXT_PUBLIC_GCS_BASE_URL}/${path}`;
+    
+    // If path already starts with http, return as is
+    if (path.startsWith("http")) {
+      return path;
+    }
+    
+    // Try GCS first if GCS_BASE_URL is available
+    const gcsBaseUrl = process.env.NEXT_PUBLIC_GCS_BASE_URL;
+    if (gcsBaseUrl) {
+      return `${gcsBaseUrl}/${path}`;
+    }
+    
+    // Fallback to local media URL
+    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8000/media";
+    return `${mediaUrl}/${path}`;
   };
 
   const playModelAudio = useCallback(

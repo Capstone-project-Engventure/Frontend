@@ -83,7 +83,8 @@
     "page": "Trang",
     "actions": "Hành động",
     "confirmDelete": "Bạn có chắc chắn muốn xóa mục này?",
-    "apiError": "Đã xảy ra lỗi khi tải dữ liệu từ máy chủ. Vui lòng thử lại sau."
+    "apiError": "Đã xảy ra lỗi khi tải dữ liệu từ máy chủ. Vui lòng thử lại sau.",
+    "networkError": "Lỗi mạng - Không thể kết nối đến máy chủ"
   },
   "StudentWritingPractice": {
     "title": "Viết",
@@ -97,7 +98,22 @@
     "feedback": "Phản hồi từ giảng viên sẽ hiển thị tại đây.",
     "submissionSuccessful": "Nộp bài thành công",
     "submissionFailed": "Nộp bài viết thất bại",
-    "content_placeholder": "Nhập hoặc dán (Ctrl + V) nội dung bài viết của bạn tại đây"
+    "content_placeholder": "Nhập hoặc dán (Ctrl + V) nội dung bài viết của bạn tại đây",
+    "placeholder_content": "Nhập hoặc dán (Ctrl + V) nội dung bài viết của bạn tại đây"
+  },
+  "SpeakingPractice": {
+    "title": "Luyện tập Nói",
+    "description": "Thực hành kỹ năng nói của bạn với các bài tập phát âm và giao tiếp.",
+    "filter": {
+      "topic": "Chủ đề",
+      "level": "Cấp độ",
+      "allTopic": "Tất cả chủ đề",
+      "allLevel": "Tất cả cấp độ",
+      "reset": "Đặt lại bộ lọc",
+      "activeFilters": "Bộ lọc đang áp dụng:",
+      "noResults": "Không tìm thấy bài học nào phù hợp với bộ lọc.",
+      "clearFilters": "Xóa bộ lọc"
+    }
   },
   "LessonPractice": {
     "breadcrumbs": {
