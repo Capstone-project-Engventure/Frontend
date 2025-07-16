@@ -642,13 +642,13 @@ export default function SpeakingPracticeDetailPage() {
                 </h3>
                 <p className="text-gray-700 mb-2">
                   Điểm số:{" "}
-                  <span className="font-bold text-lg">{result.grade}/10</span>
+                  <span className="font-bold text-lg">{result.score}/10</span>
                 </p>
-                {result.note?.length > 0 && (
+                {result.feedback?.length > 0 && (
                   <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                    {result.note.map((n: any, i: number) => (
+                    {result.feedback.map((n: any, i: number) => (
                       <div key={i} className="text-sm text-gray-600 mb-1">
-                        • {n}
+                        • {n.word} - {n.correct}
                       </div>
                     ))}
                   </ul>
@@ -675,7 +675,7 @@ export default function SpeakingPracticeDetailPage() {
                         <p className="text-sm text-gray-500">
                           Điểm:{" "}
                           <span className="font-semibold">
-                            {h.result.grade}/10
+                            {h.result.score}/10
                           </span>
                         </p>
                       </div>

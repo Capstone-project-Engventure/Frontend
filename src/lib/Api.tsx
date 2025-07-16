@@ -71,6 +71,12 @@ export const useApi = () => {
     (response) => response,
     async (error) => {
       const response = error.response;
+      
+      // Check for network errors (backend is down)
+      if (!response && error.request) {
+        console.error('Network Error: Backend server is not responding');
+        // Let the error propagate to be handled by individual components
+      }
 
       if (response?.status === 401 || response?.status === 403) {
         const refresh_token = Cookies.get("refresh_token") || "";

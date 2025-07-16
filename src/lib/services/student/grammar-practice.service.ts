@@ -27,11 +27,11 @@ class GrammarPracticeService {
             const response = await this.api.get(`/lessons/${id}`);
             return {
                 success: true,
-                dataGrammar: response.data,
+                data: response.data,
             };
 
         } catch (error: any) {
-            console.error("Error fetching reading detail:", error);
+            console.error("Error fetching grammar detail:", error);
             return { success: false, data: null };
         }
     }

@@ -46,6 +46,7 @@ interface ErrorResponse {
   error: string;
   code?: string;
   message?: string;
+  isNetworkError?: boolean;
 }
 
 // Union types cho các operations cụ thể

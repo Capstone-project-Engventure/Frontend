@@ -89,7 +89,7 @@ class LessonService extends BaseService<Lesson> {
   ): Promise<GetAllResult<Lesson>> {
     try {
       const res = await axiosInstance.get("/lessons", {
-        params: { type: "practice_speaking", ...params },
+        params: { type: "speaking_practice", ...params },
       });
 
       if (res.status === 200) {
